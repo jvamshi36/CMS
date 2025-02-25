@@ -1,0 +1,78 @@
+/* src/styles/Sidebar.css */
+.sidebar {
+  width: 200px;
+  height: 93vh;
+  background-color: #ffffff;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  color: #000;
+  margin-bottom: 30px;
+}
+
+.logo span {
+  color: #2563EB;
+}
+
+nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  font-size: 16px;
+  color: #000;
+  text-decoration: none;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  transition: background 0.3s ease-in-out;
+}
+
+.nav-item svg {
+  margin-right: 10px;
+  font-size: 20px;
+}
+
+
+
+.nav-item.active {
+  background-color: #2563EB;
+  color: #ffffff;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+}
+
+.company-section {
+    margin-top: 10px;
+  }
+  
+  .sub-nav {
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .sub-nav-item {
+    padding: 8px;
+    text-decoration: none;
+    color: #fff;
+    transition: 0.3s;
+  }
+  
+  .sub-nav-item:hover {
+    color: #007bff;
+  }

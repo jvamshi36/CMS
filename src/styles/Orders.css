@@ -1,0 +1,52 @@
+.page-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  .styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+  }
+  .styled-table th, .styled-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  .status {
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: #ffffff;
+  }
+  .status.completed {
+    background: #28a745;
+  }
+  .status.processing {
+    background: #ffc107;
+  }
+  .status.rejected {
+    background: #dc3545;
+  }
+  .view-orders {
+    color: #007bff;
+    text-decoration: none;
+  }
+  .view-orders:hover {
+    text-decoration: underline;
+  }
+.orders-header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 20px; 
+  }
+.add-order-button {
+    background-color: #2563EB;
+    color: white;
+    border: none; 
+    padding: 10px 20px; 
+    border-radius: 5px; 
+    cursor: pointer;
+  }
