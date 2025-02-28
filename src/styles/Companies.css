@@ -1,11 +1,98 @@
-.page-title { font-size: 24px; font-weight: bold; margin-bottom: 20px; }
-.styled-table { width: 100%; border-collapse: collapse; background: #ffffff; border-radius: 10px; box-shadow: 0px 2px 5px rgba(0,0,0,0.1); }
-.styled-table th, .styled-table td { padding: 15px; text-align: left; border-bottom: 1px solid #ddd; }
-.status { padding: 8px 12px; border-radius: 8px; color: #ffffff; }
-.status.completed { background: #28a745; }
-.status.processing { background: #ffc107; }
-.status.rejected { background: #dc3545; }
-.view-orders { color: #007bff; text-decoration: none; }
-.view-orders:hover { text-decoration: underline; }
-.companies-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.add-company-button { background-color: #2563EB; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+/* Companies page styles */
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.companies-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.add-company-button {
+  background-color: #2563EB;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.add-company-button:hover {
+  background-color: #1d4ed8;
+}
+
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.styled-table th,
+.styled-table td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.styled-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+.status {
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  display: inline-block;
+  white-space: nowrap; /* Prevent text wrapping */
+  min-width: 80px; /* Set a minimum width for the status box */
+  text-align: center; /* Center the text */
+}
+
+.status.completed {
+  background: #28a745;
+}
+
+.status.processing {
+  background: #ffc107;
+  color: #000;
+}
+
+.status.rejected {
+  background: #dc3545;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination button:hover {
+  background-color: #f8f9fa;
+}
+
+.pagination button.active {
+  background-color: #2563EB;
+  color: white;
+  border-color: #2563EB;
+}

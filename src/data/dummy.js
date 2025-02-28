@@ -13,16 +13,26 @@ export const companies = [
   ];
   
   export const orders = [
-    { id: "00001", item: "Electric", address: "089 Kutch Green Apt.", date: "04 Sep 2019", type: "Electronics", status: "Completed" },
+    { id: "00001", item: "Electric", address: "089 Kutch Green Apt.", date: "04 Sep 2019", type: "Electronics", status: "completed" },
     { id: "00002", item: "Book", address: "979 Immanuel Ferry Suite", date: "28 May 2019", type: "Stationary", status: "Processing" },
-    { id: "00003", item: "Electric", address: "089 Kutch Green Apt.", date: "04 Sep 2019", type: "Electronics", status: "Rejected" },
-    { id: "00004", item: "Book", address: "979 Immanuel Ferry Suite", date: "28 May 2019", type: "Stationary", status: "Processing" },
+    { id: "00003", item: "Electric", address: "089 Kutch Green Apt.", date: "04 Sep 2019", type: "Electronics", status: "completed" },
+    { id: "00004", item: "Book", address: "979 Immanuel Ferry Suite", date: "28 May 2019", type: "Stationary", status: "processing" },
     { id: "00005", item: "Electric", address: "089 Kutch Green Apt.", date: "04 Sep 2019", type: "Electronics", status: "Completed" },
     { id: "00006", item: "Book", address: "979 Immanuel Ferry Suite", date: "28 May 2019", type: "Stationary", status: "Rejected" },
     { id: "00007", item: "Electric", address: "089 Kutch Green Apt.", date: "04 Sep 2019", type: "Electronics", status: "Completed" },
     { id: "00008", item: "Book", address: "979 Immanuel Ferry Suite", date: "28 May 2019", type: "Stationary", status: "Processing" },
     { id: "00009", item: "Electric", address: "089 Kutch Green Apt.", date: "04 Sep 2019", type: "Electronics", status: "Completed" },
     { id: "000010", item: "Book", address: "979 Immanuel Ferry Suite", date: "28 May 2019", type: "Stationary", status: "Rejected" },
+    { id: "000011", item: "Electric", address: "089 Kutch Green Apt.", date: "04 Sep 2019", type: "Electronics", status: "Completed" },
+    { id: "000012", item: "Book", address: "979 Immanuel Ferry Suite", date: "28 May 2019", type: "Stationary", status: "Processing" },
+    { id: "000013", item: "Electric", address: "089 Kutch Green Apt.", date: "04 Sep 2019", type: "Electronics", status: "Rejected" },
+    { id: "000014", item: "Book", address: "979 Immanuel Ferry Suite", date: "28 May 2019", type: "Stationary", status: "Processing" },
+    { id: "000015", item: "Electric", address: "089 Kutch Green Apt.", date: "04 Sep 2019", type: "Electronics", status: "Completed" },
+    { id: "000016", item: "Book", address: "979 Immanuel Ferry Suite", date: "28 May 2019", type: "Stationary", status: "Rejected" },
+    { id: "000017", item: "Electric", address: "089 Kutch Green Apt.", date: "04 Sep 2019", type: "Electronics", status: "Completed" },
+    { id: "000018", item: "Book", address: "979 Immanuel Ferry Suite", date: "28 May 2019", type: "Stationary", status: "Processing" },
+    { id: "000019", item: "Electric", address: "089 Kutch Green Apt.", date: "04 Sep 2019", type: "Electronics", status: "Completed" },
+    { id: "000020", item: "Book", address: "979 Immanuel Ferry Suite", date: "28 May 2019", type: "Stationary", status: "Rejected" }
   ];
 
   export const teamMembers = [

@@ -1,0 +1,73 @@
+/* src/styles/LoginPage.css */
+.login-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #F8FAFC;
+    font-family: 'Mulish', sans-serif;
+}
+
+.login-image-container {
+    flex: 0.40;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f9ff;
+}
+
+.login-image {
+    width: 75%;
+}
+
+.login-form-container {
+    flex: 0.60;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 32px;
+    font-family: 'Mulish', sans-serif;
+}
+
+.login-welcome-text {
+    color: #6B7280;
+}
+
+.login-title {
+    font-weight: bold;
+    margin-top: 8px;
+    color: #333333;
+}
+
+.login-form {
+    width: 100%;
+    max-width: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the form elements */
+}
+
+.email-validated-icon {
+    color: green;
+}
+
+.login-error-text {
+    color: red;
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+.login-button {
+    margin-top: 16px;
+    font-weight: bold;
+    background-color: #2563EB !important;
+    height: 48px;
+    font-family: 'Mulish', sans-serif;
+    width: 100%; /* Make the button full width */
+}
+
+.forgot-password-button {
+    margin-top: 16px;
+    color: #2563EB !important;
+    text-transform: none;
+    font-family: 'Mulish', sans-serif;
+}

@@ -1,7 +1,8 @@
 /* src/styles/Sidebar.css */
 .sidebar {
   width: 200px;
-  height: 93vh;
+  min-height: 100vh;
+  height: auto;
   background-color: #ffffff;
   padding: 20px;
   display: flex;

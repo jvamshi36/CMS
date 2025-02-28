@@ -1,3 +1,18 @@
-.layout { display: flex; height: 100vh; }
-.main-content { flex: 1; display: flex; flex-direction: column; background: #f5f6fa; }
-.page-content { padding: 20px; }
+.layout {
+  display: flex;
+  min-height: 100vh;
+  height: auto;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f5f6fa;
+  min-height: 100vh;
+}
+
+.page-content {
+  padding: 20px;
+  flex: 1;
+}
