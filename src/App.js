@@ -17,7 +17,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Login/>}/>
         <Route path="/*" element={<ProtectedRoute/>}/>
-        <Route path="/dashboard" element={<Dashboard/>}/> {/* Changed from "/" to "/dashboard" */}
+        <Route path="/dashboard" element={<Dashboard/>}/>
         <Route path="/new-org" element={<NeworgForm/>}/>
         <Route path="/new-order" element={<NewOrder/>}/>
         <Route path="/companies" element={<Companies/>}/>

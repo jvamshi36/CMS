@@ -16,7 +16,7 @@ const Sidebar = () => {
       </nav>
       <div className="sidebar-bottom">
         <NavLink to="/settings" className="nav-item"><FiSettings /> Settings</NavLink>
-        <NavLink to="/login" className="nav-item"><AiOutlinePoweroff /> Logout</NavLink>
+        <NavLink to="/" className="nav-item"><AiOutlinePoweroff /> Logout</NavLink>
       </div>
     </div>
   );
