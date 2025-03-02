@@ -1,12 +1,31 @@
+/* src/styles/OrgDetails.css */
 .details-container {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
-  }
-  
-  .page-title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
+  padding: 20px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.section-title {
+  font-weight: bold;
+  margin: 20px 0;
+  color: #2563EB
+}
+
+.details-card {
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  background: #fff;
+}
+
+.label {
+  font-size: 14px;
+  color: #6b7280; /* Gray */
+  text-transform: capitalize;
+}
+
+.value {
+  font-weight: bold;
+  color: #374151; /* Dark Gray */
+}

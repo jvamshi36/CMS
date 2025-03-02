@@ -20,7 +20,7 @@ const LoginPage = () => {
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:8081/api/auth/login", { username, password });
+      const response = await axios.post("https://localhost:8081/api/auth/login", { username, password });
       login(response.data.token);
       navigate("/dashboard");
     } catch (error) {
