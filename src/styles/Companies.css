@@ -64,7 +64,7 @@
 
 .status.processing {
   background: #ffc107;
-  color: #000;
+
 }
 
 .status.rejected {
@@ -95,4 +95,12 @@
   background-color: #2563EB;
   color: white;
   border-color: #2563EB;
+}
+.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.sortable:hover {
+    color: #2563EB;
 }
