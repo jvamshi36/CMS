@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
       if (!token) return;
 
       try {
-        await axios.get('http://localhost:8081/api/auth/verify', {
+        await axios.get('https://localhost:8081/api/auth/verify', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser({ token });

@@ -33,8 +33,11 @@ const Orders = () => {
                 <tbody>
                     {currentOrders.map((order) => (
                         <tr key={order.id}>
-                            <td>{order.id}</td><td>{order.item}</td><td>{order.address}</td>
-                            <td>{order.date}</td><td>{order.type}</td>
+                            <td>{order.id}</td>
+                            <td>{order.item}</td>
+                            <td>{order.address}</td>
+                            <td>{order.date}</td>
+                            <td>{order.type}</td>
                             <td><span className={`status ${order.status.toLowerCase()}`}>{order.status}</span></td>
                             <td><NavLink to={`/companies/${companyId}/orders/${order.id}/order-details`}>View Details</NavLink></td>
                         </tr>

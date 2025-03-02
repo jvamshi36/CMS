@@ -115,7 +115,7 @@ const Companies = () => {
                                     <td>{`${company.addressLine1}, ${company.city}, ${company.zip}`}</td>
                                     <td>{formatDate(company.createdAt)}</td>
                                     <td>{company.gstNumber || "N/A"}</td>
-                                    <td><span className={`status ${company.status.toLowerCase()}`}>{company.status}</span></td>
+                                    <td><span className={`status ${company.status}`}>{company.status}</span></td>
                                     <td><NavLink to={`/companies/${company.id}/org-details`}>Details</NavLink></td>
                                     <td><NavLink to={`/companies/${company.id}/orders`}>Orders</NavLink></td>
                                 </tr>
