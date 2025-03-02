@@ -10,6 +10,7 @@ import Login from "./components/Login/LoginPage";
 import Team from "./pages/Team";
 import NewOrder from "./pages/NewOrder";
 import Dashboard from "./pages/Dashboard";
+import OrderDetails from "./pages/OrderDetails";
 
 function App() {
   return (
@@ -17,12 +18,13 @@ function App() {
       <Routes>
         <Route path="/" element={<Login/>}/>
         <Route path="/*" element={<ProtectedRoute/>}/>
-        <Route path="/dashboard" element={<Dashboard/>}/> {/* Changed from "/" to "/dashboard" */}
+        <Route path="/dashboard" element={<Dashboard/>}/>
         <Route path="/new-org" element={<NeworgForm/>}/>
         <Route path="/new-order" element={<NewOrder/>}/>
         <Route path="/companies" element={<Companies/>}/>
-        <Route path="/companies/:id/details" element={<Details/>}/> {/* Changed from companyId to id to match Details component */}
+        <Route path="/companies/:companyId/org-details" element={<Details/>}/>
         <Route path="/companies/:companyId/orders" element={<Orders/>}/>
+        <Route path ="/companies/:companyId/orders/:orderId/order-details" element={<OrderDetails/>}/>
         <Route path="/team" element={<Team/>}/>
       </Routes>
     </AuthProvider>

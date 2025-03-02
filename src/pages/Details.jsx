@@ -1,31 +1,71 @@
+// src/pages/OrgDetails.jsx
 import React from "react";
+import { Box, Card, CardContent, Typography, Grid } from "@mui/material";
+import "../styles/Details.css";
 import Layout from "../components/Layout/Layout";
-import { useParams } from "react-router-dom";
-import { companies } from "../data/dummy";
 
-const Details = () => {
-  const { id } = useParams();
-  const company = companies.find((company) => company.id === id);
+const OrganizationDetails = {
+  "Organization Name": "Suraksha Pharma",
+  "Constitution": "Proprietory",
+  "Address": "KPHB",
+  "City": "Hyderabad",
+  "Zip": "506001",
+  "GST No.": "GSTIN0001",
+  "PAN No.": "KKUPVER1453",
+  "Drug License No. 1": "DF3457DF5467",
+  "Drug License No. 2": "HJG457689DFG",
+  "Status": "Processing",
+};
 
-  if (!company) {
-    return (
-      <Layout>
-        <h2>Company not found</h2>
-      </Layout>
-    );
-  }
+const RepresentativeDetails = {
+  "Representative FirstName": "Aryan",
+  "Representative LastName": "G",
+  "Representative Email": "sample@gmail.com",
+  "Representative Number": "123456789",
+  "Web Username": "admin1",
+  "Web Password": "admin",
+};
 
+const OrgDetails = () => {
   return (
     <Layout>
-      <div className="details-container">
-        <h2 className="page-title">{company.name} - Details</h2>
-        <p><strong>Address:</strong> {company.address}</p>
-        <p><strong>Date Registered:</strong> {company.date}</p>
-        <p><strong>GST Number:</strong> {company.gst}</p>
-        <p><strong>Status:</strong> {company.status}</p>
-      </div>
+      <Box className="details-container">
+        {/* Organization Details */}
+        <Typography variant="h6" className="section-title">
+          Organization Details
+        </Typography>
+        <Card className="details-card">
+          <CardContent>
+            <Grid container spacing={3}>
+              {Object.entries(OrganizationDetails).map(([key, value]) => (
+                <Grid item xs={12} sm={4} key={key}>
+                  <Typography variant="body2" className="label">{key}</Typography>
+                  <Typography variant="h6" className="value">{value}</Typography>
+                </Grid>
+              ))}
+            </Grid>
+          </CardContent>
+        </Card>
+
+        {/* Representative Details */}
+        <Typography variant="h6" className="section-title">
+          Representative Details
+        </Typography>
+        <Card className="details-card">
+          <CardContent>
+            <Grid container spacing={3}>
+              {Object.entries(RepresentativeDetails).map(([key, value]) => (
+                <Grid item xs={12} sm={4} key={key}>
+                  <Typography variant="body2" className="label">{key}</Typography>
+                  <Typography variant="h6" className="value">{value}</Typography>
+                </Grid>
+              ))}
+            </Grid>
+          </CardContent>
+        </Card>
+      </Box>
     </Layout>
   );
 };
 
-export default Details;
+export default OrgDetails;

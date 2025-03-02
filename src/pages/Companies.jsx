@@ -26,7 +26,7 @@ const Companies = () => {
             <table className="styled-table">
                 <thead>
                     <tr>
-                        <th>ID</th><th>Name</th><th>Address</th><th>Date</th><th>GST No.</th><th>Status</th><th>Orders</th>
+                        <th>ID</th><th>Name</th><th>Address</th><th>Date</th><th>GST No.</th><th>Status</th><th>Details</th><th>Orders</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -34,7 +34,8 @@ const Companies = () => {
                         <tr key={company.id}>
                             <td>{company.id}</td><td>{company.name}</td><td>{company.address}</td>
                             <td>{company.date}</td><td>{company.gst}</td><td><span className={`status ${company.status.toLowerCase()}`}>{company.status}</span></td>
-                            <td><NavLink to={`/companies/${company.id}/orders`}>View Orders</NavLink></td>
+                            <td><NavLink to={`/companies/${company.id}/org-details`}>Details</NavLink></td>
+                            <td><NavLink to={`/companies/${company.id}/orders`}>Orders</NavLink></td>
                         </tr>
                     ))}
                 </tbody>

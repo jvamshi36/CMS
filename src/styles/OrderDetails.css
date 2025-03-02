@@ -1,0 +1,77 @@
+/* src/styles/Details.css */
+
+/* Main Container */
+.details-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+/* Section Title */
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+    border-left: 5px solid #ff6600;
+    padding-left: 10px;
+}
+
+/* Card Styling */
+.details-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* Labels */
+.label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #666;
+}
+
+/* Values */
+.value {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Status Styling */
+.value.shipped {
+    color: #22c55e;
+}
+
+.value.pending {
+    color: #facc15;
+}
+
+.value.cancelled {
+    color: #ef4444;
+}
+
+.value.delivered {
+    color: #2563eb;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .details-container {
+        padding: 15px;
+    }
+
+    .section-title {
+        font-size: 1.3rem;
+    }
+
+    .label {
+        font-size: 0.85rem;
+    }
+
+    .value {
+        font-size: 1rem;
+    }
+}
