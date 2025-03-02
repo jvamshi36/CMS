@@ -32,10 +32,7 @@ const Dashboard = () => {
   return (
     <Layout>
       <div className="dashboard-container">
-        <Typography variant="h5" className="dashboard-title">
-          Dashboard
-        </Typography>
-
+          <h2 className="dashboard-title">Dashboard</h2>
         <Grid container spacing={2}>
           {stats.map((stat, index) => (
             <Grid item xs={12} sm={6} md={3} key={index}>
