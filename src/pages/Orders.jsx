@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import Layout from "../components/Layout/Layout";
 import "../styles/Orders.css";
 import { orders } from "../data/dummy";
-import { useNavigate, NavLink } from "react-router-dom";
+import { useNavigate, NavLink, useParams } from "react-router-dom";
 
 const Orders = () => {
     const navigate = useNavigate();
+    const { companyId } = useParams();
     const [currentPage, setCurrentPage] = useState(1);
     const ordersPerPage = 9;
 
@@ -35,7 +36,7 @@ const Orders = () => {
                             <td>{order.id}</td><td>{order.item}</td><td>{order.address}</td>
                             <td>{order.date}</td><td>{order.type}</td>
                             <td><span className={`status ${order.status.toLowerCase()}`}>{order.status}</span></td>
-                            <td><NavLink to={`/orders/${order.id}`}>View Details</NavLink></td>
+                            <td><NavLink to={`/companies/${companyId}/orders/${order.id}/order-details`}>View Details</NavLink></td>
                         </tr>
                     ))}
                 </tbody>
@@ -54,4 +55,5 @@ const Orders = () => {
         </Layout>
     );
 };
+
 export default Orders;
