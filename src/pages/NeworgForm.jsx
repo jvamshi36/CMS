@@ -16,6 +16,7 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import CheckIcon from "@mui/icons-material/Check";
 import Layout from "../components/Layout/Layout"; // Adjust the path as necessary
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const steps = [
   "Organization Details",
@@ -48,9 +49,23 @@ const NeworgForm = () => {
   });
 
   const [errors, setErrors] = useState({}); // For displaying validation errors
+  const navigate = useNavigate(); // Initialize useNavigate
 
-  const handleNext = () => {
+  const validateStep = () => {
     let newErrors = {};
+    const requiredFields = {
+      0: ["organizationName", "constitution", "addressLine1", "city", "zip"],
+      1: ["gstNumber", "panNumber", "drugLicense1", "drugLicense2"],
+      2: ["representativeFirstName", "representativeLastName", "representativeEmail", "representativeAadhar", "representativeNumber"],
+      3: ["websiteUsername", "confirmWebsiteUsername", "websitePassword", "confirmWebsitePassword"],
+    };
+
+    requiredFields[activeStep].forEach((field) => {
+      if (!formData[field]) {
+        newErrors[field] = "This field is required";
+      }
+    });
+
     if (activeStep === 3) {
       if (formData.websiteUsername !== formData.confirmWebsiteUsername) {
         newErrors.websiteUsername = "Usernames do not match";
@@ -59,8 +74,13 @@ const NeworgForm = () => {
         newErrors.websitePassword = "Passwords do not match";
       }
     }
+
     setErrors(newErrors);
-    if (Object.keys(newErrors).length === 0) {
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNext = () => {
+    if (validateStep()) {
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
     }
   };
@@ -71,47 +91,53 @@ const NeworgForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Clear error for the field being edited
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+
+    // Enforce numeric input for specific fields
+    const numericFields = ["zip", "representativeNumber", "representativeAadhar"];
+    if (numericFields.includes(name) && !/^\d*$/.test(value)) {
+      return; // Do not update state if non-numeric input is detected
+    }
+
     setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-try {
-    // Get the JWT token or session token from storage
-    const token = localStorage.getItem('token'); // or from wherever you store it
+    if (!validateStep()) return; // Ensure final step is validated
 
-    const response = await axios.post(
-      "https://localhost:8081/api/new-org/submit",
-      formData,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`, // JWT format
-          'Content-Type': 'application/json'
-        },
-        withCredentials: true // Include cookies if using session-based auth
-      }
-    );
-    console.log("Organization created:", response.data);
-    // Handle success
-  } catch (error) {
-    console.error("Error submitting form:", error);
-
-    if (error.response) {
-      if (error.response.status === 401) {
-        // Handle unauthorized - redirect to login or show login message
-        alert("You need to log in to submit this form");
-        // Possibly redirect: navigate('/login');
-      } else if (error.response.status === 400 && error.response.data) {
-        // Handle validation errors
-        setErrors(error.response.data);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        "https://localhost:8081/api/new-org/submit",
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true
+        }
+      );
+      console.log("Organization created:", response.data);
+      navigate('/companies'); // Navigate to /companies after successful submission
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      if (error.response) {
+        if (error.response.status === 401) {
+          alert("You need to log in to submit this form");
+        } else if (error.response.status === 400 && error.response.data) {
+          setErrors(error.response.data);
+        } else {
+          alert(`Server error: ${error.response.status}`);
+        }
       } else {
-        alert(`Server error: ${error.response.status}`);
+        alert("Error connecting to server");
       }
-    } else {
-      alert("Error connecting to server");
     }
-  }
-};
+  };
 
   return (
     <Layout>
@@ -395,7 +421,6 @@ try {
                     <TextField
                       label="Website Username"
                       name="websiteUsername"
-                      type="email"
                       value={formData.websiteUsername}
                       onChange={handleChange}
                       fullWidth
@@ -407,13 +432,12 @@ try {
                   <Grid item xs={12}>
                     <TextField
                       label="Confirm Website Username"
-                      name="confirmWebsiteUsername" // Corrected name
-                      type="email"
+                      name="confirmWebsiteUsername"
                       value={formData.confirmWebsiteUsername}
                       onChange={handleChange}
                       fullWidth
                       required
-                      error={!!errors.websiteUsername} // Errors should apply if both are incorrect
+                      error={!!errors.websiteUsername}
                       helperText={errors.websiteUsername}
                     />
                   </Grid>
@@ -433,13 +457,13 @@ try {
                   <Grid item xs={12}>
                     <TextField
                       label="Confirm Website Password"
-                      name="confirmWebsitePassword" // Corrected name
+                      name="confirmWebsitePassword"
                       type="password"
                       value={formData.confirmWebsitePassword}
                       onChange={handleChange}
                       fullWidth
                       required
-                      error={!!errors.websitePassword} // Errors should apply if both are incorrect
+                      error={!!errors.websitePassword}
                       helperText={errors.websitePassword}
                     />
                   </Grid>
@@ -448,7 +472,6 @@ try {
                   <Button variant="outlined" onClick={handleBack}>
                     Back
                   </Button>
-                  {/* Add final submission logic here */}
                   <Button type="submit" variant="contained" sx={{ backgroundColor: "#2563EB" }}>
                     Submit
                   </Button>

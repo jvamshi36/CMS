@@ -1,6 +1,5 @@
-// Dashboard.jsx
 import React from "react";
-import { Grid, Typography, Card } from "@mui/material";
+import { Grid, Typography, Card, Box } from "@mui/material";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp, ShoppingCart, BarChart, Clock } from "lucide-react";
 import "../styles/Dashboard.css";
@@ -32,22 +31,34 @@ const Dashboard = () => {
   return (
     <Layout>
       <div className="dashboard-container">
-          <h2 className="dashboard-title">Dashboard</h2>
-        <Grid container spacing={2}>
-          {stats.map((stat, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
-              <Card className="dashboard-card">
-                <div className="dashboard-icon" style={{ color: stat.color }}>{stat.icon}</div>
-                <div>
-                  <Typography variant="h6" className="dashboard-value">{stat.value}</Typography>
-                  <Typography variant="body2" className="dashboard-text">{stat.title}</Typography>
-                  <Typography variant="caption" className="dashboard-trend">{stat.trend}</Typography>
-                </div>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+        <Typography variant="h4" className="dashboard-title">
+          Dashboard
+        </Typography>
 
+        <div className="dashboard-stats-container">
+          <Grid container spacing={3}>
+            {stats.map((stat) => (
+              <Grid item xs={12} sm={6} md={3} key={stat.title}>
+                <div className="dashboard-stats-item">
+                  <Box>
+                    <Typography variant="h6" className="dashboard-value">
+                      {stat.value}
+                    </Typography>
+                    <Typography variant="body2" className="dashboard-text">
+                      {stat.title}
+                    </Typography>
+                    <Typography variant="body2" className="dashboard-trend">
+                      {stat.trend}
+                    </Typography>
+                  </Box>
+                  <Box className="dashboard-icon" style={{ backgroundColor: stat.color }}>
+                    {stat.icon}
+                  </Box>
+                </div>
+              </Grid>
+            ))}
+          </Grid>
+        </div>
         <div className="dashboard-chart-container">
           <Typography variant="h6" className="chart-title">
             Sales Details
