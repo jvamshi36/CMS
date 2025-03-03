@@ -14,14 +14,15 @@ import AddIcon from "@mui/icons-material/Add";
 import CheckIcon from "@mui/icons-material/Check";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Layout from "../components/Layout/Layout";
-import { useNavigate, NavLink, useParams } from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
+import "../styles/NewOrder.css";
 
 const NewOrder = () => {
   const [products, setProducts] = useState([
     { name: "Product 1", formData: { brand: "", type: "", composition: "", quantity: "", price: "" } },
   ]);
   const [activeStep, setActiveStep] = useState(0);
+  const [errors, setErrors] = useState({});
 
   const handleNext = () => {
     setActiveStep((prev) => Math.min(prev + 1, products.length - 1));
@@ -66,59 +67,167 @@ const NewOrder = () => {
 
   return (
     <Layout>
-      <Stepper activeStep={activeStep} alternativeLabel>
-        {products.map((product, index) => (
-          <Step key={product.name} completed={activeStep > index}>
-            <StepLabel StepIconComponent={() =>
-              activeStep > index ? <CheckIcon sx={{ color: "green" }} /> :
-              activeStep === index ? <Typography sx={{ fontWeight: "bold", color: "#2563EB" }}>{index + 1}</Typography> :
-              <Typography>{index + 1}</Typography>
-            }>
-              {product.name}
-              <Button variant="text" onClick={() => handleDeleteProduct(index)} sx={{ ml: 2 }}>
-                <DeleteIcon />
+      <div className="order-container">
+      <Typography
+          variant="h4"
+          className="form-title"
+          sx={{
+            textAlign: "center",
+            mb: 4,
+            background: "linear-gradient(45deg, #2563EB, #1d4ed8)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            fontWeight: "bold",
+          }}
+        >
+          Create New Order
+        </Typography>
+
+        <div className="stepper-wrapper">
+          <Stepper activeStep={activeStep} alternativeLabel>
+            {products.map((product, index) => (
+              <Step key={product.name} completed={activeStep > index}>
+                <StepLabel
+                  StepIconComponent={() =>
+                    activeStep > index ? (
+                      <div className="step-completed">
+                        <CheckIcon sx={{ color: "#10B981" }} />
+                      </div>
+                    ) : (
+                      <div className={`step-number ${activeStep === index ? 'active' : ''}`}>
+                        {index + 1}
+                      </div>
+                    )
+                  }
+                >
+                  {product.name}
+                  <Button
+                    className="delete-button"
+                    onClick={() => handleDeleteProduct(index)}
+                    sx={{ ml: 2 }}
+                  >
+                    <DeleteIcon />
+                  </Button>
+                </StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+        </div>
+
+        <div className="order-form-card">
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <TextField
+                label="Brand Name"
+                name="brand"
+                value={products[activeStep].formData.brand}
+                onChange={(e) => handleChange(activeStep, e)}
+                fullWidth
+                required
+                className="form-input"
+                error={!!errors.brand}
+                helperText={errors.brand}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                select
+                label="Type"
+                name="type"
+                value={products[activeStep].formData.type}
+                onChange={(e) => handleChange(activeStep, e)}
+                fullWidth
+                required
+                className="form-input"
+                error={!!errors.type}
+                helperText={errors.type}
+              >
+                <MenuItem value="Medicine">Medicine</MenuItem>
+                <MenuItem value="Supplement">Supplement</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Composition"
+                name="composition"
+                value={products[activeStep].formData.composition}
+                onChange={(e) => handleChange(activeStep, e)}
+                fullWidth
+                required
+                className="form-input"
+                error={!!errors.composition}
+                helperText={errors.composition}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Quantity"
+                name="quantity"
+                value={products[activeStep].formData.quantity}
+                onChange={(e) => handleChange(activeStep, e)}
+                fullWidth
+                required
+                className="form-input"
+                error={!!errors.quantity}
+                helperText={errors.quantity}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Price per Quantity"
+                name="price"
+                value={products[activeStep].formData.price}
+                onChange={(e) => handleChange(activeStep, e)}
+                fullWidth
+                required
+                className="form-input"
+                error={!!errors.price}
+                helperText={errors.price}
+              />
+            </Grid>
+          </Grid>
+
+          <Box sx={{ mt: 4, display: "flex", justifyContent: "space-between" }}>
+            <Button
+              variant="outlined"
+              onClick={handleBack}
+              disabled={activeStep === 0}
+              className="action-button"
+            >
+              ← Back
+            </Button>
+            {activeStep === products.length - 1 ? (
+              <Button
+                variant="contained"
+                onClick={handleSubmit}
+                className="action-button submit-button"
+              >
+                Submit Order
               </Button>
-            </StepLabel>
-          </Step>
-        ))}
-      </Stepper>
+            ) : (
+              <Button
+                variant="contained"
+                onClick={handleNext}
+                className="action-button next-button"
+                disabled={activeStep === products.length - 1}
+              >
+                Continue →
+              </Button>
+            )}
+          </Box>
 
-      <Typography variant="h6" sx={{ mb: 2 }}></Typography>
-      <Grid container spacing={2} sx={{ maxWidth: 600, mx: 'auto' }}>
-        <Grid item xs={12}>
-          <TextField label="Brand Name" name="brand" value={products[activeStep].formData.brand} onChange={(e) => handleChange(activeStep, e)} fullWidth required />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField label="Type" name="type" value={products[activeStep].formData.type} onChange={(e) => handleChange(activeStep, e)} select fullWidth required>
-            <MenuItem value="Medicine">Medicine</MenuItem>
-            <MenuItem value="Supplement">Supplement</MenuItem>
-          </TextField>
-        </Grid>
-        <Grid item xs={12}>
-          <TextField label="Composition" name="composition" value={products[activeStep].formData.composition} onChange={(e) => handleChange(activeStep, e)} fullWidth required />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField label="Quantity" name="quantity" value={products[activeStep].formData.quantity} onChange={(e) => handleChange(activeStep, e)} fullWidth required />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField label="Price per Quantity" name="price" value={products[activeStep].formData.price} onChange={(e) => handleChange(activeStep, e)} fullWidth required />
-        </Grid>
-      </Grid>
-
-      <Box sx={{ mt: 3, display: "flex", justifyContent: "space-between", maxWidth: 600, mx: 'auto' }}>
-        <Button variant="outlined" onClick={handleBack} disabled={activeStep === 0}>Back</Button>
-        {activeStep === products.length - 1 ? (
-          <Button variant="contained" onClick={handleSubmit} sx={{ backgroundColor: "#FF5722" }}>Submit</Button>
-        ) : (
-          <Button variant="contained" onClick={handleNext} sx={{ backgroundColor: "#2563EB" }} disabled={activeStep === products.length - 1}>Next</Button>
-        )}
-      </Box>
-
-      <Box sx={{ mt: 3, textAlign: "center", maxWidth: 600, mx: 'auto' }}>
-        <Button variant="contained" onClick={handleAddProduct} startIcon={<AddIcon />} sx={{ backgroundColor: "#4CAF50" }}>
-          Add Product
-        </Button>
-      </Box>
+          <Box sx={{ mt: 4, textAlign: "center" }}>
+            <Button
+              variant="contained"
+              onClick={handleAddProduct}
+              startIcon={<AddIcon />}
+              className="action-button add-product-button"
+            >
+              Add Product
+            </Button>
+          </Box>
+        </div>
+      </div>
     </Layout>
   );
 };

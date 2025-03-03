@@ -36,9 +36,7 @@ const LoginPage = () => {
       </Box>
 
       <Box className="login-form-container">
-        <Typography variant="subtitle1" className="login-welcome-text">
-          Hi Suraksha Pharma, Welcome back!! 👋
-        </Typography>
+        <Typography variant="subtitle1" className="login-welcome-text">Welcome back to Suraksha Pharma!! 👋</Typography>
         <Typography variant="h5" className="login-title">
           Login to your account
         </Typography>

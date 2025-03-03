@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./Header.css";
-import userAvatar from "../../components/assets/images/img.jpg";
+import userAvatar from "../../components/assets/images/1.png";
 import { FaUser, FaLock, FaSignOutAlt } from 'react-icons/fa';
 
 const Header = () => {
