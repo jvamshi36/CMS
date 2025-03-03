@@ -1,79 +1,160 @@
 /* src/styles/Sidebar.css */
 .sidebar {
-  width: 200px;
+  width: 240px;
   min-height: 100vh;
   height: auto;
-  background-color: #ffffff;
-  padding: 20px;
+  background: linear-gradient(180deg, #5138CE 0%, #4530B8 100%);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+  color: white;
+  font-family: 'Inter', sans-serif;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 10px;
 }
 
 .logo {
   font-size: 22px;
-  font-weight: bold;
-  color: #000;
-  margin-bottom: 30px;
+  font-weight: 600;
+  color: white;
+  margin-left: 10px;
 }
 
 .logo span {
-  color: #2563EB;
+  opacity: 0.6;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+}
+
+.user-avatar {
+  min-width: 36px;
+  height: 36px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+}
+
+.user-info {
+  overflow: hidden;
+}
+
+.user-name {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-email {
+  font-size: 12px;
+  opacity: 0.6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 nav {
   display: flex;
   flex-direction: column;
+  padding: 0 10px;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  padding: 12px;
-  font-size: 16px;
-  color: #000;
+  padding: 12px 10px;
+  font-size: 14px;
+  color: white;
   text-decoration: none;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  transition: background 0.3s ease-in-out;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  transition: background 0.2s ease-in-out;
+  position: relative;
 }
 
 .nav-item svg {
-  margin-right: 10px;
+  margin-right: 12px;
   font-size: 20px;
+  opacity: 0.8;
 }
 
-
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
 
 .nav-item.active {
-  background-color: #2563EB;
-  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.notification-badge {
+  background-color: #ff4a4a;
+  color: white;
+  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  margin-left: auto;
+  padding: 0 4px;
 }
 
 .sidebar-bottom {
   margin-top: auto;
-  padding-top: 20px;
-  border-top: 1px solid #ddd;
+  padding: 10px;
+  /* Removing the border-top to match the design */
+}
+
+/* Bottom nav items should have the same styling as regular nav items */
+.sidebar-bottom .nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 10px;
+  font-size: 14px;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  transition: background 0.2s ease-in-out;
 }
 
 .company-section {
-    margin-top: 10px;
-  }
-  
-  .sub-nav {
-    margin-left: 20px;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .sub-nav-item {
-    padding: 8px;
-    text-decoration: none;
-    color: #fff;
-    transition: 0.3s;
-  }
-  
-  .sub-nav-item:hover {
-    color: #007bff;
-  }
+  margin-top: 10px;
+}
+
+.sub-nav {
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sub-nav-item {
+  padding: 8px 10px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.8);
+  transition: 0.3s;
+  font-size: 13px;
+}
+
+.sub-nav-item:hover {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}

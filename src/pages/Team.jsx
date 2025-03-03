@@ -4,6 +4,7 @@ import "../styles/Team.css";
 import { teamMembers } from "../data/dummy";
 import { useNavigate } from "react-router-dom";
 import image1 from "../components/assets/images/img.jpg";
+import { motion } from "framer-motion";
 
 const Team = () => {
   const navigate = useNavigate();

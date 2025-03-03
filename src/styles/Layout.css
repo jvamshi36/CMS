@@ -8,11 +8,16 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: #f5f6fa;
+  background: transparent; /* Change this from #f5f6fa to transparent */
   min-height: 100vh;
+  /* Add the dotted grid background here */
+  background-color: f8f9fa;
+  background-image: radial-gradient(circle, #e0e0e0 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
 .page-content {
   padding: 20px;
   flex: 1;
+  margin-top: 80px;
 }

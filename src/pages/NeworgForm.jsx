@@ -17,6 +17,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import CheckIcon from "@mui/icons-material/Check";
 import Layout from "../components/Layout/Layout"; // Adjust the path as necessary
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import "../styles/NeworgForm.css";
 
 const steps = [
   "Organization Details",
@@ -139,34 +140,311 @@ const NeworgForm = () => {
     }
   };
 
+  const renderStepContent = (step) => {
+    switch (step) {
+      case 0:
+        return (
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <TextField
+                label="Organization Name"
+                name="organizationName"
+                value={formData.organizationName}
+                onChange={handleChange}
+                fullWidth
+                required
+                error={!!errors.organizationName}
+                helperText={errors.organizationName}
+                className="form-input"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                select
+                label="Constitution"
+                name="constitution"
+                value={formData.constitution}
+                onChange={handleChange}
+                fullWidth
+                required
+                error={!!errors.constitution}
+                helperText={errors.constitution}
+                className="form-input"
+              >
+                <MenuItem value="Private">Private</MenuItem>
+                <MenuItem value="Public">Public</MenuItem>
+                <MenuItem value="Non-Profit">Non-Profit</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Address Line 1"
+                name="addressLine1"
+                value={formData.addressLine1}
+                onChange={handleChange}
+                fullWidth
+                required
+                error={!!errors.addressLine1}
+                helperText={errors.addressLine1}
+                className="form-input"
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="City"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                fullWidth
+                required
+                error={!!errors.city}
+                helperText={errors.city}
+                className="form-input"
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Zip"
+                name="zip"
+                value={formData.zip}
+                onChange={handleChange}
+                fullWidth
+                required
+                error={!!errors.zip}
+                helperText={errors.zip}
+                className="form-input"
+              />
+            </Grid>
+          </Grid>
+        );
+
+      case 1:
+        return (
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <TextField
+                label="GST Number"
+                name="gstNumber"
+                value={formData.gstNumber}
+                onChange={handleChange}
+                fullWidth
+                required
+                error={!!errors.gstNumber}
+                helperText={errors.gstNumber}
+                className="form-input"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="PAN"
+                name="panNumber"
+                value={formData.panNumber}
+                onChange={handleChange}
+                fullWidth
+                required
+                error={!!errors.panNumber}
+                helperText={errors.panNumber}
+                className="form-input"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Drug License 1"
+                name="drugLicense1"
+                value={formData.drugLicense1}
+                onChange={handleChange}
+                fullWidth
+                required
+                error={!!errors.drugLicense1}
+                helperText={errors.drugLicense1}
+                className="form-input"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Drug License 2"
+                name="drugLicense2"
+                value={formData.drugLicense2}
+                onChange={handleChange}
+                fullWidth
+                required
+                error={!!errors.drugLicense2}
+                helperText={errors.drugLicense2}
+                className="form-input"
+              />
+            </Grid>
+          </Grid>
+        );
+
+      case 2:
+        return (
+          <Grid container spacing={3}>
+            <Grid item xs={6}>
+              <TextField
+                label="First Name"
+                name="representativeFirstName"
+                value={formData.representativeFirstName}
+                onChange={handleChange}
+                fullWidth
+                required
+                error={!!errors.representativeFirstName}
+                helperText={errors.representativeFirstName}
+                className="form-input"
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Last Name"
+                name="representativeLastName"
+                value={formData.representativeLastName}
+                onChange={handleChange}
+                fullWidth
+                required
+                error={!!errors.representativeLastName}
+                helperText={errors.representativeLastName}
+                className="form-input"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Email"
+                name="representativeEmail"
+                type="email"
+                value={formData.representativeEmail}
+                onChange={handleChange}
+                fullWidth
+                required
+                error={!!errors.representativeEmail}
+                helperText={errors.representativeEmail}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Phone Number"
+                name="representativeNumber"
+                type="tel"
+                value={formData.representativeNumber}
+                onChange={handleChange}
+                fullWidth
+                required
+                inputProps={{ pattern: "[0-9]*", maxLength: 10 }}
+                error={!!errors.representativeNumber}
+                helperText={errors.representativeNumber}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Aadhar Number"
+                name="representativeAadhar"
+                type="tel"
+                value={formData.representativeAadhar}
+                onChange={handleChange}
+                fullWidth
+                required
+                inputProps={{ pattern: "[0-9]*", maxLength: 12 }}
+                error={!!errors.representativeAadhar}
+                helperText={errors.representativeAadhar}
+              />
+            </Grid>
+          </Grid>
+        );
+
+      case 3:
+        return (
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <TextField
+                label="Website Username"
+                name="websiteUsername"
+                value={formData.websiteUsername}
+                onChange={handleChange}
+                fullWidth
+                required
+                error={!!errors.websiteUsername}
+                helperText={errors.websiteUsername}
+                className="form-input"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Confirm Website Username"
+                name="confirmWebsiteUsername"
+                value={formData.confirmWebsiteUsername}
+                onChange={handleChange}
+                fullWidth
+                required
+                error={!!errors.websiteUsername}
+                helperText={errors.websiteUsername}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Website Password"
+                name="websitePassword"
+                type="password"
+                value={formData.websitePassword}
+                onChange={handleChange}
+                fullWidth
+                required
+                error={!!errors.websitePassword}
+                helperText={errors.websitePassword}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Confirm Website Password"
+                name="confirmWebsitePassword"
+                type="password"
+                value={formData.confirmWebsitePassword}
+                onChange={handleChange}
+                fullWidth
+                required
+                error={!!errors.websitePassword}
+                helperText={errors.websitePassword}
+              />
+            </Grid>
+          </Grid>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   return (
     <Layout>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          p: 2,
-        }}
-      >
-        {/* Header */}
-        <Box sx={{ display: "flex", alignItems: "center", mb: 3, width: "75%" }}></Box>
+      <div className="form-container">
+        {/* Futuristic Title */}
+        <Typography
+          variant="h4"
+          className="form-title"
+          sx={{
+            textAlign: "center",
+            mb: 4,
+            background: "linear-gradient(45deg, #2563EB, #1d4ed8)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            fontWeight: "bold",
+          }}
+        >
+          Create New Organization
+        </Typography>
 
-        {/* Main Content */}
-        <Box sx={{ width: "75%", mb: 4, display: "flex", justifyContent: "center" }}>
-          <Stepper activeStep={activeStep} alternativeLabel sx={{ width: "100%" }}>
+        {/* Enhanced Stepper */}
+        <Box className="stepper-wrapper">
+          <Stepper activeStep={activeStep} alternativeLabel>
             {steps.map((label, index) => (
               <Step key={label} completed={activeStep > index}>
                 <StepLabel
                   StepIconComponent={() =>
                     activeStep > index ? (
-                      <CheckIcon sx={{ color: "green" }} />
-                    ) : activeStep === index ? (
-                      <Typography sx={{ color: "#2563EB", fontWeight: "bold" }}>
-                        {index + 1}
-                      </Typography>
+                      <div className="step-completed">
+                        <CheckIcon style={{ color: '#10B981' }} />
+                      </div>
                     ) : (
-                      <Typography>{index + 1}</Typography>
+                      <div className={`step-number ${activeStep === index ? 'active' : ''}`}>
+                        {index + 1}
+                      </div>
                     )
                   }
                 >
@@ -178,309 +456,26 @@ const NeworgForm = () => {
         </Box>
 
         {/* Form Content */}
-        <Box
-          sx={{
-            flexGrow: 1,
-            maxWidth: "500px",
-            display: "flex",
-            justifyContent: "center",
-            mx: "auto",
-          }}
-        >
-          <Box sx={{ width: "100%" }}>
-            {activeStep === 0 && (
-              <Box component="form" sx={{ mt: 3 }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Organization Name"
-                      name="organizationName"
-                      value={formData.organizationName}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      error={!!errors.organizationName}
-                      helperText={errors.organizationName}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Constitution"
-                      name="constitution"
-                      value={formData.constitution}
-                      onChange={handleChange}
-                      select
-                      fullWidth
-                      required
-                      error={!!errors.constitution}
-                      helperText={errors.constitution}
-                    >
-                      <MenuItem value="Private">Private</MenuItem>
-                      <MenuItem value="Public">Public</MenuItem>
-                      <MenuItem value="Non-Profit">Non-Profit</MenuItem>
-                    </TextField>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Address Line 1"
-                      name="addressLine1"
-                      value={formData.addressLine1}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      error={!!errors.addressLine1}
-                      helperText={errors.addressLine1}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      label="City"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      error={!!errors.city}
-                      helperText={errors.city}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      label="Zip"
-                      name="zip"
-                      value={formData.zip}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      error={!!errors.zip}
-                      helperText={errors.zip}
-                    />
-                  </Grid>
-                </Grid>
-                <Button
-                  variant="contained"
-                  onClick={handleNext}
-                  sx={{
-                    mt: 3,
-                    justifyContent: "flex-end",
-                    backgroundColor: "#2563EB",
-                  }}
-                >
-                  Continue →
+        <Box className="form-content">
+          <div className="form-card form-animation">
+            {renderStepContent(activeStep)}
+            <Box className="button-container" sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}>
+              {activeStep > 0 && (
+                <Button onClick={handleBack} className="back-button">
+                  ← Back
                 </Button>
-              </Box>
-            )}
-
-            {activeStep === 1 && (
-              <Box component="form" sx={{ mt: 3 }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="GST"
-                      name="gstNumber"
-                      value={formData.gstNumber}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      error={!!errors.gstNumber}
-                      helperText={errors.gstNumber}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="PAN"
-                      name="panNumber"
-                      value={formData.panNumber}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      error={!!errors.panNumber}
-                      helperText={errors.panNumber}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Drug License 1"
-                      name="drugLicense1"
-                      value={formData.drugLicense1}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      error={!!errors.drugLicense1}
-                      helperText={errors.drugLicense1}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Drug License 2"
-                      name="drugLicense2"
-                      value={formData.drugLicense2}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      error={!!errors.drugLicense2}
-                      helperText={errors.drugLicense2}
-                    />
-                  </Grid>
-                </Grid>
-                <Box sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}>
-                  <Button variant="outlined" onClick={handleBack}>
-                    Back
-                  </Button>
-                  <Button variant="contained" onClick={handleNext} sx={{ backgroundColor: "#2563EB" }}>
-                    Continue →
-                  </Button>
-                </Box>
-              </Box>
-            )}
-
-            {activeStep === 2 && (
-              <Box component="form" sx={{ mt: 3 }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <TextField
-                      label="First Name"
-                      name="representativeFirstName"
-                      value={formData.representativeFirstName}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      error={!!errors.representativeFirstName}
-                      helperText={errors.representativeFirstName}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      label="Last Name"
-                      name="representativeLastName"
-                      value={formData.representativeLastName}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      error={!!errors.representativeLastName}
-                      helperText={errors.representativeLastName}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Email"
-                      name="representativeEmail"
-                      type="email"
-                      value={formData.representativeEmail}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      error={!!errors.representativeEmail}
-                      helperText={errors.representativeEmail}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Phone Number"
-                      name="representativeNumber"
-                      type="tel"
-                      value={formData.representativeNumber}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      inputProps={{ pattern: "[0-9]*", maxLength: 10 }}
-                      error={!!errors.representativeNumber}
-                      helperText={errors.representativeNumber}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Aadhar Number"
-                      name="representativeAadhar"
-                      type="tel"
-                      value={formData.representativeAadhar}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      inputProps={{ pattern: "[0-9]*", maxLength: 12 }}
-                      error={!!errors.representativeAadhar}
-                      helperText={errors.representativeAadhar}
-                    />
-                  </Grid>
-                </Grid>
-                <Box sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}>
-                  <Button variant="outlined" onClick={handleBack}>
-                    Back
-                  </Button>
-                  <Button variant="contained" onClick={handleNext} sx={{ backgroundColor: "#2563EB" }}>
-                    Continue →
-                  </Button>
-                </Box>
-              </Box>
-            )}
-
-            {activeStep === 3 && (
-              <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Website Username"
-                      name="websiteUsername"
-                      value={formData.websiteUsername}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      error={!!errors.websiteUsername}
-                      helperText={errors.websiteUsername}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Confirm Website Username"
-                      name="confirmWebsiteUsername"
-                      value={formData.confirmWebsiteUsername}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      error={!!errors.websiteUsername}
-                      helperText={errors.websiteUsername}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Website Password"
-                      name="websitePassword"
-                      type="password"
-                      value={formData.websitePassword}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      error={!!errors.websitePassword}
-                      helperText={errors.websitePassword}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Confirm Website Password"
-                      name="confirmWebsitePassword"
-                      type="password"
-                      value={formData.confirmWebsitePassword}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      error={!!errors.websitePassword}
-                      helperText={errors.websitePassword}
-                    />
-                  </Grid>
-                </Grid>
-                <Box sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}>
-                  <Button variant="outlined" onClick={handleBack}>
-                    Back
-                  </Button>
-                  <Button type="submit" variant="contained" sx={{ backgroundColor: "#2563EB" }}>
-                    Submit
-                  </Button>
-                </Box>
-              </Box>
-            )}
-          </Box>
+              )}
+              <Button
+                variant="contained"
+                onClick={activeStep === steps.length - 1 ? handleSubmit : handleNext}
+                className="submit-button"
+              >
+                {activeStep === steps.length - 1 ? "Submit" : "Continue →"}
+              </Button>
+            </Box>
+          </div>
         </Box>
-      </Box>
+      </div>
     </Layout>
   );
 };

@@ -39,21 +39,19 @@ const Dashboard = () => {
           <Grid container spacing={3}>
             {stats.map((stat) => (
               <Grid item xs={12} sm={6} md={3} key={stat.title}>
-                <div className="dashboard-stats-item">
-                  <Box>
-                    <Typography variant="h6" className="dashboard-value">
-                      {stat.value}
-                    </Typography>
-                    <Typography variant="body2" className="dashboard-text">
-                      {stat.title}
-                    </Typography>
-                    <Typography variant="body2" className="dashboard-trend">
-                      {stat.trend}
-                    </Typography>
-                  </Box>
-                  <Box className="dashboard-icon" style={{ backgroundColor: stat.color }}>
+                <div className="dashboard-card">
+                  <div className={`dashboard-icon ${stat.title.toLowerCase().replace(" ", "-")}`}>
                     {stat.icon}
-                  </Box>
+                  </div>
+                  <div className="dashboard-content">
+                    <div className="dashboard-text">{stat.title}</div>
+                    <div className="value-trend-container">
+                      <div className="dashboard-value">{stat.value}</div>
+                      <div className="dashboard-trend positive">
+                        {stat.trend.split(" ")[0]} <span>↑</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </Grid>
             ))}

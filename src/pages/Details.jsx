@@ -1,28 +1,27 @@
 // src/pages/OrgDetails.jsx
 import React, { useState, useEffect } from "react";
-import { Box, Card, CardContent, Typography, Grid, CircularProgress } from "@mui/material";
+import { Box, Typography, CircularProgress, Grid } from "@mui/material";
 import "../styles/Details.css";
 import Layout from "../components/Layout/Layout";
 import axios from "axios";
-import {  useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const OrgDetails = () => {
   const [organizationData, setOrganizationData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-    const { companyId } = useParams();
+  const { companyId } = useParams();
 
   useEffect(() => {
     const fetchOrgData = async () => {
       try {
-        // Replace with your actual API endpoint
-                const token = localStorage.getItem("token"); // Retrieve token from localStorage
-                if (!token) throw new Error("No authentication token found");
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("No authentication token found");
         const response = await axios.get(`https://localhost:8081/api/new-org/${companyId}`, {
-                                                                                         headers: {
-                                                                                             Authorization: `Bearer ${token}`
-                                                                                         }
-                                                                                     });
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         setOrganizationData(response.data);
         setLoading(false);
       } catch (err) {
@@ -33,9 +32,8 @@ const OrgDetails = () => {
     };
 
     fetchOrgData();
-  }, []);
+  }, [companyId]);
 
-  // Format organization details from API response
   const getOrganizationDetails = () => {
     if (!organizationData) return {};
 
@@ -53,7 +51,6 @@ const OrgDetails = () => {
     };
   };
 
-  // Format representative details from API response
   const getRepresentativeDetails = () => {
     if (!organizationData) return {};
 
@@ -91,51 +88,39 @@ const OrgDetails = () => {
   return (
     <Layout>
       <Box className="details-container">
-        <Card className="details-card">
-          <CardContent>
-            {/* Organization Details */}
-            <Typography variant="h5" className="section-title">
-              Organization Details
-            </Typography>
-            <Grid container spacing={2} className="details-grid">
-              {Object.entries(getOrganizationDetails()).map(([key, value]) => (
-                <Grid item xs={12} sm={6} key={key}>
-                  <Box className="detail-item">
-                    <Typography variant="subtitle1" className="detail-label">
-                      {key}
-                    </Typography>
-                    <Typography variant="body1" className="detail-value">
-                      {value}
-                    </Typography>
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
-          </CardContent>
-        </Card>
+        {/* Organization Details Container */}
+        <Typography variant="h5" className="section-title">
+            Organization Details
+          </Typography>
+        <Box sx={{ my: 2 }}/>
+        <Box className="details-card">
+        <Grid container spacing={2}>
+  {Object.entries(getOrganizationDetails()).map(([key, value]) => (
+    <Grid item xs={12} sm={6} key={key}>
+      <Typography variant="body1" className="detail-value">
+        {key}: <span>{value}</span>
+      </Typography>
+    </Grid>
+  ))}
+</Grid>
+        </Box>
 
-        <Card className="details-card">
-          <CardContent>
-            {/* Representative Details */}
-            <Typography variant="h5" className="section-title">
-              Representative Details
-            </Typography>
-            <Grid container spacing={2} className="details-grid">
-              {Object.entries(getRepresentativeDetails()).map(([key, value]) => (
-                <Grid item xs={12} sm={6} key={key}>
-                  <Box className="detail-item">
-                    <Typography variant="subtitle1" className="detail-label">
-                      {key}
-                    </Typography>
-                    <Typography variant="body1" className="detail-value">
-                      {value}
-                    </Typography>
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
-          </CardContent>
-        </Card>
+        {/* Representative Details Container */}
+        <Typography variant="h5" className="section-title">
+            Representative Details
+          </Typography>
+          <Box sx={{ my: 2 }}/>
+        <Box className="details-card">
+          <Grid container spacing={2}>
+            {Object.entries(getRepresentativeDetails()).map(([key, value]) => (
+              <Grid item xs={12} sm={6} key={key}>
+                <Typography variant="body1" className="detail-value">
+                  {key}: <span>{value}</span> 
+                </Typography>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
       </Box>
     </Layout>
   );

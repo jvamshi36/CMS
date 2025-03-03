@@ -8,7 +8,7 @@ import { AiOutlineDashboard, AiOutlinePoweroff, AiOutlineTeam } from "react-icon
 const Sidebar = () => {
   return (
     <div className="sidebar">
-      <h2 className="logo">Suraksha<span> Pharma</span></h2>
+      <h2 className="logo">Suraksha Pharma</h2>
       <nav>
         <NavLink to="/dashboard" className="nav-item">< AiOutlineDashboard/> Dashboard</NavLink>
         <NavLink to="/companies" className="nav-item"><BiBuildings /> Companies</NavLink>

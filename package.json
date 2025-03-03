@@ -18,6 +18,7 @@
     "browserify-zlib": "^0.2.0",
     "cross-env": "^7.0.3",
     "crypto-browserify": "^3.12.1",
+    "framer-motion": "^12.4.7",
     "https-browserify": "^1.0.0",
     "lucide-react": "^0.476.0",
     "react": "^19.0.0",

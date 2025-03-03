@@ -12,14 +12,19 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const verifyToken = async () => {
       const token = localStorage.getItem('token');
-      if (!token) return;
+      if (!token) {
+        console.error("No token found");
+        return;
+      }
 
       try {
-        await axios.get('https://localhost:8081/api/auth/verify', {
+        const response = await axios.get('https://localhost:8081/api/auth/verify', {
           headers: { Authorization: `Bearer ${token}` },
         });
+        console.log("Token verified:", response.data);
         setUser({ token });
       } catch (error) {
+        console.error("Token verification failed:", error);
         localStorage.removeItem('token');
       }
     };

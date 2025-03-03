@@ -1,0 +1,119 @@
+/* src/styles/Header.css */
+.header-container {
+  position: fixed;
+  top: 0;
+  left: 240px; /* Width of sidebar */
+  right: 0;
+  height: 80px; /* Adjust height as needed */
+  background: rgba(255, 255, 255, 0.2); /* Very transparent white */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(81, 56, 206, 0.1);
+  z-index: 99; /* Below the floating elements */
+}
+
+.search-box {
+  position: fixed;
+  top: 20px;
+  left: 280px; /* Adjust based on sidebar width + padding */
+  padding: 8px 15px;
+  border: 1px solid rgba(81, 56, 206, 0.2);
+  border-radius: 8px;
+  width: 300px;
+  background: rgba(255, 255, 255, 0.4);
+  color: #4530B8;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 100;
+}
+
+.search-box:focus {
+  outline: none;
+  border-color: #5138CE;
+  box-shadow: 0 0 0 2px rgba(81, 56, 206, 0.1);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.header-right {
+  position: fixed;
+  top: 20px;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  z-index: 100;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  border: 2px solid rgba(81, 56, 206, 0.2);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+}
+
+.user-avatar:hover {
+  transform: scale(1.05);
+}
+
+.user-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(81, 56, 206, 0.15);
+  min-width: 200px;
+  overflow: hidden;
+}
+
+.menu-item {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #4530B8;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.menu-item:hover {
+  background: rgba(81, 56, 206, 0.1);
+}
+
+.menu-item svg {
+  font-size: 16px;
+  color: #5138CE;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user-menu {
+  animation: slideDown 0.2s ease-out;
+}
+
+/* Add glass morphism effect */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
