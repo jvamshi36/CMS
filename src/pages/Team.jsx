@@ -3,8 +3,10 @@ import Layout from "../components/Layout/Layout";
 import "../styles/Team.css";
 import { teamMembers } from "../data/dummy";
 import { useNavigate } from "react-router-dom";
-import image1 from "../components/assets/images/img.jpg";
-import { motion } from "framer-motion";
+import image1 from "../components/assets/images/user1.jpg";
+import image2 from "../components/assets/images/shyam.jpg";
+
+
 
 const Team = () => {
   const navigate = useNavigate();
@@ -18,7 +20,7 @@ const Team = () => {
       <div className="team-grid">
         {teamMembers.map((member, index) => (
           <div key={index} className="team-card">
-            <img src={image1} alt={member.name} className="team-image" />
+            <img src={image2} alt={member.name} className="team-image" />
             <h3>{member.name}</h3>
             <p>{member.role}</p>
             <p>{member.email}</p>

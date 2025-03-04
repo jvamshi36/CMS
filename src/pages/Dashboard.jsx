@@ -31,9 +31,7 @@ const Dashboard = () => {
   return (
     <Layout>
       <div className="dashboard-container">
-        <Typography variant="h4" className="dashboard-title">
-          Dashboard
-        </Typography>
+       <h2 className="page-title">Dashboard</h2>
 
         <div className="dashboard-stats-container">
           <Grid container spacing={3}>

@@ -17,6 +17,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import CheckIcon from "@mui/icons-material/Check";
 import Layout from "../components/Layout/Layout"; // Adjust the path as necessary
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { Snackbar, Alert } from "@mui/material";
 import "../styles/NeworgForm.css";
 
 const steps = [
@@ -51,6 +52,7 @@ const NeworgForm = () => {
 
   const [errors, setErrors] = useState({}); // For displaying validation errors
   const navigate = useNavigate(); // Initialize useNavigate
+ const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const validateStep = () => {
     let newErrors = {};
@@ -123,7 +125,13 @@ const NeworgForm = () => {
         }
       );
       console.log("Organization created:", response.data);
-      navigate('/companies'); // Navigate to /companies after successful submission
+       setOpenSnackbar(true);
+
+            // Redirect after 5 seconds
+            setTimeout(() => {
+              navigate("/companies");
+            }, 5000);
+
     } catch (error) {
       console.error("Error submitting form:", error);
       if (error.response) {
@@ -475,6 +483,15 @@ const NeworgForm = () => {
             </Box>
           </div>
         </Box>
+              <Snackbar
+                open={openSnackbar}
+                autoHideDuration={5000}
+                onClose={() => setOpenSnackbar(false)}
+              >
+                <Alert severity="info" variant="filled">
+                  Saving information... Redirecting in 5 seconds 🚀
+                </Alert>
+              </Snackbar>
       </div>
     </Layout>
   );

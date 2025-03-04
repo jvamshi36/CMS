@@ -36,8 +36,8 @@ export const companies = [
   ];
 
   export const teamMembers = [
-    { name: "Jason Price", role: "Admin", email: "janick_parisian@yahoo.com", image: "/user1.jpg" },
-    { name: "Jukko Sisao", role: "CEO", email: "sibyl_kozey@gmail.com", image: "/user2.jpg" },
-    { name: "Harriet King", role: "CTO", email: "nadia_block@hotmail.com", image: "/user3.jpg" },
-    { name: "Lenora Benson", role: "Lead", email: "fell.wallace@kunde.us", image: "/user4.jpg" }
+    { name: "Jason Price", role: "Admin", email: "janick_parisian@yahoo.com", image: "../components/assets/images/user1.jpg" },
+    { name: "Jukko Sisao", role: "CEO", email: "sibyl_kozey@gmail.com", image: "./components/assets/images/user2.jpg" },
+    { name: "Harriet King", role: "CTO", email: "nadia_block@hotmail.com", image: "./components/assets/images/user3.jpg" },
+    { name: "Lenora Benson", role: "Lead", email: "fell.wallace@kunde.us", image: "./components/assets/images/user4.jpg" }
   ];

@@ -7,12 +7,11 @@
 
 /* Futuristic Header */
 .team-header {
+
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
-  padding: 20px;
-  border-radius: 15px;
+  margin-bottom: 20px;
 
 }
 
@@ -72,6 +71,7 @@
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 25px;
   padding: 20px;
+  margin-bottom: 20px;
 }
 
 /* Futuristic Card Design */

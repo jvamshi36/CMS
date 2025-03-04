@@ -109,7 +109,6 @@
 
 .status.processing {
     background: linear-gradient(135deg, #ffc107, #d39e00);
-    color: #000;
 }
 
 .status.rejected {

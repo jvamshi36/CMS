@@ -17,16 +17,23 @@
   color: white;
   border: none;
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
+  font-weight: 600;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
   box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+}
+.add-company-button:hover::before {
+  left: 100%;
 }
 
 .add-company-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
 }
+
 
 /* Table Container with Glass Effect */
 .styled-table {

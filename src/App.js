@@ -1,8 +1,7 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
-import './index.css'; // Ensure this imports your CSS
+import {Routes, Route, Navigate} from "react-router-dom";
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
-import { AuthProvider } from './context/AuthContext';
+import {AuthProvider} from './context/AuthContext';
 import NeworgForm from "./pages/NeworgForm";
 import Companies from "./pages/Companies";
 import Orders from "./pages/Orders";
@@ -15,11 +14,13 @@ import OrderDetails from "./pages/OrderDetails";
 
 function App() {
   return (
-    <div className="dotted-grid">
-      <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/*" element={<ProtectedRoute />} />
+    <AuthProvider>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Protected Routes */}
+        <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/new-org" element={<NeworgForm />} />
           <Route path="/new-order" element={<NewOrder />} />
@@ -28,9 +29,15 @@ function App() {
           <Route path="/companies/:companyId/orders" element={<Orders />} />
           <Route path="/companies/:companyId/orders/:orderId/order-details" element={<OrderDetails />} />
           <Route path="/team" element={<Team />} />
-        </Routes>
-      </AuthProvider>
-    </div>
+        </Route>
+
+        {/* Redirect root to login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+
+        {/* Catch-all route for unknown paths */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </AuthProvider>
   );
 }
 
