@@ -1,0 +1,140 @@
+/* NewOrder.css */
+.order-container {
+    padding: 30px;
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+  }
+  
+  .order-title {
+margin-bottom: 2rem !important;
+text-align: center;
+font-size: 2rem !important;
+font-weight: 600 !important;
+  }
+  
+  /* Stepper Styling */
+  .stepper-wrapper {
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .MuiStepper-root {
+    background: rgba(255, 255, 255, 0.9) !important;
+    padding: 25px !important;
+    border-radius: 15px !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 8px 32px rgba(37, 99, 235, 0.08) !important;
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Rotating Glow Effect */
+  .MuiStepper-root::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+      circle,
+      rgba(37, 99, 235, 0.1) 0%,
+      rgba(37, 99, 235, 0.05) 25%,
+      transparent 70%
+    );
+    animation: rotate 15s linear infinite;
+    z-index: -1;
+  }
+  
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Form Card Styling */
+  .order-form-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 32px rgba(37, 99, 235, 0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    animation: fadeIn 0.4s ease-out;
+  }
+  
+  /* Input Fields */
+  .form-input.MuiTextField-root {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-radius: 12px !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .form-input.MuiTextField-root:hover {
+    background: rgba(255, 255, 255, 0.95) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.1) !important;
+  }
+  
+  /* Buttons */
+  .action-button {
+    border-radius: 12px !important;
+    padding: 10px 24px !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    letter-spacing: 0.5px !important;
+    transition: all 0.3s ease !important;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .next-button {
+    background: linear-gradient(135deg, #2563EB, #1d4ed8) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2) !important;
+  }
+  
+  .submit-button {
+    background: linear-gradient(135deg, #FF5722, #F4511E) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(244, 81, 30, 0.2) !important;
+  }
+  
+  .add-product-button {
+    background: linear-gradient(135deg, #4CAF50, #43A047) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2) !important;
+  }
+  
+  .action-button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3) !important;
+  }
+  
+  .delete-button {
+    color: #EF4444 !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .delete-button:hover {
+    color: #DC2626 !important;
+    transform: scale(1.1) !important;
+  }
+  
+  /* Animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }

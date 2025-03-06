@@ -1,0 +1,180 @@
+/* Companies page styles */
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.companies-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.add-company-button {
+  background: linear-gradient(135deg, #2563EB, #1d4ed8);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+}
+.add-company-button:hover::before {
+  left: 100%;
+}
+
+.add-company-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+}
+
+
+/* Table Container with Glass Effect */
+.styled-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.styled-table th {
+  padding: 16px;
+  text-align: left;
+  background: rgba(248, 249, 250, 0.8);
+  font-weight: 600;
+  color: #1a56db;
+  border-bottom: 2px solid rgba(37, 99, 235, 0.1);
+  transition: all 0.3s ease;
+}
+
+.styled-table td {
+  padding: 16px;
+  border-bottom: 1px solid rgba(37, 99, 235, 0.05);
+  transition: all 0.3s ease;
+}
+
+/* Futuristic Row Hover Effect */
+.styled-table tbody tr {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.styled-table tbody tr:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(37, 99, 235, 0.05) 0%,
+    rgba(37, 99, 235, 0.02) 100%
+  );
+  transform: translateX(6px);
+  box-shadow: -4px 0 0 0 #2563EB;
+}
+
+/* Links in table */
+.styled-table a {
+  color: #2563EB;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  background: rgba(37, 99, 235, 0.1);
+}
+
+.styled-table a:hover {
+  background: rgba(37, 99, 235, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Status Badges */
+.status {
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: #ffffff;
+  font-size: 14px;
+  display: inline-block;
+  white-space: nowrap;
+  min-width: 80px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.status.completed {
+  background: linear-gradient(135deg, #28a745, #208838);
+}
+
+.status.processing {
+  background: linear-gradient(135deg, #ffc107, #d39e00);
+}
+
+.status.rejected {
+  background: linear-gradient(135deg, #dc3545, #bd2130);
+}
+
+/* Enhanced Sortable Headers */
+.sortable {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding-right: 24px !important;
+}
+
+.sortable:hover {
+  color: #2563EB;
+  background: rgba(37, 99, 235, 0.05);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 8px 16px;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #2563EB;
+  backdrop-filter: blur(5px);
+}
+
+.pagination button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+  background: rgba(37, 99, 235, 0.1);
+}
+
+.pagination button.active {
+  background: linear-gradient(135deg, #2563EB, #1d4ed8);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+
+/* Loading and Error States */
+.loading, .error, .no-data {
+  text-align: center;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+}
