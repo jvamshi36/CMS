@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+// src/context/AuthContext.js
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -69,6 +70,7 @@ api.interceptors.request.use(
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [userType, setUserType] = useState(null); // 'ADMIN' or 'ORGANIZATION'
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -76,6 +78,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const verifyToken = async () => {
       const token = sessionStorage.getItem('_auth_token');
+      const storedUserType = sessionStorage.getItem('_user_type');
+      
       if (!token) {
         setLoading(false);
         return;
@@ -87,9 +91,11 @@ export const AuthProvider = ({ children }) => {
           username: response.data.username,
           tokenExpires: response.data.expires
         });
+        setUserType(storedUserType || 'ADMIN');
       } catch (error) {
         console.error("Token verification failed:", error);
         sessionStorage.removeItem('_auth_token');
+        sessionStorage.removeItem('_user_type');
       } finally {
         setLoading(false);
       }
@@ -98,53 +104,26 @@ export const AuthProvider = ({ children }) => {
     verifyToken();
   }, []);
 
-  // Set up token refresh before expiry
-  useEffect(() => {
-    if (user?.tokenExpires) {
-      const refreshTime = user.tokenExpires - (Date.now() + 5 * 60 * 1000); // 5 minutes before expiry
-      
-      if (refreshTime <= 0) {
-        // Token is already expired or about to expire
-        refreshToken();
-      } else {
-        // Schedule token refresh
-        const refreshTimer = setTimeout(refreshToken, refreshTime);
-        return () => clearTimeout(refreshTimer);
-      }
-    }
-  }, [user]);
-
-  const refreshToken = async () => {
-    try {
-      const response = await api.post('/api/auth/refresh');
-      if (response.data.token) {
-        sessionStorage.setItem('_auth_token', response.data.token);
-        setUser({
-          username: response.data.username || user?.username,
-          tokenExpires: Date.now() + response.data.expiresIn
-        });
-      }
-    } catch (error) {
-      console.error("Failed to refresh token:", error);
-      logout();
-    }
-  };
-
   const login = async (username, password) => {
     try {
       const response = await api.post('/api/auth/login', { username, password });
       
       if (response.data.token) {
-        // Store token in memory (SessionStorage is cleared when the tab is closed)
+        // Store token in memory
         sessionStorage.setItem('_auth_token', response.data.token);
+        sessionStorage.setItem('_user_type', response.data.userType);
         
-        // Set user data
         setUser({
           username,
           tokenExpires: Date.now() + response.data.expiresIn
         });
         
-        return { success: true };
+        setUserType(response.data.userType);
+        
+        return { 
+          success: true,
+          userType: response.data.userType 
+        };
       }
     } catch (error) {
       console.error("Login failed:", error);
@@ -157,14 +136,14 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      // Call logout endpoint to invalidate refresh token
       await api.post('/api/auth/logout');
     } catch (error) {
       console.error("Logout API call failed:", error);
     } finally {
-      // Clear token from memory
       sessionStorage.removeItem('_auth_token');
+      sessionStorage.removeItem('_user_type');
       setUser(null);
+      setUserType(null);
       navigate('/login');
     }
   };
@@ -173,12 +152,23 @@ export const AuthProvider = ({ children }) => {
     return !!user && !!sessionStorage.getItem('_auth_token');
   };
 
+  const isAdmin = () => {
+    return userType === 'ADMIN';
+  };
+
+  const isOrganization = () => {
+    return userType === 'ORGANIZATION';
+  };
+
   const authContextValue = {
     user,
+    userType,
     login,
     logout,
     loading,
     isAuthenticated,
+    isAdmin,
+    isOrganization,
     api
   };
 

@@ -1,77 +1,240 @@
-/* src/styles/Details.css */
-
-/* Main Container */
-.details-container {
-    max-width: 1200px;
-    margin: 20px auto;
+/* src/pages/OrderDetails.css */
+.order-details-container {
     padding: 20px;
-}
-
-/* Section Title */
-.section-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 15px;
-    border-left: 5px solid #ff6600;
-    padding-left: 10px;
-}
-
-/* Card Styling */
-.details-card {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+  }
+  
+  .order-details-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 20px;
+  }
+  
+  .page-title {
+    font-size: 2rem !important;
+    font-weight: bold !important;
+    background: linear-gradient(45deg, #2563EB, #1d4ed8);
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+  }
+  
+  .back-button {
+    border-color: #2563EB !important;
+    color: #2563EB !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    text-transform: none !important;
+    padding: 6px 16px !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .back-button:hover {
+    background-color: rgba(37, 99, 235, 0.05) !important;
+    transform: translateX(-3px) !important;
+  }
+  
+  .order-summary-card, .order-items-card {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 15px !important;
+    padding: 25px !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
+    margin-bottom: 30px !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(243, 244, 246, 1) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+  }
+  
+  .order-summary-card:hover, .order-items-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12) !important;
+  }
+  
+  .card-title {
+    font-weight: 600 !important;
+    margin-bottom: 20px !important;
+    padding-bottom: 15px !important;
+    border-bottom: 2px solid rgba(37, 99, 235, 0.1) !important;
+    color: #1e293b !important;
+  }
+  
+  .section-title {
+    color: #475569 !important;
+    font-weight: 600 !important;
+    margin-bottom: 15px !important;
+    font-size: 1rem !important;
+  }
+  
+  .order-info-section {
     margin-bottom: 20px;
-}
-
-/* Labels */
-.label {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #666;
-}
-
-/* Values */
-.value {
-    font-size: 1.2rem;
+  }
+  
+  .info-row {
+    display: flex;
+    margin-bottom: 12px;
+    align-items: center;
+  }
+  
+  .info-label {
     font-weight: 600;
-    color: #333;
-}
-
-/* Status Styling */
-.value.shipped {
-    color: #22c55e;
-}
-
-.value.pending {
-    color: #facc15;
-}
-
-.value.cancelled {
-    color: #ef4444;
-}
-
-.value.delivered {
-    color: #2563eb;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .details-container {
-        padding: 15px;
+    min-width: 140px;
+    color: #64748b;
+  }
+  
+  .info-value {
+    color: #0f172a;
+  }
+  
+  .info-value.price {
+    font-weight: 600;
+    color: #2563EB;
+  }
+  
+  .status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: white;
+    display: inline-block;
+    min-width: 80px;
+    text-align: center;
+  }
+  
+  .status-badge.completed {
+    background: linear-gradient(135deg, #10b981, #059669);
+  }
+  
+  .status-badge.processing, .status-badge.pending {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+  }
+  
+  .status-badge.rejected, .status-badge.cancelled {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+  }
+  
+  .order-items-table-container {
+    overflow-x: auto;
+  }
+  
+  .order-items-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  
+  .order-items-table th {
+    padding: 15px;
+    text-align: left;
+    background-color: rgba(243, 244, 246, 0.8);
+    color: #475569;
+    font-weight: 600;
+    border-bottom: 2px solid rgba(37, 99, 235, 0.1);
+  }
+  
+  .order-items-table td {
+    padding: 15px;
+    border-bottom: 1px solid rgba(243, 244, 246, 0.7);
+    color: #1e293b;
+  }
+  
+  .product-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .product-name {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 5px;
+  }
+  
+  .product-description {
+    font-size: 0.85rem;
+    color: #64748b;
+  }
+  
+  .total-label {
+    text-align: right !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+  }
+  
+  .total-value {
+    font-weight: 700 !important;
+    color: #2563EB !important;
+    font-size: 1.1rem !important;
+  }
+  
+  .order-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+  
+  .cancel-order-button {
+    background-color: #ef4444 !important;
+    color: white !important;
+    padding: 8px 20px !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    text-transform: none !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .cancel-order-button:hover {
+    background-color: #dc2626 !important;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3) !important;
+  }
+  
+  .order-details-loading, .order-details-error {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    gap: 20px;
+  }
+  
+  .error-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  .retry-button {
+    background-color: #2563EB !important;
+    color: white !important;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .order-details-container {
+      padding: 15px;
     }
-
-    .section-title {
-        font-size: 1.3rem;
+    
+    .order-details-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
     }
-
-    .label {
-        font-size: 0.85rem;
+    
+    .back-button {
+      align-self: flex-start;
     }
-
-    .value {
-        font-size: 1rem;
+    
+    .info-row {
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 15px;
     }
-}
+    
+    .info-label {
+      margin-bottom: 5px;
+    }
+    
+    .order-items-table {
+      min-width: 600px;
+    }
+  }

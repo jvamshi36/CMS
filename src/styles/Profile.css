@@ -1,0 +1,161 @@
+/* src/pages/Profile.css */
+.profile-container {
+    padding: 20px;
+  }
+  
+  .profile-title {
+    font-size: 2rem !important;
+    font-weight: bold !important;
+    margin-bottom: 1.5rem !important;
+    background: linear-gradient(45deg, #2563EB, #1d4ed8);
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+  }
+  
+  .profile-grid {
+    margin-top: 10px !important;
+  }
+  
+  .profile-card {
+    padding: 25px !important;
+    border-radius: 15px !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+    overflow: hidden !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(243, 244, 246, 1) !important;
+    margin-bottom: 24px !important;
+  }
+  
+  .profile-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12) !important;
+  }
+  
+  .account-card {
+    margin-top: 1.5rem !important;
+  }
+  
+  .card-title {
+    font-weight: 600 !important;
+    margin-bottom: 20px !important;
+    padding-bottom: 15px !important;
+    border-bottom: 2px solid rgba(37, 99, 235, 0.1) !important;
+    color: #1e293b !important;
+  }
+  
+  .card-content {
+    flex-grow: 1 !important;
+  }
+  
+  .profile-row {
+    display: flex;
+    margin-bottom: 14px;
+    align-items: center;
+  }
+  
+  .profile-label {
+    font-weight: 600;
+    min-width: 160px;
+    color: #64748b;
+  }
+  
+  .profile-value {
+    color: #0f172a;
+  }
+  
+  .password-dots {
+    letter-spacing: 2px;
+    font-weight: bold;
+  }
+  
+  .status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: white;
+    display: inline-block;
+  }
+  
+  .status-badge.completed {
+    background: linear-gradient(135deg, #10b981, #059669);
+  }
+  
+  .status-badge.processing, .status-badge.pending {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+  }
+  
+  .status-badge.rejected, .status-badge.cancelled {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+  }
+  
+  .change-password-button {
+    margin-top: 20px !important;
+    align-self: flex-start !important;
+    background: linear-gradient(135deg, #2563EB, #1d4ed8) !important;
+    color: white !important;
+    font-weight: 500 !important;
+    padding: 8px 20px !important;
+    border-radius: 8px !important;
+    text-transform: none !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .change-password-button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3) !important;
+  }
+  
+  .profile-loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    gap: 20px;
+  }
+  
+  .profile-error {
+    padding: 30px;
+    max-width: 600px;
+    margin: 40px auto;
+    text-align: center;
+  }
+  
+  .retry-button {
+    margin-top: 20px !important;
+    background-color: #2563EB !important;
+    color: white !important;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .profile-container {
+      padding: 15px;
+    }
+    
+    .profile-title {
+      font-size: 1.8rem !important;
+    }
+    
+    .profile-card {
+      padding: 20px !important;
+    }
+    
+    .profile-row {
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+    
+    .profile-label {
+      margin-bottom: 5px;
+    }
+  }

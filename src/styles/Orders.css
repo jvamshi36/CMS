@@ -1,129 +1,132 @@
-/* Orders.css */
-.page-title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
-
-.orders-header {
+/* src/pages/Orders.css */
+.orders-container {
+    padding: 20px;
+  }
+  
+  .orders-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-}
-
-.add-order-button {
-    background: linear-gradient(135deg, #2563EB, #1d4ed8);
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
-}
-
-.add-order-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
-}
-
-/* Table Container with Glass Effect */
-.styled-table {
+    margin-bottom: 30px;
+  }
+  
+  .page-title {
+    font-size: 2rem !important;
+    font-weight: bold !important;
+    background: linear-gradient(45deg, #2563EB, #1d4ed8);
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+  }
+  
+  .new-order-button {
+    background: linear-gradient(135deg, #2563EB, #1d4ed8) !important;
+    color: white !important;
+    font-weight: 500 !important;
+    padding: 8px 20px !important;
+    border-radius: 8px !important;
+    text-transform: none !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .new-order-button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.4) !important;
+  }
+  
+  .orders-table-container {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(243, 244, 246, 1);
+  }
+  
+  .orders-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    background: rgba(255, 255, 255, 0.7);
-    border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    margin-bottom: 20px;
-    overflow: hidden;
-}
-
-.styled-table th {
-    padding: 16px;
+  }
+  
+  .orders-table th {
+    padding: 15px;
     text-align: left;
-    background: rgba(248, 249, 250, 0.8);
+    background-color: rgba(243, 244, 246, 0.8);
+    color: #475569;
     font-weight: 600;
-    color: #1a56db;
     border-bottom: 2px solid rgba(37, 99, 235, 0.1);
+  }
+  
+  .orders-table td {
+    padding: 15px;
+    border-bottom: 1px solid rgba(243, 244, 246, 0.7);
+    color: #1e293b;
+  }
+  
+  .orders-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .orders-table tbody tr {
     transition: all 0.3s ease;
-}
-
-.styled-table td {
-    padding: 16px;
-    border-bottom: 1px solid rgba(37, 99, 235, 0.05);
-    transition: all 0.3s ease;
-}
-
-/* Futuristic Row Hover Effect */
-.styled-table tbody tr {
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.styled-table tbody tr:hover {
-    background: linear-gradient(
-        90deg,
-        rgba(37, 99, 235, 0.05) 0%,
-        rgba(37, 99, 235, 0.02) 100%
-    );
-    transform: translateX(6px);
-    box-shadow: -4px 0 0 0 #2563EB;
-}
-
-/* Links in table */
-.styled-table a {
-    color: #2563EB;
-    text-decoration: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    transition: all 0.3s ease;
-    background: rgba(37, 99, 235, 0.1);
-}
-
-.styled-table a:hover {
-    background: rgba(37, 99, 235, 0.15);
-    transform: translateY(-2px);
-}
-
-/* Enhanced Status Badges */
-.status {
-    padding: 8px 16px;
+  }
+  
+  .orders-table tbody tr:hover {
+    background-color: rgba(243, 244, 246, 0.5);
+    transform: translateX(5px);
+  }
+  
+  .status-badge {
+    padding: 5px 12px;
     border-radius: 20px;
-    color: #ffffff;
-    font-size: 14px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: white;
     display: inline-block;
-    white-space: nowrap;
     min-width: 80px;
     text-align: center;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.status.completed {
-    background: linear-gradient(135deg, #28a745, #208838);
-}
-
-.status.processing {
-    background: linear-gradient(135deg, #ffc107, #d39e00);
-}
-
-.status.rejected {
-    background: linear-gradient(135deg, #dc3545, #bd2130);
-}
-
-/* Enhanced Pagination */
-.pagination {
+  }
+  
+  .status-badge.completed {
+    background: linear-gradient(135deg, #10b981, #059669);
+  }
+  
+  .status-badge.processing, .status-badge.pending {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+  }
+  
+  .status-badge.rejected, .status-badge.cancelled {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+  }
+  
+  .view-button {
+    background-color: #2563EB !important;
+    color: white !important;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    min-width: unset !important;
+    padding: 5px 12px !important;
+    border-radius: 6px !important;
+    text-transform: none !important;
+    box-shadow: none !important;
+  }
+  
+  .view-button:hover {
+    background-color: #1d4ed8 !important;
+    box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3) !important;
+  }
+  
+  .pagination {
     display: flex;
     justify-content: center;
     gap: 10px;
     margin-top: 20px;
-}
-
-.pagination button {
+  }
+  
+  .pagination button {
     padding: 8px 16px;
     border: 1px solid rgba(37, 99, 235, 0.2);
     background: rgba(255, 255, 255, 0.8);
@@ -132,58 +135,87 @@
     transition: all 0.3s ease;
     color: #2563EB;
     backdrop-filter: blur(5px);
-}
-
-.pagination button:hover {
+  }
+  
+  .pagination button:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
     background: rgba(37, 99, 235, 0.1);
-}
-
-.pagination button.active {
+  }
+  
+  .pagination button.active {
     background: linear-gradient(135deg, #2563EB, #1d4ed8);
     color: white;
     border-color: transparent;
     box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
-}
-
-/* Loading and Error States */
-.loading, .error, .no-data {
-    text-align: center;
-    padding: 40px;
-    background: rgba(255, 255, 255, 0.7);
+  }
+  
+  .no-orders {
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 15px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    margin: 20px 0;
-}
-
-/* Hover effect for table headers */
-.styled-table th:hover {
-    background: rgba(37, 99, 235, 0.05);
-    color: #2563EB;
-}
-
-/* Add subtle animation for status changes */
-.status {
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
+    border: 1px solid rgba(243, 244, 246, 1);
+  }
+  
+  .no-orders h6 {
+    color: #1e293b !important;
+    margin-bottom: 10px !important;
+  }
+  
+  .no-orders-message {
+    color: #64748b !important;
+    margin-bottom: 20px !important;
+  }
+  
+  .place-order-button {
+    background: linear-gradient(135deg, #2563EB, #1d4ed8) !important;
+    color: white !important;
+    font-weight: 500 !important;
+    padding: 8px 20px !important;
+    border-radius: 8px !important;
+    text-transform: none !important;
+  }
+  
+  .orders-loading, .orders-error {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    gap: 20px;
+  }
+  
+  .retry-button {
+    margin-top: 20px !important;
+    background-color: #2563EB !important;
+    color: white !important;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .orders-container {
+      padding: 15px;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    
+    .orders-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
     }
-}
-
-/* Add hover effect for the entire table */
-.styled-table:hover {
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-    transform: translateY(-2px);
-    transition: all 0.3s ease;
-}
+    
+    .orders-table-container {
+      overflow-x: auto;
+    }
+    
+    .orders-table {
+      min-width: 700px;
+    }
+    
+    .pagination {
+      margin-top: 30px;
+    }
+  }

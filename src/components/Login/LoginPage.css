@@ -1,4 +1,4 @@
-/* src/styles/LoginPage.css */
+/* src/components/Login/LoginPage.css */
 .login-container {
     display: flex;
     min-height: 100vh;
@@ -69,19 +69,20 @@
     font-weight: 600 !important;
 }
 
-.emoji {
-    font-size: 1.5rem;
-    color: yellow;
-}
-
 .login-title {
     font-weight: bold !important;
     margin-top: 8px;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     background: linear-gradient(45deg, #1e293b, #334155);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+}
+
+.login-subtitle {
+    margin-bottom: 2rem !important;
+    text-align: center !important;
+    color: #64748b !important;
 }
 
 .login-form {

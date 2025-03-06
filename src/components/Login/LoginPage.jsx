@@ -1,10 +1,11 @@
+// src/components/Login/LoginPage.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TextField, Button, IconButton, InputAdornment, Typography, Box, CircularProgress } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useAuth } from '../../context/AuthContext';
 import img from "../assets/images/login-img.png";
-import "../Login/LoginPage.css";
+import "./LoginPage.css";
 import { Alert, Snackbar } from "@mui/material";
 
 const LoginPage = () => {
@@ -45,9 +46,13 @@ const LoginPage = () => {
         setSnackbarMessage("Login successful!");
         setOpenSnackbar(true);
         
-        // Navigate after a short delay
+        // Navigate after a short delay based on user type
         setTimeout(() => {
-          navigate("/dashboard");
+          if (result.userType === "ORGANIZATION") {
+            navigate("/org/dashboard");
+          } else {
+            navigate("/dashboard");
+          }
         }, 1000);
       } else {
         setError(result.message);
@@ -74,9 +79,14 @@ const LoginPage = () => {
       </Box>
 
       <Box className="login-form-container">
-        <Typography variant="subtitle1" className="login-welcome-text">Welcome back to Suraksha Pharma!! 👋</Typography>
+        <Typography variant="subtitle1" className="login-welcome-text">
+          Welcome to Suraksha Pharma! 👋
+        </Typography>
         <Typography variant="h5" className="login-title">
           Login to your account
+        </Typography>
+        <Typography variant="body2" className="login-subtitle">
+          Admin and Organization users can log in here
         </Typography>
 
         <form onSubmit={handleSubmit} className="login-form">

@@ -1,3 +1,4 @@
+/* src/components/Layout/Layout.css */
 .layout {
   display: flex;
   min-height: 100vh;
@@ -8,10 +9,10 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: transparent; /* Change this from #f5f6fa to transparent */
+  background: transparent;
   min-height: 100vh;
   /* Add the dotted grid background here */
-  background-color: f8f9fa;
+  background-color: #f8f9fa;
   background-image: radial-gradient(circle, #e0e0e0 1px, transparent 1px);
   background-size: 20px 20px;
 }
@@ -20,4 +21,20 @@
   padding: 20px;
   flex: 1;
   margin-top: 80px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+  
+  .main-content {
+    width: 100%;
+  }
+  
+  .page-content {
+    padding: 15px;
+    margin-top: 60px;
+  }
 }
