@@ -1,0 +1,131 @@
+/* src/styles/OrgDetails.css */
+.details-container {
+  padding: 30px;
+  max-width: 1400px;
+  margin: auto;
+}
+
+/* Enhanced Title with Animated Gradient */
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  background: linear-gradient(
+    270deg,
+    #1f2937,
+    #374151,
+    #2563EB,
+    #1d4ed8
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+  animation: gradientFlow 6s ease infinite;
+  letter-spacing: -0.5px;
+  padding-left: 15px;
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 70%;
+  background: linear-gradient(to bottom, #2563EB, #1d4ed8);
+  border-radius: 4px;
+}
+
+/* Modern Card Styling */
+.details-card {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+.details-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 45px rgba(37, 99, 235, 0.15);
+  border-color: rgba(37, 99, 235, 0.2);
+}
+
+/* Glass morphism effect for detail items */
+.detail-value {
+  background: rgba(255, 255, 255, 0.6);
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin: 8px 0;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.detail-value:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateX(5px);
+  box-shadow: -3px 0 0 0 #2563EB;
+}
+
+/* Key-Value styling */
+.detail-value {
+  font-size: 15px;
+  color: #6b7280;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detail-label {
+  font-weight: 500;
+  min-width: 150px;
+}
+
+.detail-value span {
+  font-weight: 600;
+  color: #374151;
+  font-size: 15px;
+  background: linear-gradient(135deg, #2563EB, #1d4ed8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding-left: 10px;
+}
+
+/* Loading Animation */
+@keyframes gradientFlow {
+  0% { background-position: 0% 50% }
+  50% { background-position: 100% 50% }
+  100% { background-position: 0% 50% }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .details-container {
+    padding: 20px;
+  }
+
+  .section-title {
+    font-size: 24px;
+  }
+
+  .details-card {
+    padding: 20px;
+  }
+
+  .detail-value {
+    padding: 12px 15px;
+  }
+}
+

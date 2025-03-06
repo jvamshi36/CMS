@@ -1,0 +1,242 @@
+/* src/styles/NeworgForm.css */
+.form-container {
+  padding: 30px;
+  max-width: 800px;  /* Reduced from 1400px for better form layout */
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Form Title */
+.form-title {
+  margin-bottom: 2rem !important;
+  text-align: center;
+  font-size: 2rem !important;
+  font-weight: 600 !important;
+}
+
+/* Stepper Styling */
+.stepper-wrapper {
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.MuiStepper-root {
+  background: rgba(255, 255, 255, 0.9) !important;
+  padding: 20px !important;
+  border-radius: 15px !important;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.1) !important;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Rotating Glow Effect */
+.MuiStepper-root::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(37, 99, 235, 0.1) 0%,
+    rgba(37, 99, 235, 0.05) 25%,
+    transparent 70%
+  );
+  animation: rotate 15s linear infinite;
+  z-index: -1;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Form Card */
+.form-card {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-radius: 15px !important;
+  padding: 30px !important;
+  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Input Fields */
+.MuiTextField-root {
+  margin-bottom: 0 !important;  /* Remove extra margin */
+}
+
+.MuiInputBase-root {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-radius: 8px !important;
+}
+
+/* Fix for double line issue */
+.MuiOutlinedInput-notchedOutline {
+  border-width: 1px !important;
+}
+
+.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-width: 1px !important;
+}
+
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-width: 2px !important;
+  border-color: #2563EB !important;
+}
+
+/* Input Label */
+.MuiInputLabel-root {
+  color: #374151 !important;
+  font-weight: 500 !important;
+}
+
+.MuiInputLabel-root.Mui-focused {
+  color: #2563EB !important;
+}
+
+/* Buttons */
+.button-container {
+  margin-top: 2rem !important;
+  display: flex;
+  gap: 1rem;
+}
+
+.submit-button {
+  background: linear-gradient(135deg, #2563EB, #1d4ed8) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  padding: 10px 24px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2) !important;
+}
+
+.submit-button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3) !important;
+}
+
+.back-button {
+  border: 2px solid rgba(37, 99, 235, 0.5) !important;
+  color: #2563EB !important;
+  border-radius: 8px !important;
+  padding: 8px 24px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s ease !important;
+}
+
+.back-button:hover {
+  background: rgba(37, 99, 235, 0.05) !important;
+}
+
+/* Grid Spacing */
+.MuiGrid-container {
+  margin: 0 !important;  /* Remove default margin */
+}
+
+.MuiGrid-item {
+  padding: 12px !important;  /* Adjust padding for grid items */
+}
+
+/* Step Icons */
+.MuiStepIcon-root {
+  color: rgba(37, 99, 235, 0.2) !important;
+}
+
+.MuiStepIcon-root.Mui-active {
+  color: #2563EB !important;
+  filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.5)) !important;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(37, 99, 235, 0.7));
+  }
+  100% {
+    filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.5));
+  }
+}
+
+/* Step Labels */
+.MuiStepLabel-label {
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+.MuiStepLabel-label.Mui-active {
+  transform: scale(1.05);
+  color: #2563EB !important;
+  font-weight: 600 !important;
+}
+
+/* Form Animation */
+.form-animation {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Error States */
+.Mui-error .MuiOutlinedInput-notchedOutline {
+  border-color: #ef4444 !important;
+  border-width: 1px !important;
+}
+
+.MuiFormHelperText-root.Mui-error {
+  color: #ef4444 !important;
+  margin-top: 4px !important;
+}
+
+/* Additional Stepper Enhancements */
+.MuiStepConnector-line {
+  border-color: rgba(37, 99, 235, 0.2) !important;
+}
+
+.MuiStepConnector-root.Mui-active .MuiStepConnector-line {
+  border-color: #2563EB !important;
+}
+
+.MuiStepConnector-root.Mui-completed .MuiStepConnector-line {
+  border-color: #10B981 !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+  .form-container {
+    padding: 20px;
+  }
+  
+  .form-card {
+    padding: 20px !important;
+  }
+  
+  .MuiGrid-item {
+    padding: 8px !important;
+  }
+}
