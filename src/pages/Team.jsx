@@ -1,7 +1,7 @@
 import React from "react";
 import Layout from "../components/Layout/Layout";
 import "../styles/Team.css";
-import { teamMembers } from "../data/dummy";
+import { teamMembers } from "../components/data/dummy";
 import { useNavigate } from "react-router-dom";
 import image1 from "../components/assets/images/user1.jpg";
 import image2 from "../components/assets/images/shyam.jpg";

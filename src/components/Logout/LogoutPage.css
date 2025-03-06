@@ -1,0 +1,93 @@
+.logout-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #4285F4;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .logout-shape {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  .shape-1 {
+    width: 800px;
+    height: 800px;
+    top: -300px;
+    left: -200px;
+  }
+  
+  .shape-2 {
+    width: 600px;
+    height: 600px;
+    bottom: -200px;
+    right: -200px;
+  }
+  
+  .logout-card {
+    width: 90%;
+    max-width: 400px;
+    background-color: white;
+    border-radius: 16px;
+    padding: 40px 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1;
+  }
+  
+  .logout-spinner {
+    color: #4285F4 !important;
+    margin-bottom: 24px !important;
+  }
+  
+  .logout-title {
+    font-weight: 600 !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .logout-message {
+    color: rgba(0, 0, 0, 0.6) !important;
+    margin-bottom: 24px !important;
+  }
+  
+  .logout-error-title {
+    font-weight: 600 !important;
+    color: #d32f2f !important;
+    margin-bottom: 16px !important;
+  }
+  
+  .logout-error-message {
+    color: rgba(0, 0, 0, 0.6) !important;
+    margin-bottom: 24px !important;
+  }
+  
+  .logout-success-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #e7f3ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+  }
+  
+  .logout-button {
+    background-color: #4285F4 !important;
+    color: white !important;
+    padding: 12px 32px !important;
+    border-radius: 8px !important;
+    text-transform: none !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3) !important;
+  }
+  
+  .logout-button:hover {
+    background-color: #3367D6 !important;
+  }

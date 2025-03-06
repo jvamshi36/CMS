@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Layout from "../components/Layout/Layout";
 import "../styles/Orders.css";
-import { orders } from "../data/dummy";
+import { orders } from "../components/data/dummy";
 import { useNavigate, NavLink, useParams } from "react-router-dom";
 
 const Orders = () => {

@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import "../../styles/Sidebar.css";
+import "./Sidebar.css";
 import { FiLogOut, FiSettings } from "react-icons/fi";
 import { HiOutlineCube } from "react-icons/hi";
 import { LuCircuitBoard } from "react-icons/lu";  // Futuristic Dashboard Icon
@@ -45,7 +45,7 @@ const Sidebar = () => {
           <FiSettings className="futuristic-icon" /> Settings
         </NavLink>
 
-        <NavLink to="/" className="nav-item">
+        <NavLink to="/logout" className="nav-item">
           <FiLogOut className="futuristic-icon" /> Logout
         </NavLink>
       </div>

@@ -1,32 +1,70 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { TextField, Button, IconButton, InputAdornment, Typography, Box } from "@mui/material";
+import { TextField, Button, IconButton, InputAdornment, Typography, Box, CircularProgress } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useAuth } from '../../context/AuthContext';
 import img from "../assets/images/login-img.png";
 import "../Login/LoginPage.css";
+import { Alert, Snackbar } from "@mui/material";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("error");
+  
   const navigate = useNavigate();
-  const {login}  = useAuth();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Basic validation
+    if (!username.trim()) {
+      setError("Username is required");
+      return;
+    }
+    
+    if (!password) {
+      setError("Password is required");
+      return;
+    }
+    
     setError("");
+    setLoading(true);
 
     try {
-      const response = await axios.post("https://localhost:8081/api/auth/login", { username, password });
-      login(response.data.token);
-      navigate("/dashboard");
+      const result = await login(username, password);
+      
+      if (result.success) {
+        setSnackbarSeverity("success");
+        setSnackbarMessage("Login successful!");
+        setOpenSnackbar(true);
+        
+        // Navigate after a short delay
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1000);
+      } else {
+        setError(result.message);
+      }
     } catch (error) {
-      console.error("Login failed", error.response?.data);
-      setError(error.response?.data?.message || "Login failed. Please try again.");
+      console.error("Login error:", error);
+      setError("Login failed. Please check your credentials and try again.");
+    } finally {
+      setLoading(false);
     }
+  };
+  
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
   };
 
   return (
@@ -50,6 +88,12 @@ const LoginPage = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Please enter your username"
+            disabled={loading}
+            error={!!error && !username}
+            helperText={!username && error ? "Username is required" : ""}
+            InputProps={{
+              autoComplete: "username"
+            }}
           />
 
           <TextField
@@ -61,10 +105,18 @@ const LoginPage = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter password"
+            disabled={loading}
+            error={!!error && !password}
+            helperText={!password && error ? "Password is required" : ""}
             InputProps={{
+              autoComplete: "current-password",
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={() => setShowPassword(!showPassword)}>
+                  <IconButton 
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={loading}
+                    edge="end"
+                  >
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
@@ -72,21 +124,46 @@ const LoginPage = () => {
             }}
           />
 
-          {error && (
+          {error && username && password && (
             <Typography className="login-error-text">
               {error}
             </Typography>
           )}
 
-          <Button type="submit" variant="contained" className="login-button">
-            Login
+          <Button 
+            type="submit" 
+            variant="contained" 
+            className="login-button"
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
           </Button>
         </form>
 
-        <Button onClick={() => alert("Forgot password clicked")} className="forgot-password-button">
+        <Button 
+          onClick={() => navigate("/forgot-password")} 
+          className="forgot-password-button"
+          disabled={loading}
+        >
           Forgot Password?
         </Button>
       </Box>
+
+      <Snackbar 
+        open={openSnackbar} 
+        autoHideDuration={6000} 
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={handleCloseSnackbar} 
+          severity={snackbarSeverity} 
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
