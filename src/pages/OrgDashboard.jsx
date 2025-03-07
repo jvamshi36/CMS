@@ -9,7 +9,7 @@ import "../styles/Dashboard.css";
 
 const OrgDashboard = () => {
   const [orgData, setOrgData] = useState(null);
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState([]);  // Initialize as empty array
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user } = useAuth();
@@ -22,11 +22,12 @@ const OrgDashboard = () => {
         // Fetch organization profile data
         const profileData = await apiService.get("/api/org/dashboard/profile");
         setOrgData(profileData);
-        
+
         // Fetch organization orders
         const ordersData = await apiService.get("/api/org/dashboard/orders");
-        setOrders(ordersData);
-        
+        // Ensure orders is always an array
+        setOrders(Array.isArray(ordersData) ? ordersData : []);
+
         setError(null);
       } catch (err) {
         console.error("Error fetching organization data:", err);
@@ -56,8 +57,8 @@ const OrgDashboard = () => {
         <Box className="error-container">
           <Typography variant="h6" className="error-title">Something went wrong</Typography>
           <Typography variant="body1" className="error-message">{error}</Typography>
-          <Button 
-            variant="contained" 
+          <Button
+            variant="contained"
             onClick={() => window.location.reload()}
             className="retry-button"
           >
@@ -115,8 +116,8 @@ const OrgDashboard = () => {
                   </span>
                 </div>
               </Box>
-              <Button 
-                variant="outlined" 
+              <Button
+                variant="outlined"
                 className="card-button"
                 onClick={() => navigate("/org/profile")}
               >
@@ -154,7 +155,7 @@ const OrgDashboard = () => {
               <Typography variant="h6" className="card-title">
                 Recent Orders
               </Typography>
-              {orders.length > 0 ? (
+              {Array.isArray(orders) && orders.length > 0 ? (
                 <table className="dashboard-table">
                   <thead>
                     <tr>
@@ -195,17 +196,17 @@ const OrgDashboard = () => {
                   No orders found.
                 </Typography>
               )}
-              {orders.length > 0 && (
-                <Button 
-                  variant="outlined" 
+              {Array.isArray(orders) && orders.length > 0 && (
+                <Button
+                  variant="outlined"
                   className="card-button"
                   onClick={() => navigate("/org/orders")}
                 >
                   View All Orders
                 </Button>
               )}
-              <Button 
-                variant="contained" 
+              <Button
+                variant="contained"
                 className="new-order-button"
                 onClick={() => navigate("/org/new-order")}
               >

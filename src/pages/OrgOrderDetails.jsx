@@ -49,16 +49,16 @@ const OrgOrderDetails = () => {
                 <Box className="order-details-error">
                     <Alert severity="error">{error}</Alert>
                     <div className="error-actions">
-                        <Button 
-                            variant="outlined" 
-                            startIcon={<ArrowBack />} 
+                        <Button
+                            variant="outlined"
+                            startIcon={<ArrowBack />}
                             onClick={() => navigate("/org/orders")}
                             className="back-button"
                         >
                             Back to Orders
                         </Button>
-                        <Button 
-                            variant="contained" 
+                        <Button
+                            variant="contained"
                             onClick={() => window.location.reload()}
                             className="retry-button"
                         >
@@ -74,8 +74,8 @@ const OrgOrderDetails = () => {
         <OrgLayout>
             <div className="order-details-container">
                 <Box className="order-details-header">
-                    <Button 
-                        startIcon={<ArrowBack />} 
+                    <Button
+                        startIcon={<ArrowBack />}
                         onClick={() => navigate("/org/orders")}
                         variant="outlined"
                         className="back-button"
@@ -122,8 +122,8 @@ const OrgOrderDetails = () => {
                                 </div>
                                 <div className="info-row">
                                     <span className="info-label">Expected Delivery:</span>
-                                    <span className="info-value">{order?.expectedDelivery 
-                                        ? new Date(order.expectedDelivery).toLocaleDateString() 
+                                    <span className="info-value">{order?.expectedDelivery
+                                        ? new Date(order.expectedDelivery).toLocaleDateString()
                                         : "To be determined"}
                                     </span>
                                 </div>
@@ -175,8 +175,8 @@ const OrgOrderDetails = () => {
 
                 {order?.status === "Pending" && (
                     <Box className="order-actions">
-                        <Button 
-                            variant="contained" 
+                        <Button
+                            variant="contained"
                             color="error"
                             className="cancel-order-button"
                             onClick={() => {/* Implement cancel order functionality */}}
