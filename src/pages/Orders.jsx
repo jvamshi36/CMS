@@ -22,7 +22,7 @@ const Orders = () => {
         <Layout>
             <div className="orders-header">
                 <h2 className="page-title">Order Lists</h2>
-                <button className="new-order-button" onClick={() => navigate("/new-order")}>New Order</button>
+                <button className="add-order-button" onClick={() => navigate("/new-order")}>New Order</button>
             </div>
             <table className="styled-table">
                 <thead>

@@ -1,65 +1,40 @@
-/* Add this to your Layout.css file */
-.page-content {
-  padding: 20px;
-  flex: 1;
-  margin-top: 80px; /* Match header height */
-  transition: margin-top 0.3s ease;
-  overflow-x: auto; /* Allow horizontal scrolling within content area */
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+/* src/components/Layout/Layout.css */
+.layout {
+  display: flex;
+  min-height: 100vh;
+  height: auto;
 }
 
-/* Make table containers properly scrollable */
-.table-container,
-.orders-table-container,
-.styled-table {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Ensure the main-content allows overflow in the right direction */
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   background: transparent;
   min-height: 100vh;
-  margin-left: 240px; /* Same width as sidebar */
-  transition: margin-left 0.3s ease;
   /* Add the dotted grid background here */
   background-color: #f8f9fa;
   background-image: radial-gradient(circle, #e0e0e0 1px, transparent 1px);
   background-size: 20px 20px;
-  width: calc(100% - 240px); /* Full remaining width */
-  box-sizing: border-box; /* Include padding in width calculation */
-  overflow-x: visible; /* Allow content to determine scrolling */
+}
+
+.page-content {
+  padding: 20px;
+  flex: 1;
+  margin-top: 80px;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .main-content {
-    margin-left: 0;
-    width: 100%;
-    overflow-x: visible; /* Allow horizontal scrolling when needed */
+  .layout {
+    flex-direction: column;
   }
-
+  
+  .main-content {
+    width: 100%;
+  }
+  
   .page-content {
     padding: 15px;
-    margin-top: 60px; /* Match smaller mobile header height */
-  }
-
-  /* Fix for the layout container to allow scrolling */
-  .layout {
-    overflow-x: visible;
-  }
-
-  /* Keep body from scrolling when sidebar is open */
-  body.sidebar-open {
-    overflow: hidden;
-  }
-
-  /* But allow the content area to scroll */
-  body.sidebar-open .page-content {
-    overflow-x: auto;
+    margin-top: 60px;
   }
 }

@@ -7,14 +7,10 @@
   }
   
   .order-title {
-  margin-bottom: 2rem !important;
-  text-align: center;
-  font-size: 2rem !important;
-  font-weight: 600 !important;
-  background: linear-gradient(45deg, #2563EB, #1d4ed8);
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
+margin-bottom: 2rem !important;
+text-align: center;
+font-size: 2rem !important;
+font-weight: 600 !important;
   }
   
   /* Stepper Styling */

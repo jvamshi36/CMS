@@ -1,67 +1,25 @@
 body {
   margin: 0;
-  padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  height: 100%;
-  overflow-x: auto; /* Changed from hidden to allow scrolling when needed */
+  height: 100%; /* Ensure body takes full height */
 }
 
-html {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-*, *:before, *:after {
-  box-sizing: inherit;
-}
-
-#root {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow-x: visible; /* Allow content to determine if scrolling is needed */
+html, body {
+  height: 100%; /* Ensure html and body take full height */
 }
 
 .dotted-grid {
-  background-color: #f8f9fa;
+  background-color: #f8f9fa; /* Light background color */
   background-image: radial-gradient(circle, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
-  background-size: 20px 20px;
-  min-height: 100vh;
+  background-size: 20px 20px; /* Adjust the size of the dots */
+  min-height: 100vh; /* Ensure it covers the full viewport height */
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
-}
-
-/* Mobile optimization for tables and wide content */
-@media (max-width: 768px) {
-  /* Only prevent horizontal scrolling when the sidebar is open */
-  body.sidebar-open {
-    overflow-x: hidden;
-  }
-
-  /* Otherwise allow natural scrolling behavior */
-  body {
-    overflow-x: auto;
-  }
-
-  #root {
-    width: 100%;
-    overflow-x: visible; /* Let content determine scrolling need */
-  }
-
-  /* Better touch scrolling on iOS */
-  .table-container,
-  .page-content,
-  body,
-  html {
-    -webkit-overflow-scrolling: touch;
-  }
 }

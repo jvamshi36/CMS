@@ -7,9 +7,9 @@ import { LuCircuitBoard } from "react-icons/lu";  // Futuristic Dashboard Icon
 import { FaBuilding } from "react-icons/fa"; // Futuristic Companies Icon
 import { GiArtificialIntelligence } from "react-icons/gi"; // Futuristic Team Icon
 
-const Sidebar = ({ className }) => {
+const Sidebar = () => {
   return (
-    <div className={`sidebar ${className || ''}`}>
+    <div className="sidebar">
       <div className="logo-container">
         <HiOutlineCube size={28} className="futuristic-icon" />
         <h2 className="logo">Suraksha <span>Pharma</span></h2>
@@ -27,31 +27,26 @@ const Sidebar = ({ className }) => {
 
       <nav>
         <NavLink to="/dashboard" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
-          <LuCircuitBoard className="futuristic-icon" />
-          <span>Dashboard</span>
+          <LuCircuitBoard className="futuristic-icon" /> Dashboard
         </NavLink>
 
         <NavLink to="/companies" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
-          <FaBuilding className="futuristic-icon" />
-          <span>Companies</span>
+          <FaBuilding className="futuristic-icon" /> Companies
           <span className="notification-badge">3</span>
         </NavLink>
 
         <NavLink to="/team" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
-          <GiArtificialIntelligence className="futuristic-icon" />
-          <span>Team</span>
+          <GiArtificialIntelligence className="futuristic-icon" /> Team
         </NavLink>
       </nav>
 
       <div className="sidebar-bottom">
         <NavLink to="/settings" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
-          <FiSettings className="futuristic-icon" />
-          <span>Settings</span>
+          <FiSettings className="futuristic-icon" /> Settings
         </NavLink>
 
         <NavLink to="/logout" className="nav-item">
-          <FiLogOut className="futuristic-icon" />
-          <span>Logout</span>
+          <FiLogOut className="futuristic-icon" /> Logout
         </NavLink>
       </div>
     </div>

@@ -1,4 +1,4 @@
-/* src/components/Header/Header.css */
+/* src/styles/Header.css */
 .header-container {
   position: fixed;
   top: 0;
@@ -11,7 +11,6 @@
   border-bottom: 1px solid rgba(37, 99, 235, 0.1);
   z-index: 99;
   box-shadow: 0 4px 30px rgba(37, 99, 235, 0.05);
-  transition: left 0.3s ease;
 }
 
 /* Animated gradient border */
@@ -105,7 +104,7 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 16px;
-  box-shadow:
+  box-shadow: 
     0 10px 30px rgba(37, 99, 235, 0.1),
     0 1px 2px rgba(37, 99, 235, 0.05);
   min-width: 220px;
@@ -189,38 +188,10 @@
 @media (max-width: 768px) {
   .header-container {
     left: 0;
-    width: 100%;
-    height: 60px; /* Smaller height on mobile */
   }
-
+  
   .search-box {
-    left: 70px; /* Make room for the sidebar toggle button */
-    width: calc(100% - 180px);
-    max-width: 300px;
-    top: 13px; /* Adjust for smaller header height */
-    padding: 8px 15px; /* Smaller padding */
-    font-size: 13px; /* Smaller font */
-  }
-
-  .header-right {
-    top: 10px; /* Adjust for smaller header height */
-    right: 15px;
-  }
-
-  .user-avatar {
-    width: 36px; /* Smaller avatar */
-    height: 36px;
-  }
-
-  /* Adjust menu position for mobile */
-  .user-menu {
-    right: -10px;
-    margin-top: 12px;
-    width: 200px;
-  }
-
-  .menu-item {
-    padding: 12px 15px;
-    font-size: 13px;
+    left: 20px;
+    width: calc(100% - 140px);
   }
 }
