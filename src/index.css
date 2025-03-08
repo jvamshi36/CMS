@@ -23,3 +23,190 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+/* src/styles/common.css - New file to consolidate shared styles */
+
+/* Common Typography */
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  background: linear-gradient(45deg, #2563EB, #1d4ed8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Common Card Styles */
+.card {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Common Button Styles */
+.btn-primary {
+  background: linear-gradient(135deg, #2563EB, #1d4ed8);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+}
+
+.btn-secondary {
+  background: white;
+  color: #2563EB;
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: rgba(37, 99, 235, 0.05);
+  transform: translateY(-2px);
+}
+
+/* Common Status Badges */
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+  color: white;
+}
+
+.status.completed {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.status.processing, .status.pending {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.status.rejected, .status.cancelled {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+/* Common Table Styles */
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.table th {
+  padding: 15px;
+  text-align: left;
+  background: rgba(248, 249, 250, 0.8);
+  font-weight: 600;
+  color: #1a56db;
+  border-bottom: 2px solid rgba(37, 99, 235, 0.1);
+}
+
+.table td {
+  padding: 15px;
+  border-bottom: 1px solid rgba(37, 99, 235, 0.05);
+}
+
+.table tbody tr {
+  transition: all 0.3s ease;
+}
+
+.table tbody tr:hover {
+  background: rgba(37, 99, 235, 0.05);
+  transform: translateX(5px);
+}
+
+/* Common Form Styles */
+.form-input {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  background: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+  margin-bottom: 15px;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  background: white;
+}
+
+/* Loading and Error States */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 20px;
+}
+
+.error-container {
+  text-align: center;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  max-width: 500px;
+  margin: 40px auto;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 30px 0;
+}
+
+.pagination button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pagination button:hover {
+  background: rgba(37, 99, 235, 0.1);
+  transform: translateY(-2px);
+}
+
+.pagination button.active {
+  background: #2563EB;
+  color: white;
+  border-color: #2563EB;
+}

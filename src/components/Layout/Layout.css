@@ -15,24 +15,22 @@
   background-color: #f8f9fa;
   background-image: radial-gradient(circle, #e0e0e0 1px, transparent 1px);
   background-size: 20px 20px;
+  margin-left: 240px; /* Match sidebar width */
+  transition: margin-left 0.3s ease;
 }
 
 .page-content {
   padding: 20px;
   flex: 1;
-  margin-top: 80px;
+  margin-top: 80px; /* Match header height */
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .layout {
-    flex-direction: column;
-  }
-  
   .main-content {
-    width: 100%;
+    margin-left: 60px; /* Match collapsed sidebar width */
   }
-  
+
   .page-content {
     padding: 15px;
     margin-top: 60px;

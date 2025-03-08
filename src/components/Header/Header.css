@@ -1,16 +1,17 @@
-/* src/styles/Header.css */
+/* src/components/Header/Header.css */
 .header-container {
   position: fixed;
   top: 0;
-  left: 240px;
+  left: 240px; /* Match sidebar width */
   right: 0;
   height: 80px;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(37, 99, 235, 0.1);
-  z-index: 99;
+  z-index: 90; /* Lower than sidebar but above content */
   box-shadow: 0 4px 30px rgba(37, 99, 235, 0.05);
+  transition: left 0.3s ease;
 }
 
 /* Animated gradient border */
@@ -27,6 +28,7 @@
     rgba(37, 99, 235, 0.3),
     rgba(37, 99, 235, 0)
   );
+  background-size: 200% 100%;
   animation: shimmer 3s infinite;
 }
 
@@ -39,7 +41,7 @@
 .search-box {
   position: fixed;
   top: 20px;
-  left: 280px;
+  left: 280px; /* Adjusted for sidebar */
   padding: 12px 20px;
   border: 1px solid rgba(37, 99, 235, 0.2);
   border-radius: 12px;
@@ -104,13 +106,14 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 16px;
-  box-shadow: 
+  box-shadow:
     0 10px 30px rgba(37, 99, 235, 0.1),
     0 1px 2px rgba(37, 99, 235, 0.05);
   min-width: 220px;
   overflow: hidden;
   border: 1px solid rgba(37, 99, 235, 0.1);
   animation: menuSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 110; /* Above other elements */
 }
 
 @keyframes menuSlide {
@@ -175,23 +178,14 @@
   border-bottom: 1px solid rgba(37, 99, 235, 0.05);
 }
 
-/* Glass Effect */
-.glass-effect {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
   .header-container {
-    left: 0;
+    left: 60px; /* Match collapsed sidebar width */
   }
-  
+
   .search-box {
-    left: 20px;
+    left: 80px; /* Adjust for collapsed sidebar */
     width: calc(100% - 140px);
   }
 }
