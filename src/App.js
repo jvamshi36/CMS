@@ -34,6 +34,7 @@ const NewOrder = lazy(() => import('./pages/NewOrder'));
 const Companies = lazy(() => import('./pages/Companies'));
 const Details = lazy(() => import('./pages/Details'));
 const Orders = lazy(() => import('./pages/Orders'));
+const Settings = lazy(() =>import ('./pages/Settings'));
 const OrderDetails = lazy(() => import('./pages/OrderDetails'));
 const Team = lazy(() => import('./pages/Team'));
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -42,6 +43,7 @@ const OrgDashboard = lazy(() => import('./pages/OrgDashboard'));
 const OrgProfile = lazy(() => import('./pages/OrgProfile'));
 const OrgOrders = lazy(() => import('./pages/OrgOrders'));
 const OrgOrderDetails = lazy(() => import('./pages/OrgOrderDetails'));
+const OrgSettings = lazy(() =>import ('./pages/OrgSettings'));
 
 function App() {
   return (
@@ -64,6 +66,7 @@ function App() {
               <Route path="/companies/:companyId/orders" element={<Orders />} />
               <Route path="/companies/:companyId/orders/:orderId/order-details" element={<OrderDetails />} />
               <Route path="/team" element={<Team />} />
+              <Route path="/settings" element={<Settings />} />
             </Route>
 
             {/* Organization Protected Routes */}
@@ -72,6 +75,7 @@ function App() {
               <Route path="/org/profile" element={<OrgProfile />} />
               <Route path="/org/orders" element={<OrgOrders />} />
               <Route path="/org/orders/:orderId" element={<OrgOrderDetails />} />
+              <Route path="/org/settings" element={<OrgSettings />} />
             </Route>
 
             {/* Shared Protected Routes */}

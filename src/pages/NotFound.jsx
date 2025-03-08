@@ -6,10 +6,20 @@ import "../styles/NotFound.css";
 
 const NotFound = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin, isOrganization } = useAuth();
 
   const handleGoBack = () => {
-    navigate('/dashboard');
+    if (isAuthenticated()) {
+      if (isAdmin()) {
+        navigate('/dashboard');
+      } else if (isOrganization()) {
+        navigate('/org/dashboard');
+      } else {
+        navigate('/login');
+      }
+    } else {
+      navigate('/login');
+    }
   };
 
   return (
