@@ -20,14 +20,17 @@
   }
   
   .new-order-button {
-    background: linear-gradient(135deg, #2563EB, #1d4ed8) !important;
-    color: white !important;
-    font-weight: 500 !important;
-    padding: 8px 20px !important;
-    border-radius: 8px !important;
-    text-transform: none !important;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
-    transition: all 0.3s ease !important;
+  background: linear-gradient(135deg, #2563EB, #1d4ed8);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
   }
   
   .new-order-button:hover {

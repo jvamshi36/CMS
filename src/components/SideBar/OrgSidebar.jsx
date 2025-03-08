@@ -1,4 +1,3 @@
-// src/components/SideBar/OrgSidebar.jsx
 import React from "react";
 import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
@@ -6,15 +5,15 @@ import { FiLogOut, FiSettings, FiHome, FiPackage, FiUser } from "react-icons/fi"
 import { HiOutlineCube } from "react-icons/hi";
 import { useAuth } from "../../context/AuthContext";
 
-const OrgSidebar = () => {
+const OrgSidebar = ({ className }) => {
   const { logout } = useAuth();
-  
+
   const handleLogout = () => {
     logout();
   };
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${className || ''}`}>
       <div className="logo-container">
         <HiOutlineCube size={28} className="futuristic-icon" />
         <h2 className="logo">Suraksha <span>Pharma</span></h2>
@@ -32,25 +31,30 @@ const OrgSidebar = () => {
 
       <nav>
         <NavLink to="/org/dashboard" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
-          <FiHome className="futuristic-icon" /> Dashboard
+          <FiHome className="futuristic-icon" />
+          <span>Dashboard</span>
         </NavLink>
 
         <NavLink to="/org/profile" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
-          <FiUser className="futuristic-icon" /> Profile
+          <FiUser className="futuristic-icon" />
+          <span>Profile</span>
         </NavLink>
 
         <NavLink to="/org/orders" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
-          <FiPackage className="futuristic-icon" /> Orders
+          <FiPackage className="futuristic-icon" />
+          <span>Orders</span>
         </NavLink>
       </nav>
 
       <div className="sidebar-bottom">
         <NavLink to="/org/settings" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
-          <FiSettings className="futuristic-icon" /> Settings
+          <FiSettings className="futuristic-icon" />
+          <span>Settings</span>
         </NavLink>
 
         <button onClick={handleLogout} className="nav-item logout-button">
-          <FiLogOut className="futuristic-icon" /> Logout
+          <FiLogOut className="futuristic-icon" />
+          <span>Logout</span>
         </button>
       </div>
     </div>

@@ -29,15 +29,17 @@
     right: -200px;
   }
   
-  .not-found-card {
-    background-color: white;
-    border-radius: 16px;
-    padding: 40px 20px;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    position: relative;
-    z-index: 1;
-  }
+.not-found-card {
+  background-color: white;
+  border-radius: 16px;
+  padding: 40px 20px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
   
   .browser-window {
     width: 220px;
