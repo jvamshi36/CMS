@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -15,6 +14,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Layout from "../components/Layout/Layout";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import "../styles/NewOrder.css";
 
 const NewOrder = () => {
@@ -133,28 +133,23 @@ const NewOrder = () => {
 
   const handleSubmit = async () => {
     try {
-      // Validate all products, not just the current one
+      // Validate form data
+      const currentProduct = products[activeStep];
       const formErrors = {};
-      let hasErrors = false;
 
-      // Validate each product
-      products.forEach((product, idx) => {
-        Object.entries(product.formData).forEach(([key, value]) => {
-          // Skip validation for optional fields
-          if (['remarks', 'cylinderCharges', 'dpcoMrp'].includes(key)) return;
+      // Basic validation checks
+      Object.entries(currentProduct.formData).forEach(([key, value]) => {
+        // Skip validation for optional fields
+        if (['remarks', 'cylinderCharges', 'dpcoMrp'].includes(key)) return;
 
-          if (!value && value !== 0) {
-            if (!formErrors[idx]) formErrors[idx] = {};
-            formErrors[idx][key] = "This field is required";
-            hasErrors = true;
-          }
-        });
+        if (!value && value !== 0) {
+          formErrors[key] = "This field is required";
+        }
       });
 
       // If there are errors, update the errors state and return
-      if (hasErrors) {
-        setErrors(formErrors[activeStep] || {});
-        alert("Please fill in all required fields for all products.");
+      if (Object.keys(formErrors).length > 0) {
+        setErrors(formErrors);
         return;
       }
 
@@ -165,15 +160,11 @@ const NewOrder = () => {
       const orderData = {
         products: products.map(product => ({
           ...product.formData
-        })),
-        orderDate: new Date().toISOString(),
-        totalAmount: products.reduce((sum, product) => sum + (parseFloat(product.formData.amount) || 0), 0)
+        }))
       };
 
-      console.log("Sending order data:", orderData);
-
-      // For visibility in network tab, send with fetch
-      const response = await fetch('https://httpbin.org/post', { // Using httpbin to echo back the data
+      // Send data to backend
+      const response = await fetch('/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -181,23 +172,21 @@ const NewOrder = () => {
         body: JSON.stringify(orderData),
       });
 
-      // Log the raw response
-      const responseText = await response.text();
-      console.log("Raw response:", responseText);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
 
-      // Parse the response
-      const data = JSON.parse(responseText);
-      console.log("Parsed response:", data);
+      const data = await response.json();
+      console.log("Order submitted successfully:", data);
 
-      // This will show in the console and you'll see the network request
-      alert("Order submitted! Check browser console and network tab.");
-
-      // Uncomment to redirect after successful submission:
+      // Optionally redirect or show success message
+      alert("Order submitted successfully!");
+      // If you want to redirect after submission:
       // navigate('/orders');
 
     } catch (error) {
       console.error("Error submitting order:", error);
-      alert("Failed to submit order. Please check console for details.");
+      alert("Failed to submit order. Please try again.");
     }
   };
 
@@ -538,5 +527,4 @@ const NewOrder = () => {
   );
 };
 
-// Make sure to export the component as default
 export default NewOrder;

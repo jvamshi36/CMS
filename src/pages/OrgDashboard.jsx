@@ -1,4 +1,4 @@
-// src/pages/OrgDashboard.jsx
+// src/pages/OrgDashboard.jsx - Updated with correct API path
 import React, { useState, useEffect } from "react";
 import OrgLayout from "../components/Layout/OrgLayout";
 import { Box, Typography, Paper, Grid, CircularProgress, Button } from "@mui/material";
@@ -23,22 +23,36 @@ const OrgDashboard = () => {
         const profileData = await apiService.get("/api/org/dashboard/profile");
         setOrgData(profileData);
 
-        // Fetch organization orders
-        const ordersData = await apiService.get("/api/org/dashboard/orders");
+        // Fetch organization orders - UPDATED PATH to match backend controller
+        const ordersData = await apiService.get("/api/org/orders");
         // Ensure orders is always an array
         setOrders(Array.isArray(ordersData) ? ordersData : []);
 
         setError(null);
       } catch (err) {
         console.error("Error fetching organization data:", err);
-        setError(err.message || "Failed to load organization data. Please try again later.");
+
+        // Check if it's an authentication error
+        if (err.status === 401 || (err.response && err.response.status === 401)) {
+          // Handle authentication error
+          setError("Your session has expired. Please login again.");
+
+          // You might want to redirect to login page
+          setTimeout(() => {
+            navigate("/login");
+          }, 3000);
+        } else {
+          setError(err.message || "Failed to load organization data. Please try again later.");
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchOrgData();
-  }, []);
+  }, [navigate]);
+
+  // Rest of the component remains the same
 
   if (loading) {
     return (

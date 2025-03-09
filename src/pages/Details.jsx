@@ -3,25 +3,20 @@ import React, { useState, useEffect } from "react";
 import { Box, Typography, CircularProgress, Grid } from "@mui/material";
 import "../styles/Details.css";
 import Layout from "../components/Layout/Layout";
-import axios from "axios";
 import { useParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const OrgDetails = () => {
   const [organizationData, setOrganizationData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { companyId } = useParams();
+  const { api } = useAuth();
 
   useEffect(() => {
     const fetchOrgData = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("No authentication token found");
-        const response = await axios.get(`https://localhost:8081/api/new-org/${companyId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response = await api.get(`/api/new-org/${companyId}`);
         setOrganizationData(response.data);
         setLoading(false);
       } catch (err) {
@@ -32,7 +27,7 @@ const OrgDetails = () => {
     };
 
     fetchOrgData();
-  }, [companyId]);
+  }, [companyId, api]);
 
   const getOrganizationDetails = () => {
     if (!organizationData) return {};
@@ -91,31 +86,31 @@ const OrgDetails = () => {
         {/* Organization Details Container */}
         <Typography variant="h5" className="section-title">
             Organization Details
-          </Typography>
+        </Typography>
         <Box sx={{ my: 2 }}/>
         <Box className="details-card">
-        <Grid container spacing={2}>
-  {Object.entries(getOrganizationDetails()).map(([key, value]) => (
-    <Grid item xs={12} sm={6} key={key}>
-      <Typography variant="body1" className="detail-value">
-        {key}: <span>{value}</span>
-      </Typography>
-    </Grid>
-  ))}
-</Grid>
+          <Grid container spacing={2}>
+            {Object.entries(getOrganizationDetails()).map(([key, value]) => (
+              <Grid item xs={12} sm={6} key={key}>
+                <Typography variant="body1" className="detail-value">
+                  {key}: <span>{value}</span>
+                </Typography>
+              </Grid>
+            ))}
+          </Grid>
         </Box>
 
         {/* Representative Details Container */}
         <Typography variant="h5" className="section-title">
             Representative Details
-          </Typography>
-          <Box sx={{ my: 2 }}/>
+        </Typography>
+        <Box sx={{ my: 2 }}/>
         <Box className="details-card">
           <Grid container spacing={2}>
             {Object.entries(getRepresentativeDetails()).map(([key, value]) => (
               <Grid item xs={12} sm={6} key={key}>
                 <Typography variant="body1" className="detail-value">
-                  {key}: <span>{value}</span> 
+                  {key}: <span>{value}</span>
                 </Typography>
               </Grid>
             ))}
