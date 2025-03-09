@@ -15,13 +15,11 @@ const LogoutPage = () => {
       try {
         await logout();
         // Short delay for better UX - shows the loading state briefly
-        setTimeout(() => {
+
           setIsLoggingOut(false);
           // Auto-redirect to login after a brief pause
-          setTimeout(() => {
             navigate('/login');
-          }, 1500);
-        }, 1000);
+
       } catch (error) {
         console.error('Logout failed:', error);
         setError('Failed to log out properly. Please try again.');

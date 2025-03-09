@@ -25,18 +25,6 @@ const OrderDetails = () => {
         console.error("Error fetching order details:", err);
         setError(err.message || "Failed to load order details");
 
-        // For development, use dummy order details if API fails
-        // setOrderDetails({
-        //   id: orderId,
-        //   customerName: "John Doe",
-        //   orderDate: "01 March 2024",
-        //   deliveryDate: "05 March 2024",
-        //   items: "Laptop, Mouse, Keyboard",
-        //   totalAmount: "₹45,000",
-        //   paymentMethod: "Credit Card",
-        //   orderStatus: "Shipped",
-        //   address: "123 Street, Hyderabad, India",
-        // });
       } finally {
         setLoading(false);
       }
@@ -95,9 +83,9 @@ const OrderDetails = () => {
     if (!orderDetails) return {};
 
     return {
-      "Order ID": orderDetails.orderId || orderDetails.id,
+      "Order ID": orderDetails.id || orderDetails.id,
       "Product Name": orderDetails.productName || "Multiple Items",
-      "Order Date": formatDate(orderDetails.createdAt || orderDetails.orderDate),
+      "Order Date": formatDate(orderDetails.date),
       "Expected Delivery": formatDate(orderDetails.expectedDelivery || orderDetails.deliveryDate),
       "Total Amount": `₹${orderDetails.totalAmount?.toLocaleString() || orderDetails.totalAmount || "N/A"}`,
       "Status": orderDetails.status || orderDetails.orderStatus || "Processing",
@@ -133,11 +121,17 @@ const OrderDetails = () => {
             <Grid container spacing={3}>
               {Object.entries(getOrderDetailsData()).map(([key, value]) => (
                 <Grid item xs={12} sm={4} key={key}>
-                  <Typography variant="body2" className="detail-value">
-                    {key}: <span>{typeof value === 'string' && value.toLowerCase() === 'processing' || value.toLowerCase() === 'pending' || value.toLowerCase() === 'completed' || value.toLowerCase() === 'cancelled' ?
-                      <span className={`status ${value.toLowerCase()}`}>{value}</span> :
-                      value}</span>
-                  </Typography>
+                <Typography variant="body2" className="detail-value">
+                  {key}: <span>
+                    {typeof value === "string" &&
+                    ["processing", "pending", "completed", "cancelled"].includes(value.toLowerCase()) ? (
+                      <span className={`status ${value.toLowerCase()}`}>{value}</span>
+                    ) : (
+                      value?.toString() ?? "N/A"
+                    )}
+                  </span>
+                </Typography>
+
                 </Grid>
               ))}
             </Grid>

@@ -24,22 +24,22 @@ api.interceptors.response.use(
     // If the error is 401 and we haven't tried to refresh the token yet
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      
+
       try {
         // Try to get a new token using the refresh endpoint
-        const response = await axios.post('/api/auth/refresh', {}, { 
+        const response = await axios.post('/api/auth/refresh', {}, {
           withCredentials: true,
           baseURL: process.env.REACT_APP_API_URL || 'https://localhost:8081'
         });
-        
+
         // If we got a new token, update it in memory
         if (response.data.token) {
           // Store the token in memory (not localStorage)
           sessionStorage.setItem('_auth_token', response.data.token);
-          
+
           // Update the Authorization header for the original request
           originalRequest.headers['Authorization'] = 'Bearer ' + response.data.token;
-          
+
           // Return the original request with the new token
           return api(originalRequest);
         }

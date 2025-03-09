@@ -5,7 +5,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import { CircularProgress, Box } from '@mui/material';
-
+import Dashboard from './pages/Dashboard';
+import OrgDashboard from './pages/OrgDashboard';
 // Loading component for suspense fallback
 const LoadingPage = () => (
   <Box 
@@ -28,7 +29,6 @@ const LoadingPage = () => (
 const Login = lazy(() => import('./components/Login/LoginPage'));
 const ForgotPassword = lazy(() => import('./components/Login/ForgotPassword'));
 const ResetPassword = lazy(() => import('./components/Login/ResetPassword'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
 const NeworgForm = lazy(() => import('./pages/NeworgForm'));
 const NewOrder = lazy(() => import('./pages/NewOrder'));
 const Companies = lazy(() => import('./pages/Companies'));
@@ -39,7 +39,6 @@ const OrderDetails = lazy(() => import('./pages/OrderDetails'));
 const Team = lazy(() => import('./pages/Team'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const Logout = lazy(() => import('./components/Logout/LogoutPage'));
-const OrgDashboard = lazy(() => import('./pages/OrgDashboard'));
 const OrgProfile = lazy(() => import('./pages/OrgProfile'));
 const OrgOrders = lazy(() => import('./pages/OrgOrders'));
 const OrgOrderDetails = lazy(() => import('./pages/OrgOrderDetails'));

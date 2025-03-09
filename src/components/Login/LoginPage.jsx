@@ -46,14 +46,12 @@ const LoginPage = () => {
         setSnackbarMessage("Login successful!");
         setOpenSnackbar(true);
         
-        // Navigate after a short delay based on user type
-        setTimeout(() => {
+
           if (result.userType === "ORGANIZATION") {
             navigate("/org/dashboard");
           } else {
             navigate("/dashboard");
           }
-        }, 1000);
       } else {
         setError(result.message);
       }

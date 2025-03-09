@@ -230,7 +230,7 @@ const NewOrder = () => {
       const orderData = {
         // Include basic required fields
         orgId: parseInt(companyId) || null,
-        status: "Pending",
+        status: "Processing",
         totalAmount: parseFloat(currentProduct.formData.amount) || calculatedTotal || 0,
         shippingAddress: "To be determined", // This should ideally come from a form field
 
