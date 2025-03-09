@@ -173,24 +173,37 @@ const OrgDashboard = () => {
                 <table className="dashboard-table">
                   <thead>
                     <tr>
-                      <th>Order ID</th>
-                      <th>Date</th>
-                      <th>Items</th>
-                      <th>Status</th>
-                      <th>Actions</th>
+                        <th>Order ID</th>
+                        <th>PRN NO. </th>
+                        <th>Date Of Order</th>
+                        <th>Product Name</th>
+                        <th>Total Amount</th>
+                        <th>Status</th>
+                        <th>Order Details</th>
                     </tr>
                   </thead>
                   <tbody>
                     {orders.slice(0, 5).map((order) => (
                       <tr key={order.id}>
-                        <td>{order.id}</td>
-                        <td>{new Date(order.date).toLocaleDateString()}</td>
-                        <td>{order.items}</td>
-                        <td>
-                          <span className={`status-badge ${order.status.toLowerCase()}`}>
-                            {order.status}
-                          </span>
-                        </td>
+                           <td>{order.id || 'N/A'}</td>
+                            <td>{order.prnNo|| 'N/A'}</td>
+                           <td>
+                             {order.date
+                               ? new Date(order.date).toLocaleString('en-US', {
+                                   year: 'numeric',
+                                   month: 'short',
+                                   day: 'numeric'
+                                 })
+                               : 'N/A'
+                             }
+                           </td>
+                            <td>{order.productName || 'N/A'}</td>
+                            <td>₹{order.totalAmount?.toFixed(2) || '0.00'}</td>
+                            <td>
+                                <span className={`status ${(order.status || '').toLowerCase()}`}>
+                                    {order.status || 'Processing'}
+                                </span>
+                            </td>
                         <td>
                           <Button
                             variant="contained"

@@ -163,9 +163,12 @@ const OrgOrders = () => {
                   <TableHead>
                     <TableRow>
                       <TableCell>Order ID</TableCell>
-                      <TableCell>Date</TableCell>
-                      <TableCell>Items</TableCell>
-                      <TableCell>Total</TableCell>
+                       <TableCell>PRN NO.</TableCell>
+                      <TableCell>Date Of Order</TableCell>
+                      <TableCell>Product Name</TableCell>
+                      <TableCell>Type</TableCell>
+                      <TableCell>Batch Size</TableCell>
+                       <TableCell>Total Amount</TableCell>
                       <TableCell>Status</TableCell>
                       <TableCell>Actions</TableCell>
                     </TableRow>
@@ -173,15 +176,23 @@ const OrgOrders = () => {
                   <TableBody>
                     {currentOrders.map((order) => (
                       <TableRow key={order.id}>
-                        <TableCell>{order.id}</TableCell>
-                        <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
-                        <TableCell>{order.items}</TableCell>
-                        <TableCell>₹{order.total?.toLocaleString() || "N/A"}</TableCell>
-                        <TableCell>
-                          <span className={`status-badge ${order.status.toLowerCase()}`}>
-                            {order.status}
-                          </span>
-                        </TableCell>
+                        <TableCell>{order.id || 'N/A'}</TableCell>
+                        <TableCell>{order.prnNo|| 'N/A'}</TableCell>
+                        <TableCell>{order.date?
+                            new Date(order.date).toLocaleString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                                })
+                            : 'N/A'
+                        }</TableCell>
+                        <TableCell>{order.productName || 'N/A'}</TableCell>
+                        <TableCell>{order.type || 'N/A'}</TableCell>
+                        <TableCell>{order.batchSizeStrips || 'N/A'}</TableCell>
+                        <TableCell>₹{order.totalAmount?.toFixed(2) || '0.00'}</TableCell>
+                         <TableCell><span className={`status ${(order.status || '').toLowerCase()}`}>
+                                                            {order.status || 'Processing'}
+                                                        </span> </TableCell>
                         <TableCell>
                           <Button
                             variant="contained"

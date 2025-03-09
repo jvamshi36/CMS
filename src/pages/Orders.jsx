@@ -15,12 +15,15 @@ const Orders = () => {
     const ordersPerPage = 9;
 
     // Use the auth context for API calls and auth state
-    const { api, isAuthenticated } = useAuth();
+    const { api, isAuthenticated, isAdmin } = useAuth();
 
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                // Validate authentication first
+                console.log("Is authenticated?", isAuthenticated());
+                            console.log("Is admin?", isAdmin());
+                            console.log("Token:", sessionStorage.getItem('_auth_token'));
+
                 if (!isAuthenticated()) {
                     console.error("Authentication required");
                     setError("You must be logged in to view orders");
@@ -199,11 +202,13 @@ const Orders = () => {
             <table className="styled-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Order ID</th>
-                        <th>Product</th>
-                        <th>Date</th>
-                        <th>Amount</th>
+                        <th>PRN NO. </th>
+                        <th>Date Of Order</th>
+                        <th>Product Name</th>
+                        <th>Type</th>
+                        <th>Batch Size</th>
+                        <th>Total Amount</th>
                         <th>Status</th>
                         <th>Order Details</th>
                     </tr>
@@ -211,11 +216,22 @@ const Orders = () => {
                 <tbody>
                     {currentOrders.map((order) => (
                         <tr key={order.id}>
-                            <td>{order.id}</td>
-                            <td>{order.orderId || 'N/A'}</td>
+                            <td>{order.id || 'N/A'}</td>
+                            <td>{order.prnNo|| 'N/A'}</td>
+                           <td>
+                             {order.date
+                               ? new Date(order.date).toLocaleString('en-US', {
+                                   year: 'numeric',
+                                   month: 'short',
+                                   day: 'numeric'
+                                 })
+                               : 'N/A'
+                             }
+                           </td>
                             <td>{order.productName || 'N/A'}</td>
-                            <td>{order.orderDate ? new Date(order.orderDate).toLocaleDateString() : 'N/A'}</td>
-                            <td>${order.totalAmount?.toFixed(2) || '0.00'}</td>
+                            <td>{order.type || 'N/A'}</td>
+                            <td>{order.batchSizeStrips || 'N/A'}</td>
+                            <td>₹{order.totalAmount?.toFixed(2) || '0.00'}</td>
                             <td>
                                 <span className={`status ${(order.status || '').toLowerCase()}`}>
                                     {order.status || 'Processing'}
@@ -223,7 +239,7 @@ const Orders = () => {
                             </td>
                             <td>
                                 <NavLink to={`/companies/${companyId}/orders/${order.id}/order-details`}>
-                                    View Details
+                                    Details
                                 </NavLink>
                             </td>
                         </tr>

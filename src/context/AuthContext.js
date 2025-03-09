@@ -110,6 +110,7 @@ export const AuthProvider = ({ children }) => {
       
       if (response.data.token) {
         // Store token in memory
+        console.log("Storing token:", response.data.token); // Add this line
         sessionStorage.setItem('_auth_token', response.data.token);
         sessionStorage.setItem('_user_type', response.data.userType);
         

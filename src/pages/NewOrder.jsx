@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -8,17 +9,24 @@ import {
   Stepper,
   TextField,
   Typography,
+  CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CheckIcon from "@mui/icons-material/Check";
 import DeleteIcon from "@mui/icons-material/Delete";
+import BugReportIcon from "@mui/icons-material/BugReport";
 import Layout from "../components/Layout/Layout";
-import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import apiService from "../utils/api";
+import { useAuth } from "../context/AuthContext.js";
 import "../styles/NewOrder.css";
 
 const NewOrder = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated, isAdmin } = useAuth();
   const [products, setProducts] = useState([
     {
       name: "Product 1",
@@ -48,6 +56,24 @@ const NewOrder = () => {
   ]);
   const [activeStep, setActiveStep] = useState(0);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info"
+  });
+
+  // Extract company ID from URL query params
+  const companyId = new URLSearchParams(location.search).get('companyId');
+
+  // Log authentication status on component mount
+  useEffect(() => {
+    console.log("Component mounted");
+    console.log("Is authenticated?", isAuthenticated());
+    console.log("Is admin?", isAdmin());
+    console.log("Company ID from URL:", companyId);
+    console.log("Token:", sessionStorage.getItem('_auth_token'));
+  }, [isAuthenticated, isAdmin, companyId]);
 
   const handleNext = () => {
     setActiveStep((prev) => Math.min(prev + 1, products.length - 1));
@@ -131,10 +157,39 @@ const NewOrder = () => {
     setProducts(updatedProducts);
   };
 
+  // Debug function to check form data
+  const debugFormData = () => {
+    const currentProduct = products[activeStep];
+    console.log("Current form data:", currentProduct.formData);
+    console.log("Required fields for Order entity:", [
+      "orgId", "status", "totalAmount", "shippingAddress", "productName",
+      "brand", "type", "quantity", "price"
+    ]);
+
+    // Check for missing required fields
+    const missingFields = ["productName", "brand", "type", "quantity", "price"]
+      .filter(field => !currentProduct.formData[field]);
+
+    console.log("Missing required fields:", missingFields);
+    console.log("Company ID:", companyId);
+    console.log("Authentication token:", sessionStorage.getItem('_auth_token'));
+
+    setSnackbar({
+      open: true,
+      message: "Form data logged to console",
+      severity: "info"
+    });
+  };
+
   const handleSubmit = async () => {
     try {
+      console.log("Submit button clicked");
+      setLoading(true);
+
       // Validate form data
       const currentProduct = products[activeStep];
+      console.log("Current form data:", currentProduct.formData);
+
       const formErrors = {};
 
       // Basic validation checks
@@ -149,51 +204,124 @@ const NewOrder = () => {
 
       // If there are errors, update the errors state and return
       if (Object.keys(formErrors).length > 0) {
+        console.log("Validation errors:", formErrors);
         setErrors(formErrors);
+        setLoading(false);
+        setSnackbar({
+          open: true,
+          message: "Please fill in all required fields",
+          severity: "error"
+        });
         return;
       }
 
       // Clear any previous errors
       setErrors({});
+      console.log("Form validation passed, preparing to submit");
+
+      // Calculate a basic total amount if not provided
+      let calculatedTotal = 0;
+      if (currentProduct.formData.price && currentProduct.formData.quantity) {
+        calculatedTotal = parseFloat(currentProduct.formData.price) *
+                          parseInt(currentProduct.formData.quantity);
+      }
 
       // Prepare data for submission
       const orderData = {
-        products: products.map(product => ({
-          ...product.formData
-        }))
+        // Include basic required fields
+        orgId: parseInt(companyId) || null,
+        status: "Pending",
+        totalAmount: parseFloat(currentProduct.formData.amount) || calculatedTotal || 0,
+        shippingAddress: "To be determined", // This should ideally come from a form field
+
+        // Include all form fields
+        ...currentProduct.formData,
+
+        // Ensure numeric fields are properly formatted
+        quantity: parseInt(currentProduct.formData.quantity || 0),
+        price: parseFloat(currentProduct.formData.price || 0),
+
+        // Generate a unique order ID if needed
+        orderId: `ORD-${Date.now()}`
       };
 
-      // Send data to backend
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderData),
+      console.log("Order data being submitted:", orderData);
+      console.log("Authentication status:", isAuthenticated());
+      console.log("Admin status:", isAdmin());
+      console.log("Sending request to: /api/admin/orders/submit");
+
+      // Use API service to submit the order
+      const response = await apiService.post('/api/admin/orders/submit', orderData);
+
+      console.log("Order submission response:", response);
+
+      setSnackbar({
+        open: true,
+        message: "Order submitted successfully!",
+        severity: "success"
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("Order submitted successfully:", data);
-
-      // Optionally redirect or show success message
-      alert("Order submitted successfully!");
-      // If you want to redirect after submission:
-      // navigate('/orders');
+      // Wait a moment before redirecting
+      setTimeout(() => {
+        if (companyId) {
+          navigate(`/companies/${companyId}/orders`);
+        } else {
+          navigate('/dashboard');
+        }
+      }, 2000);
 
     } catch (error) {
       console.error("Error submitting order:", error);
-      alert("Failed to submit order. Please try again.");
+      console.error("Error details:", {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data
+      });
+
+      setSnackbar({
+        open: true,
+        message: `Failed to submit order: ${error.message || "Unknown error"}`,
+        severity: "error"
+      });
+    } finally {
+      setLoading(false);
     }
   };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({...snackbar, open: false});
+  };
+
+  // Function to automatically calculate amount based on rate and quantity
+  const calculateAmount = (index) => {
+    const product = products[index];
+    const rate = parseFloat(product.formData.rate || 0);
+    const quantity = parseInt(product.formData.quantity || 0);
+
+    if (rate && quantity) {
+      const amount = (rate * quantity).toFixed(2);
+
+      const updatedProducts = [...products];
+      updatedProducts[index].formData.amount = amount;
+      updatedProducts[index].formData.price = rate; // Also set price to rate for consistency
+      setProducts(updatedProducts);
+
+      console.log(`Calculated amount: ${amount} (rate: ${rate} × quantity: ${quantity})`);
+    }
+  };
+
+  useEffect(() => {
+    // Calculate amount whenever rate or quantity changes
+    const currentProduct = products[activeStep];
+    if (currentProduct.formData.rate && currentProduct.formData.quantity) {
+      calculateAmount(activeStep);
+    }
+  }, [products[activeStep]?.formData.rate, products[activeStep]?.formData.quantity]);
 
   return (
     <Layout>
       <div className="order-container">
-      <Typography
+        <Typography
           variant="h4"
           className="form-title"
           sx={{
@@ -205,7 +333,7 @@ const NewOrder = () => {
             fontWeight: "bold",
           }}
         >
-          Create New Order
+          Create New Order {companyId ? `for Company #${companyId}` : ""}
         </Typography>
 
         <div className="stepper-wrapper">
@@ -409,6 +537,7 @@ const NewOrder = () => {
               <TextField
                 label="Rate"
                 name="rate"
+                type="number"
                 value={products[activeStep].formData.rate}
                 onChange={(e) => handleChange(activeStep, e)}
                 fullWidth
@@ -416,6 +545,20 @@ const NewOrder = () => {
                 className="form-input"
                 error={!!errors.rate}
                 helperText={errors.rate}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Quantity"
+                name="quantity"
+                type="number"
+                value={products[activeStep].formData.quantity}
+                onChange={(e) => handleChange(activeStep, e)}
+                fullWidth
+                required
+                className="form-input"
+                error={!!errors.quantity}
+                helperText={errors.quantity}
               />
             </Grid>
             <Grid item xs={6}>
@@ -429,6 +572,20 @@ const NewOrder = () => {
                 className="form-input"
                 error={!!errors.amount}
                 helperText={errors.amount}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Price"
+                name="price"
+                type="number"
+                value={products[activeStep].formData.price}
+                onChange={(e) => handleChange(activeStep, e)}
+                fullWidth
+                required
+                className="form-input"
+                error={!!errors.price}
+                helperText={errors.price}
               />
             </Grid>
             <Grid item xs={6}>
@@ -486,7 +643,7 @@ const NewOrder = () => {
             <Button
               variant="outlined"
               onClick={handleBack}
-              disabled={activeStep === 0}
+              disabled={activeStep === 0 || loading}
               className="action-button"
             >
               ← Back
@@ -496,33 +653,62 @@ const NewOrder = () => {
                 variant="contained"
                 onClick={handleSubmit}
                 className="action-button submit-button"
+                disabled={loading}
               >
-                Submit Order
+                {loading ? <CircularProgress size={24} /> : "Submit Order"}
               </Button>
             ) : (
               <Button
                 variant="contained"
                 onClick={handleNext}
                 className="action-button next-button"
-                disabled={activeStep === products.length - 1}
+                disabled={activeStep === products.length - 1 || loading}
               >
                 Continue →
               </Button>
             )}
           </Box>
 
-          <Box sx={{ mt: 4, textAlign: "center" }}>
+          <Box sx={{ mt: 4, textAlign: "center", display: "flex", justifyContent: "center", gap: 2 }}>
             <Button
               variant="contained"
               onClick={handleAddProduct}
               startIcon={<AddIcon />}
               className="action-button add-product-button"
+              disabled={loading}
             >
               Add Product
+            </Button>
+
+            <Button
+              variant="outlined"
+              onClick={debugFormData}
+              startIcon={<BugReportIcon />}
+              color="secondary"
+              className="debug-button"
+              disabled={loading}
+            >
+              Debug Form Data
             </Button>
           </Box>
         </div>
       </div>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Layout>
   );
 };
