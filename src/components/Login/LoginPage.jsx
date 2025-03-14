@@ -1,6 +1,6 @@
 // src/components/Login/LoginPage.jsx
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { TextField, Button, IconButton, InputAdornment, Typography, Box, CircularProgress } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useAuth } from '../../context/AuthContext';
@@ -17,52 +17,89 @@ const LoginPage = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("error");
-  
+
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const location = useLocation();
+  const { login, isAuthenticated, userType } = useAuth();
+
+  // Check if user is already logged in
+  useEffect(() => {
+    if (isAuthenticated()) {
+      // Redirect based on user type
+      if (userType === "ORGANIZATION") {
+        navigate("/org/dashboard", { replace: true });
+      } else {
+        navigate("/dashboard", { replace: true });
+      }
+    }
+  }, [isAuthenticated, navigate, userType]);
+
+  // Check for redirected messages (like "logged out successfully")
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const message = params.get('message');
+    const status = params.get('status') || 'info';
+
+    if (message) {
+      setSnackbarMessage(message);
+      setSnackbarSeverity(status);
+      setOpenSnackbar(true);
+
+      // Clean the URL
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Basic validation
+
+    // Field validation
     if (!username.trim()) {
       setError("Username is required");
       return;
     }
-    
+
     if (!password) {
       setError("Password is required");
       return;
     }
-    
+
     setError("");
     setLoading(true);
 
     try {
       const result = await login(username, password);
-      
+
       if (result.success) {
         setSnackbarSeverity("success");
         setSnackbarMessage("Login successful!");
         setOpenSnackbar(true);
-        
 
-          if (result.userType === "ORGANIZATION") {
-            navigate("/org/dashboard");
-          } else {
-            navigate("/dashboard");
-          }
+        // Navigate immediately based on user type
+        // No need for setTimeout which can cause race conditions
+        if (result.userType === "ORGANIZATION") {
+          navigate("/org/dashboard", { replace: true });
+        } else {
+          navigate("/dashboard", { replace: true });
+        }
       } else {
         setError(result.message);
+        setSnackbarSeverity("error");
+        setSnackbarMessage(result.message);
+        setOpenSnackbar(true);
       }
     } catch (error) {
       console.error("Login error:", error);
-      setError("Login failed. Please check your credentials and try again.");
+      const errorMessage = "Login failed. Please check your credentials and try again.";
+      setError(errorMessage);
+      setSnackbarSeverity("error");
+      setSnackbarMessage(errorMessage);
+      setOpenSnackbar(true);
     } finally {
       setLoading(false);
     }
   };
-  
+
   const handleCloseSnackbar = (event, reason) => {
     if (reason === 'clickaway') {
       return;
@@ -120,10 +157,11 @@ const LoginPage = () => {
               autoComplete: "current-password",
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton 
+                  <IconButton
                     onClick={() => setShowPassword(!showPassword)}
                     disabled={loading}
                     edge="end"
+                    aria-label={showPassword ? "hide password" : "show password"}
                   >
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
@@ -133,14 +171,14 @@ const LoginPage = () => {
           />
 
           {error && username && password && (
-            <Typography className="login-error-text">
+            <Typography className="login-error-text" color="error" role="alert">
               {error}
             </Typography>
           )}
 
-          <Button 
-            type="submit" 
-            variant="contained" 
+          <Button
+            type="submit"
+            variant="contained"
             className="login-button"
             disabled={loading}
           >
@@ -148,8 +186,8 @@ const LoginPage = () => {
           </Button>
         </form>
 
-        <Button 
-          onClick={() => navigate("/forgot-password")} 
+        <Button
+          onClick={() => navigate("/forgot-password")}
           className="forgot-password-button"
           disabled={loading}
         >
@@ -157,15 +195,15 @@ const LoginPage = () => {
         </Button>
       </Box>
 
-      <Snackbar 
-        open={openSnackbar} 
-        autoHideDuration={6000} 
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <Alert 
-          onClose={handleCloseSnackbar} 
-          severity={snackbarSeverity} 
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarSeverity}
           variant="filled"
           sx={{ width: '100%' }}
         >

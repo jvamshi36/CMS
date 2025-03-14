@@ -1,10 +1,14 @@
 // src/context/AuthContext.js
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
 // Create the auth context
 const AuthContext = createContext();
+
+// Create a flag to track logging out state (outside component to be globally accessible)
+const isLoggingOut = { current: false };
+const isRefreshing = { current: false };
+let refreshPromise = null;
 
 // Set up the axios instance with defaults
 const api = axios.create({
@@ -20,17 +24,39 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    
+
+    // Skip token refresh if we're logging out or the request was for logout
+    if (isLoggingOut.current || originalRequest.url?.includes('/logout')) {
+      return Promise.reject(error);
+    }
+
     // If the error is 401 and we haven't tried to refresh the token yet
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        // Try to get a new token using the refresh endpoint
-        const response = await axios.post('/api/auth/refresh', {}, {
+        // Prevent multiple refresh calls - use existing promise if one is in progress
+        if (isRefreshing.current) {
+          if (refreshPromise) {
+            await refreshPromise;
+            // After refresh completes, update the original request header
+            const token = sessionStorage.getItem('_auth_token');
+            if (token) {
+              originalRequest.headers['Authorization'] = 'Bearer ' + token;
+              return api(originalRequest);
+            }
+          }
+          return Promise.reject(error); // If no refresh promise, reject
+        }
+
+        isRefreshing.current = true;
+        refreshPromise = axios.post('/api/auth/refresh', {}, {
           withCredentials: true,
           baseURL: process.env.REACT_APP_API_URL || 'https://localhost:8081'
         });
+
+        // Wait for the refresh request
+        const response = await refreshPromise;
 
         // If we got a new token, update it in memory
         if (response.data.token) {
@@ -40,16 +66,22 @@ api.interceptors.response.use(
           // Update the Authorization header for the original request
           originalRequest.headers['Authorization'] = 'Bearer ' + response.data.token;
 
+          isRefreshing.current = false;
+          refreshPromise = null;
+
           // Return the original request with the new token
           return api(originalRequest);
         }
+
+        isRefreshing.current = false;
+        refreshPromise = null;
       } catch (refreshError) {
-        // If refresh fails, redirect to login
-        window.location.href = '/login';
+        isRefreshing.current = false;
+        refreshPromise = null;
         return Promise.reject(refreshError);
       }
     }
-    
+
     return Promise.reject(error);
   }
 );
@@ -57,6 +89,11 @@ api.interceptors.response.use(
 // Add auth header to requests when token exists
 api.interceptors.request.use(
   (config) => {
+    // Skip adding auth token for logout requests if we're already logging out
+    if (isLoggingOut.current && config.url?.includes('/logout')) {
+      return config;
+    }
+
     const token = sessionStorage.getItem('_auth_token');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
@@ -72,14 +109,27 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userType, setUserType] = useState(null); // 'ADMIN' or 'ORGANIZATION'
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [authError, setAuthError] = useState(null);
+  const logoutInProgress = useRef(false); // Track logout state within component
+
+  // Reset logout flag when component mounts
+  useEffect(() => {
+    isLoggingOut.current = false;
+    logoutInProgress.current = false;
+
+    return () => {
+      // Clean up on unmount
+      isLoggingOut.current = false;
+      logoutInProgress.current = false;
+    };
+  }, []);
 
   // Verify token on initial load
   useEffect(() => {
     const verifyToken = async () => {
       const token = sessionStorage.getItem('_auth_token');
       const storedUserType = sessionStorage.getItem('_user_type');
-      
+
       if (!token) {
         setLoading(false);
         return;
@@ -87,65 +137,98 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const response = await api.get('/api/auth/verify');
-        setUser({ 
+        setUser({
           username: response.data.username,
           tokenExpires: response.data.expires
         });
         setUserType(storedUserType || 'ADMIN');
+        setAuthError(null);
       } catch (error) {
         console.error("Token verification failed:", error);
         sessionStorage.removeItem('_auth_token');
         sessionStorage.removeItem('_user_type');
+        setAuthError("Session expired. Please login again.");
       } finally {
         setLoading(false);
       }
     };
-    
+
     verifyToken();
   }, []);
 
   const login = async (username, password) => {
     try {
       const response = await api.post('/api/auth/login', { username, password });
-      
+
       if (response.data.token) {
         // Store token in memory
-        console.log("Storing token:", response.data.token); // Add this line
         sessionStorage.setItem('_auth_token', response.data.token);
         sessionStorage.setItem('_user_type', response.data.userType);
-        
+
         setUser({
           username,
           tokenExpires: Date.now() + response.data.expiresIn
         });
-        
+
         setUserType(response.data.userType);
-        
-        return { 
+        setAuthError(null);
+
+        return {
           success: true,
-          userType: response.data.userType 
+          userType: response.data.userType
         };
       }
+
+      // If we get here without a token, something went wrong
+      return {
+        success: false,
+        message: "Invalid response from server. Please try again."
+      };
     } catch (error) {
       console.error("Login failed:", error);
-      return { 
-        success: false, 
+      return {
+        success: false,
         message: error.response?.data?.message || "Login failed. Please try again."
       };
     }
   };
 
   const logout = async () => {
+    // Prevent duplicate logout calls
+    if (logoutInProgress.current) {
+      console.log("Logout already in progress, skipping duplicate call");
+      return { success: true, alreadyInProgress: true };
+    }
+
     try {
+      // Set both flags to prevent any refresh attempts during logout
+      logoutInProgress.current = true;
+      isLoggingOut.current = true;
+
+      // Make the logout API call
       await api.post('/api/auth/logout');
-    } catch (error) {
-      console.error("Logout API call failed:", error);
-    } finally {
+
+      // Clear session data regardless of API response
       sessionStorage.removeItem('_auth_token');
       sessionStorage.removeItem('_user_type');
       setUser(null);
       setUserType(null);
-      navigate('/login');
+
+      return { success: true };
+    } catch (error) {
+      console.error("Logout API call failed:", error);
+      // Still clear local session data even if API call fails
+      sessionStorage.removeItem('_auth_token');
+      sessionStorage.removeItem('_user_type');
+      setUser(null);
+      setUserType(null);
+      throw error; // Re-throw the error so the component can handle it
+    } finally {
+      // Reset logout flags after a short delay to ensure any in-flight requests complete
+      setTimeout(() => {
+        logoutInProgress.current = false;
+        isLoggingOut.current = false;
+      }, 500);
     }
   };
 
@@ -167,6 +250,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     loading,
+    authError,
     isAuthenticated,
     isAdmin,
     isOrganization,
