@@ -1,5 +1,5 @@
-// src/context/AuthContext.js
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+// src/context/AuthContext.js - Optimized version
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 
 // Create the auth context
@@ -111,11 +111,17 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
   const logoutInProgress = useRef(false); // Track logout state within component
+  const initialCheckDone = useRef(false); // Track if initial token verification is done
 
   // Reset logout flag when component mounts
   useEffect(() => {
     isLoggingOut.current = false;
     logoutInProgress.current = false;
+
+    // Only verify token once on initial load
+    if (!initialCheckDone.current) {
+      verifyToken();
+    }
 
     return () => {
       // Clean up on unmount
@@ -124,36 +130,34 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
-  // Verify token on initial load
-  useEffect(() => {
-    const verifyToken = async () => {
-      const token = sessionStorage.getItem('_auth_token');
-      const storedUserType = sessionStorage.getItem('_user_type');
+  // Verify token function
+  const verifyToken = useCallback(async () => {
+    const token = sessionStorage.getItem('_auth_token');
+    const storedUserType = sessionStorage.getItem('_user_type');
 
-      if (!token) {
-        setLoading(false);
-        return;
-      }
+    if (!token) {
+      setLoading(false);
+      initialCheckDone.current = true;
+      return;
+    }
 
-      try {
-        const response = await api.get('/api/auth/verify');
-        setUser({
-          username: response.data.username,
-          tokenExpires: response.data.expires
-        });
-        setUserType(storedUserType || 'ADMIN');
-        setAuthError(null);
-      } catch (error) {
-        console.error("Token verification failed:", error);
-        sessionStorage.removeItem('_auth_token');
-        sessionStorage.removeItem('_user_type');
-        setAuthError("Session expired. Please login again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    verifyToken();
+    try {
+      const response = await api.get('/api/auth/verify');
+      setUser({
+        username: response.data.username,
+        tokenExpires: response.data.expires
+      });
+      setUserType(storedUserType || 'ADMIN');
+      setAuthError(null);
+    } catch (error) {
+      console.error("Token verification failed:", error);
+      sessionStorage.removeItem('_auth_token');
+      sessionStorage.removeItem('_user_type');
+      setAuthError("Session expired. Please login again.");
+    } finally {
+      setLoading(false);
+      initialCheckDone.current = true;
+    }
   }, []);
 
   const login = async (username, password) => {
@@ -232,17 +236,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const isAuthenticated = () => {
+  const isAuthenticated = useCallback(() => {
     return !!user && !!sessionStorage.getItem('_auth_token');
-  };
+  }, [user]);
 
-  const isAdmin = () => {
+  const isAdmin = useCallback(() => {
     return userType === 'ADMIN';
-  };
+  }, [userType]);
 
-  const isOrganization = () => {
+  const isOrganization = useCallback(() => {
     return userType === 'ORGANIZATION';
-  };
+  }, [userType]);
 
   const authContextValue = {
     user,

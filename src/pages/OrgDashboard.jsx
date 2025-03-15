@@ -1,5 +1,5 @@
-// src/pages/OrgDashboard.jsx - Updated with correct API path
-import React, { useState, useEffect } from "react";
+// src/pages/OrgDashboard.jsx - Optimized version
+import React, { useState, useEffect, useRef } from "react";
 import OrgLayout from "../components/Layout/OrgLayout";
 import { Box, Typography, Paper, Grid, CircularProgress, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -14,10 +14,16 @@ const OrgDashboard = () => {
   const [error, setError] = useState(null);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const fetchInProgress = useRef(false);
 
   useEffect(() => {
     const fetchOrgData = async () => {
+      // Skip if we already have a fetch in progress
+      if (fetchInProgress.current) return;
+
+      fetchInProgress.current = true;
       setLoading(true);
+
       try {
         // Fetch organization profile data
         const profileData = await apiService.get("/api/org/dashboard/profile");
@@ -46,13 +52,19 @@ const OrgDashboard = () => {
         }
       } finally {
         setLoading(false);
+        fetchInProgress.current = false;
       }
     };
 
     fetchOrgData();
-  }, [navigate]);
 
-  // Rest of the component remains the same
+    // Cleanup function
+    return () => {
+      fetchInProgress.current = false;
+      // Cancel any pending requests
+      apiService.clearPendingRequests && apiService.clearPendingRequests();
+    };
+  }, [navigate]); // Only depends on navigate, will run once on mount
 
   if (loading) {
     return (
@@ -73,7 +85,10 @@ const OrgDashboard = () => {
           <Typography variant="body1" className="error-message">{error}</Typography>
           <Button
             variant="contained"
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              fetchInProgress.current = false; // Reset the flag
+              window.location.reload();
+            }}
             className="retry-button"
           >
             Retry

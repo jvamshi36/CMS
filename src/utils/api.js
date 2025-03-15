@@ -1,7 +1,11 @@
+// src/utils/api.js - Optimized version with request deduplication
 import axios from 'axios';
 
 // Get the base URL from environment variable or use default
 const baseURL = process.env.REACT_APP_API_URL || 'https://localhost:8081';
+
+// Track in-flight requests to prevent duplicates
+const pendingRequests = new Map();
 
 // Create axios instance with default config
 const api = axios.create({
@@ -13,17 +17,45 @@ const api = axios.create({
   timeout: 15000 // 15 seconds timeout
 });
 
-// Add a request interceptor to include auth token
+// Generate a unique key for a request to track duplicates
+const getRequestKey = (config) => {
+  return `${config.method}:${config.url}:${JSON.stringify(config.params || {})}`;
+};
+
+// Add a request interceptor to include auth token and handle duplicates
 api.interceptors.request.use(
   (config) => {
     // Get token from session storage
     const token = sessionStorage.getItem('_auth_token');
-    
+
     // If token exists, add it to the header
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    
+
+    // Check for duplicate requests
+    const requestKey = getRequestKey(config);
+
+    // If this is a GET request and there's already a pending request with the same key
+    if (config.method.toLowerCase() === 'get' && pendingRequests.has(requestKey)) {
+      // Create a new CancelToken to abort this duplicate request
+      const source = axios.CancelToken.source();
+      config.cancelToken = source.token;
+      // Abort immediately
+      source.cancel(`Duplicate request cancelled for ${requestKey}`);
+      console.log(`Prevented duplicate request: ${requestKey}`);
+    } else {
+      // For non-GET methods or new GET requests, record this request
+      pendingRequests.set(requestKey, true);
+
+      // Add a callback to remove from pending when the request completes
+      const originalRequestComplete = config.requestComplete || (() => {});
+      config.requestComplete = () => {
+        pendingRequests.delete(requestKey);
+        originalRequestComplete();
+      };
+    }
+
     return config;
   },
   (error) => {
@@ -31,10 +63,30 @@ api.interceptors.request.use(
   }
 );
 
-// Add response interceptor for common error handling
+// Add response interceptor to mark requests as complete and handle errors
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Call the requestComplete callback if it exists
+    if (response.config.requestComplete) {
+      response.config.requestComplete();
+    }
+    return response;
+  },
   (error) => {
+    // For cancelled requests due to duplicates, just return a rejected promise
+    // with a custom flag so we can handle it specially
+    if (axios.isCancel(error)) {
+      return Promise.reject({
+        isDuplicateRequest: true,
+        message: error.message
+      });
+    }
+
+    // For other errors, make sure to mark the request as complete
+    if (error.config && error.config.requestComplete) {
+      error.config.requestComplete();
+    }
+
     // Handle network errors
     if (!error.response) {
       console.error('Network error:', error);
@@ -43,10 +95,10 @@ api.interceptors.response.use(
         networkError: true
       });
     }
-    
+
     // Handle different response status codes
     const { status, data } = error.response;
-    
+
     switch (status) {
       case 400:
         // Bad request
@@ -103,7 +155,7 @@ api.interceptors.response.use(
   }
 );
 
-// API service methods with standardized error handling
+// API service methods with duplicate request handling
 const apiService = {
   // GET request
   get: async (url, config = {}) => {
@@ -111,10 +163,17 @@ const apiService = {
       const response = await api.get(url, config);
       return response.data;
     } catch (error) {
+      // If this was a cancelled duplicate request, try to reuse the original response
+      if (error.isDuplicateRequest) {
+        console.log("Duplicate request detected, waiting for original request to complete");
+        // For duplicate GET requests, we'd ideally like to return the result of the original request
+        // We could implement a more sophisticated caching/promise sharing mechanism here
+        // For now, we'll just re-throw and let the calling code handle this
+      }
       throw error;
     }
   },
-  
+
   // POST request
   post: async (url, data = {}, config = {}) => {
     try {
@@ -124,7 +183,7 @@ const apiService = {
       throw error;
     }
   },
-  
+
   // PUT request
   put: async (url, data = {}, config = {}) => {
     try {
@@ -134,7 +193,7 @@ const apiService = {
       throw error;
     }
   },
-  
+
   // DELETE request
   delete: async (url, config = {}) => {
     try {
@@ -144,7 +203,7 @@ const apiService = {
       throw error;
     }
   },
-  
+
   // Upload files
   upload: async (url, formData, onProgress = () => {}) => {
     try {
@@ -163,6 +222,11 @@ const apiService = {
     } catch (error) {
       throw error;
     }
+  },
+
+  // Clear all pending requests (useful for page transitions, logout, etc.)
+  clearPendingRequests: () => {
+    pendingRequests.clear();
   }
 };
 

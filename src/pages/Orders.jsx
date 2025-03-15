@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// src/pages/Orders.jsx - Optimized version
+import React, { useState, useEffect, useRef } from "react";
 import Layout from "../components/Layout/Layout";
 import "../styles/Orders.css";
 import { useNavigate, NavLink, useParams } from "react-router-dom";
@@ -13,16 +14,22 @@ const Orders = () => {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const ordersPerPage = 9;
+    const apiCallInProgress = useRef(false);
 
     // Use the auth context for API calls and auth state
     const { api, isAuthenticated, isAdmin } = useAuth();
 
     useEffect(() => {
         const fetchOrders = async () => {
+            // Skip if we already have an API call in progress
+            if (apiCallInProgress.current) return;
+
+            apiCallInProgress.current = true;
+
             try {
                 console.log("Is authenticated?", isAuthenticated());
-                            console.log("Is admin?", isAdmin());
-                            console.log("Token:", sessionStorage.getItem('_auth_token'));
+                console.log("Is admin?", isAdmin());
+                console.log("Token:", sessionStorage.getItem('_auth_token'));
 
                 if (!isAuthenticated()) {
                     console.error("Authentication required");
@@ -71,11 +78,17 @@ const Orders = () => {
                 }
             } finally {
                 setLoading(false);
+                apiCallInProgress.current = false;
             }
         };
 
         fetchOrders();
-    }, [companyId, api, isAuthenticated, navigate]);
+
+        // Cleanup function
+        return () => {
+            apiCallInProgress.current = false;
+        };
+    }, [companyId, api, isAuthenticated, isAdmin, navigate]);
 
     // Get current orders
     const indexOfLastOrder = currentPage * ordersPerPage;
@@ -132,7 +145,11 @@ const Orders = () => {
                         </Button>
                         <Button
                             variant="contained"
-                            onClick={() => setLoading(true) || window.location.reload()}
+                            onClick={() => {
+                                setLoading(true);
+                                apiCallInProgress.current = false; // Reset flag to allow retry
+                                window.location.reload();
+                            }}
                         >
                             Try Again
                         </Button>

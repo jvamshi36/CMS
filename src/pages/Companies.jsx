@@ -1,3 +1,4 @@
+// src/pages/Companies.jsx - Optimized version
 import React, { useState, useEffect, useCallback } from "react";
 import Layout from "../components/Layout/Layout";
 import "../styles/Companies.css";
@@ -19,10 +20,16 @@ const Companies = () => {
     const companiesPerPage = 9;
 
     const [sortConfig, setSortConfig] = useState({ key: "createdAt", direction: "desc" });
+    const [fetchCount, setFetchCount] = useState(0); // Track API call count to prevent duplicates
 
-    // Fetch companies - wrapped in useCallback to prevent infinite loops
+    // Fetch companies with protection against duplicate calls
     const fetchCompanies = useCallback(async () => {
+        // If already fetched or currently fetching, don't fetch again
+        if (fetchCount > 0 || companies.length > 0) return;
+
         setLoading(true);
+        setFetchCount(prev => prev + 1); // Increment fetch count to prevent duplicates
+
         try {
             const data = await apiService.get("/api/new-org");
             setCompanies(data);
@@ -38,14 +45,14 @@ const Companies = () => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [fetchCount, companies.length]);
 
-    // Load companies on component mount
+    // Load companies on component mount - with empty dependency array to execute only once
     useEffect(() => {
         fetchCompanies();
-    }, [fetchCompanies]);
+    }, []); // Intentionally empty to run once on mount
 
-    // Handle sorting
+    // Handle sorting - isolated from the fetchCompanies flow
     const handleSort = (key) => {
         let direction = "asc";
         if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -103,6 +110,7 @@ const Companies = () => {
 
     // Retry fetching data if there was an error
     const handleRetry = () => {
+        setFetchCount(0); // Reset fetch count to allow a retry
         fetchCompanies();
     };
 
@@ -125,8 +133,8 @@ const Companies = () => {
                 <Box className="error-container">
                     <h3>Something went wrong</h3>
                     <p>{error}</p>
-                    <Button 
-                        variant="contained" 
+                    <Button
+                        variant="contained"
                         onClick={handleRetry}
                         sx={{ mt: 2 }}
                     >
@@ -163,8 +171,8 @@ const Companies = () => {
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th 
-                                        onClick={() => handleSort("organizationName")} 
+                                    <th
+                                        onClick={() => handleSort("organizationName")}
                                         className="sortable"
                                     >
                                         Name {sortConfig.key === "organizationName" ? (sortConfig.direction === "asc" ? "▲" : "▼") : "▲▼"}
@@ -195,7 +203,7 @@ const Companies = () => {
                                             </span>
                                         </td>
                                         <td>
-                                            <NavLink 
+                                            <NavLink
                                                 to={`/companies/${company.id}/org-details`}
                                                 className="table-link"
                                             >
@@ -203,7 +211,7 @@ const Companies = () => {
                                             </NavLink>
                                         </td>
                                         <td>
-                                            <NavLink 
+                                            <NavLink
                                                 to={`/companies/${company.id}/orders`}
                                                 className="table-link"
                                             >
@@ -215,7 +223,7 @@ const Companies = () => {
                             </tbody>
                         </table>
                     </div>
-                    
+
                     <div className="pagination">
                         {Array.from({ length: Math.ceil(companies.length / companiesPerPage) }).map((_, index) => (
                             <button
@@ -236,9 +244,9 @@ const Companies = () => {
                 onClose={handleCloseSnackbar}
                 anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
             >
-                <Alert 
-                    onClose={handleCloseSnackbar} 
-                    severity={snackbar.severity} 
+                <Alert
+                    onClose={handleCloseSnackbar}
+                    severity={snackbar.severity}
                     variant="filled"
                     sx={{ width: '100%' }}
                 >

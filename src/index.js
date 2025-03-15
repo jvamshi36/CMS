@@ -1,3 +1,4 @@
+// src/index.js - Remove StrictMode
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from 'react-router-dom';
@@ -6,9 +7,8 @@ import "./index.css";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
-   <BrowserRouter>
+  // Remove StrictMode to prevent double mounting in development
+  <BrowserRouter>
     <App />
-   </BrowserRouter>
-  </React.StrictMode>
+  </BrowserRouter>
 );
