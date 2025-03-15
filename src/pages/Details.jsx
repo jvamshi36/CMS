@@ -20,6 +20,7 @@ import "../styles/Details.css";
 import Layout from "../components/Layout/Layout";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import apiService from "../utils/api"; // Add this import
 
 const OrgDetails = () => {
   const [organizationData, setOrganizationData] = useState(null);
@@ -110,10 +111,46 @@ const OrgDetails = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Field-specific validation
+    let fieldError = null;
+
+    // Validate specific fields as the user types
+    if (name === "representativeNumber") {
+      // Phone number validation - must be exactly 10 digits
+      if (value && !/^\d*$/.test(value)) {
+        fieldError = "Phone number must contain only digits";
+      } else if (value && value.length !== 10) {
+        fieldError = "Phone number must be exactly 10 digits";
+      }
+    } else if (name === "representativeAadhar") {
+      // Aadhar validation - must be exactly 12 digits
+      if (value && !/^\d*$/.test(value)) {
+        fieldError = "Aadhar number must contain only digits";
+      } else if (value && value.length !== 12) {
+        fieldError = "Aadhar number must be exactly 12 digits";
+      }
+    } else if (name === "representativeEmail") {
+      // Email validation
+      if (value && !/\S+@\S+\.\S+/.test(value)) {
+        fieldError = "Please enter a valid email address";
+      }
+    }
+
+    // Update form data
     setEditFormData(prev => ({
       ...prev,
       [name]: value
     }));
+
+    // Show validation error if present
+    if (fieldError) {
+      setSnackbar({
+        open: true,
+        message: fieldError,
+        severity: "warning"
+      });
+    }
   };
 
   const hasChanges = () => {
@@ -127,13 +164,30 @@ const OrgDetails = () => {
   };
 
   const handleSaveClick = async () => {
+    // Validate the form data before submitting
+    const validationErrors = validateFormData(editFormData);
+    if (Object.keys(validationErrors).length > 0) {
+      // Display the first validation error in a snackbar
+      const firstError = Object.values(validationErrors)[0];
+      setSnackbar({
+        open: true,
+        message: firstError,
+        severity: "error"
+      });
+      return;
+    }
+
     try {
       setLoading(true);
+
+      // Log the data being sent
+      console.log("Sending data to update organization:", editFormData);
+
       // Make API call to update the organization
-      await api.put(`/api/new-org/${companyId}`, editFormData);
+      const response = await apiService.put(`/api/new-org/${companyId}`, editFormData);
 
       // Update the local state with the edited data
-      setOrganizationData(editFormData);
+      setOrganizationData(response);
       setIsEditing(false);
 
       // Show success message
@@ -144,14 +198,93 @@ const OrgDetails = () => {
       });
     } catch (err) {
       console.error("Error updating organization data:", err);
-      setSnackbar({
-        open: true,
-        message: "Failed to update organization details. Please try again.",
-        severity: "error"
-      });
+
+      // Check for validation errors in the response
+      if (err.response && err.response.status === 400 && err.response.data) {
+        console.error("Validation errors from server:", err.response.data);
+        // Display the first validation error from the server
+        const errorMessage = typeof err.response.data === 'object' ?
+          Object.values(err.response.data)[0] :
+          "Please check your form data and try again.";
+
+        setSnackbar({
+          open: true,
+          message: errorMessage,
+          severity: "error"
+        });
+      } else {
+        setSnackbar({
+          open: true,
+          message: err.message || "Failed to update organization details. Please try again.",
+          severity: "error"
+        });
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  // Function to validate form data before submission
+  const validateFormData = (formData) => {
+    const errors = {};
+
+    // Validate organization name
+    if (!formData.organizationName || formData.organizationName.trim() === '') {
+      errors.organizationName = "Organization name is required";
+    }
+
+    // Validate constitution
+    if (!formData.constitution || formData.constitution.trim() === '') {
+      errors.constitution = "Constitution is required";
+    }
+
+    // Validate address
+    if (!formData.addressLine1 || formData.addressLine1.trim() === '') {
+      errors.addressLine1 = "Address is required";
+    }
+
+    // Validate city
+    if (!formData.city || formData.city.trim() === '') {
+      errors.city = "City is required";
+    }
+
+    // Validate zip
+    if (!formData.zip || formData.zip.trim() === '') {
+      errors.zip = "Zip code is required";
+    }
+
+    // Validate representative first name
+    if (!formData.representativeFirstName || formData.representativeFirstName.trim() === '') {
+      errors.representativeFirstName = "Representative first name is required";
+    }
+
+    // Validate representative last name
+    if (!formData.representativeLastName || formData.representativeLastName.trim() === '') {
+      errors.representativeLastName = "Representative last name is required";
+    }
+
+    // Validate representative email
+    if (!formData.representativeEmail || formData.representativeEmail.trim() === '') {
+      errors.representativeEmail = "Representative email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.representativeEmail)) {
+      errors.representativeEmail = "Please enter a valid email address";
+    }
+
+    // Validate representative phone number
+    if (!formData.representativeNumber || formData.representativeNumber.trim() === '') {
+      errors.representativeNumber = "Representative phone number is required";
+    } else if (!/^\d{10}$/.test(formData.representativeNumber)) {
+      errors.representativeNumber = "Phone number must be exactly 10 digits";
+    }
+
+    // Validate representative Aadhar
+    if (!formData.representativeAadhar || formData.representativeAadhar.trim() === '') {
+      errors.representativeAadhar = "Representative Aadhar is required";
+    } else if (!/^\d{12}$/.test(formData.representativeAadhar)) {
+      errors.representativeAadhar = "Aadhar number must be exactly 12 digits";
+    }
+
+    return errors;
   };
 
   const handleCloseSnackbar = () => {
@@ -429,8 +562,8 @@ const OrgDetails = () => {
                 variant="outlined"
                 color="secondary"
                 onClick={handleCancelEdit}
+                className= "cancel-button"
                 startIcon={<Cancel />}
-                className="cancel-button"
               >
                 Cancel
               </Button>
@@ -439,7 +572,7 @@ const OrgDetails = () => {
                 color="primary"
                 onClick={handleSaveClick}
                 startIcon={<Save />}
-                className="save-button"
+                className= "save-button"
                 disabled={loading || !hasChanges()}
               >
                 {loading ? <CircularProgress size={24} /> : "Save Changes"}
@@ -451,7 +584,7 @@ const OrgDetails = () => {
               color="primary"
               onClick={handleEditClick}
               startIcon={<Edit />}
-              className="edit-button"
+              className = "edit-button"
             >
               Edit Details
             </Button>

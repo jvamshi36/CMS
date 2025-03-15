@@ -1,4 +1,4 @@
-// src/pages/OrderDetails.jsx
+// src/pages/OrderDetails.jsx - Updated with complete edit support
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -28,6 +28,7 @@ const OrderDetails = () => {
   const navigate = useNavigate();
   const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editFormData, setEditFormData] = useState({});
@@ -44,6 +45,7 @@ const OrderDetails = () => {
       setLoading(true);
       try {
         const response = await apiService.get(`/api/admin/orders/${companyId}/${orderId}`);
+        console.log("Order details received:", response);
         setOrderDetails(response);
         setEditFormData(response); // Initialize edit form with current data
         setError(null);
@@ -58,11 +60,14 @@ const OrderDetails = () => {
     fetchOrderDetails();
   }, [companyId, orderId]);
 
-  // Format date
+  // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
       const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return dateString; // Return original string if not a valid date
+      }
       return date.toLocaleDateString(undefined, {
         year: 'numeric',
         month: 'short',
@@ -70,12 +75,28 @@ const OrderDetails = () => {
       });
     } catch (e) {
       console.error("Date parsing error:", e);
-      return "Invalid date";
+      return dateString; // Return original string on error
+    }
+  };
+
+  // Format date for input fields (YYYY-MM-DD format required by date inputs)
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return "";
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return ""; // Return empty string if invalid date
+      }
+      return date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+    } catch (e) {
+      console.error("Date formatting error:", e);
+      return "";
     }
   };
 
   // Handle edit mode
   const handleEditClick = () => {
+    setEditFormData({...orderDetails}); // Create a fresh copy
     setIsEditing(true);
   };
 
@@ -89,7 +110,7 @@ const OrderDetails = () => {
 
   const handleConfirmCancel = () => {
     setConfirmDialogOpen(false);
-    setEditFormData(orderDetails); // Reset form data
+    setEditFormData({...orderDetails}); // Reset form data to original values
     setIsEditing(false);
   };
 
@@ -107,8 +128,21 @@ const OrderDetails = () => {
 
   const hasChanges = () => {
     // Check if any fields have been changed
+    if (!orderDetails) return false;
+
     for (const key in editFormData) {
-      if (orderDetails[key] !== editFormData[key]) {
+      // Skip comparison for objects/arrays and undefined values
+      if (
+        typeof editFormData[key] === 'object' ||
+        orderDetails[key] === undefined ||
+        editFormData[key] === undefined
+      ) {
+        continue;
+      }
+
+      // Convert to string for comparison to handle different types
+      if (String(orderDetails[key]) !== String(editFormData[key])) {
+        console.log(`Field ${key} changed: ${orderDetails[key]} -> ${editFormData[key]}`);
         return true;
       }
     }
@@ -116,13 +150,38 @@ const OrderDetails = () => {
   };
 
   const handleSaveClick = async () => {
-    try {
-      setLoading(true);
-      // Make API call to update the order
-      await apiService.put(`/api/admin/orders/${companyId}/${orderId}`, editFormData);
+    // Validate the form data before submitting
+    const validationErrors = validateFormData(editFormData);
+    if (Object.keys(validationErrors).length > 0) {
+      // Display the first validation error in a snackbar
+      const firstError = Object.values(validationErrors)[0];
+      setSnackbar({
+        open: true,
+        message: firstError,
+        severity: "error"
+      });
+      return;
+    }
 
-      // Update the local state with the edited data
-      setOrderDetails(editFormData);
+    try {
+      setSaving(true);
+
+      // Ensure IDs are set for the API request
+      const dataToSubmit = {
+        ...editFormData,
+        id: Number(orderId),
+        orgId: Number(companyId)
+      };
+
+      console.log("Saving order with data:", dataToSubmit);
+
+      // Make API call to update the order
+      const response = await apiService.put(`/api/admin/orders/${companyId}/${orderId}`, dataToSubmit);
+
+      console.log("Update response:", response);
+
+      // Update the local state with the response (complete updated order)
+      setOrderDetails(response);
       setIsEditing(false);
 
       // Show success message
@@ -133,14 +192,85 @@ const OrderDetails = () => {
       });
     } catch (err) {
       console.error("Error updating order details:", err);
-      setSnackbar({
-        open: true,
-        message: "Failed to update order details. Please try again.",
-        severity: "error"
-      });
+
+      // Check for validation errors in the response
+      if (err.response && err.response.status === 400 && err.response.data) {
+        console.error("Validation errors from server:", err.response.data);
+        // Display the first validation error from the server
+        const errorMessage = typeof err.response.data === 'object' ?
+          Object.values(err.response.data)[0] :
+          "Please check your form data and try again.";
+
+        setSnackbar({
+          open: true,
+          message: errorMessage,
+          severity: "error"
+        });
+      } else {
+        setSnackbar({
+          open: true,
+          message: err.message || "Failed to update order details. Please try again.",
+          severity: "error"
+        });
+      }
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
+  };
+
+  // Function to validate form data before submission
+  const validateFormData = (formData) => {
+    const errors = {};
+
+    // Validate product name
+    if (!formData.productName || formData.productName.trim() === '') {
+      errors.productName = "Product name is required";
+    }
+
+    // Validate brand
+    if (!formData.brand || formData.brand.trim() === '') {
+      errors.brand = "Brand is required";
+    }
+
+    // Validate type
+    if (!formData.type || formData.type.trim() === '') {
+      errors.type = "Type is required";
+    }
+
+    // Validate quantity
+    if (!formData.quantity) {
+      errors.quantity = "Quantity is required";
+    } else if (isNaN(formData.quantity) || parseInt(formData.quantity) <= 0) {
+      errors.quantity = "Quantity must be a positive number";
+    }
+
+    // Validate shipping address if present
+    if (formData.shippingAddress && formData.shippingAddress.trim() === '') {
+      errors.shippingAddress = "Shipping address cannot be empty if provided";
+    }
+
+    // Validate prices
+    if (formData.totalAmount && (isNaN(formData.totalAmount) || parseFloat(formData.totalAmount) < 0)) {
+      errors.totalAmount = "Total amount must be a non-negative number";
+    }
+
+    if (formData.price && (isNaN(formData.price) || parseFloat(formData.price) < 0)) {
+      errors.price = "Price must be a non-negative number";
+    }
+
+    // Validate expected delivery date if present
+    if (formData.expectedDelivery) {
+      try {
+        const date = new Date(formData.expectedDelivery);
+        if (isNaN(date.getTime())) {
+          errors.expectedDelivery = "Invalid delivery date format";
+        }
+      } catch (e) {
+        errors.expectedDelivery = "Invalid delivery date";
+      }
+    }
+
+    return errors;
   };
 
   const handleCloseSnackbar = () => {
@@ -152,7 +282,7 @@ const OrderDetails = () => {
     if (!orderDetails) return {};
 
     return {
-      "Order ID": orderDetails.id || orderDetails.id,
+      "Order ID": orderDetails.id || orderDetails.orderId,
       "Product Name": orderDetails.productName || "Multiple Items",
       "Order Date": formatDate(orderDetails.date),
       "Expected Delivery": formatDate(orderDetails.expectedDelivery || orderDetails.deliveryDate),
@@ -166,6 +296,16 @@ const OrderDetails = () => {
       "Composition": orderDetails.composition || "N/A"
     };
   };
+
+  // Status options for the dropdown
+  const statusOptions = [
+    "Pending",
+    "Processing",
+    "Shipped",
+    "Delivered",
+    "Completed",
+    "Cancelled"
+  ];
 
   if (loading && !orderDetails) {
     return (
@@ -294,11 +434,9 @@ const OrderDetails = () => {
                     variant="outlined"
                     margin="normal"
                   >
-                    <MenuItem value="Processing">Processing</MenuItem>
-                    <MenuItem value="Shipped">Shipped</MenuItem>
-                    <MenuItem value="Delivered">Delivered</MenuItem>
-                    <MenuItem value="Completed">Completed</MenuItem>
-                    <MenuItem value="Cancelled">Cancelled</MenuItem>
+                    {statusOptions.map(option => (
+                      <MenuItem key={option} value={option}>{option}</MenuItem>
+                    ))}
                   </TextField>
                 </Grid>
                 <Grid item xs={12}>
@@ -330,7 +468,7 @@ const OrderDetails = () => {
                     fullWidth
                     label="Expected Delivery Date"
                     name="expectedDelivery"
-                    value={editFormData.expectedDelivery || ""}
+                    value={formatDateForInput(editFormData.expectedDelivery) || ""}
                     onChange={handleChange}
                     variant="outlined"
                     margin="normal"
@@ -365,7 +503,7 @@ const OrderDetails = () => {
                   <Typography variant="body2" className="detail-value">
                     {key}: <span>
                       {typeof value === "string" &&
-                      ["processing", "pending", "completed", "cancelled"].includes(value.toLowerCase()) ? (
+                      ["processing", "pending", "completed", "cancelled", "shipped", "delivered"].includes(value.toLowerCase()) ? (
                         <span className={`status ${value.toLowerCase()}`}>{value}</span>
                       ) : (
                         value?.toString() ?? "N/A"
@@ -385,143 +523,144 @@ const OrderDetails = () => {
             <Typography variant="h6" className="section-title">
               Product Information
             </Typography>
-            {isEditing ? (
-              <Card className="details-card">
-                <CardContent>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="Quantity"
-                        name="quantity"
-                        value={editFormData.quantity || ""}
-                        onChange={handleChange}
-                        variant="outlined"
-                        margin="normal"
-                        type="number"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="Rate"
-                        name="rate"
-                        value={editFormData.rate || ""}
-                        onChange={handleChange}
-                        variant="outlined"
-                        margin="normal"
-                        type="number"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="Batch Size (Strips)"
-                        name="batchSizeStrips"
-                        value={editFormData.batchSizeStrips || ""}
-                        onChange={handleChange}
-                        variant="outlined"
-                        margin="normal"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="Batch Size (Tabs)"
-                        name="batchSizeTabs"
-                        value={editFormData.batchSizeTabs || ""}
-                        onChange={handleChange}
-                        variant="outlined"
-                        margin="normal"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="MRP"
-                        name="mrp"
-                        value={editFormData.mrp || ""}
-                        onChange={handleChange}
-                        variant="outlined"
-                        margin="normal"
-                        type="number"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="Size Code"
-                        name="sizeCode"
-                        value={editFormData.sizeCode || ""}
-                        onChange={handleChange}
-                        variant="outlined"
-                        margin="normal"
-                      />
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card className="details-card">
-                <CardContent>
-                  <Grid container spacing={3}>
-                    {orderDetails.items?.map((item, index) => (
-                      <React.Fragment key={index}>
-                        <Grid item xs={12} sm={4}>
-                          <Typography variant="body2" className="detail-value">
-                            Product: <span>{item.productName}</span>
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                          <Typography variant="body2" className="detail-value">
-                            Quantity: <span>{item.quantity}</span>
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                          <Typography variant="body2" className="detail-value">
-                            Price: <span>₹{item.unitPrice?.toLocaleString()}</span>
-                          </Typography>
-                        </Grid>
-                      </React.Fragment>
-                    ))}
-                    {orderDetails.quantity && !orderDetails.items?.length && (
-                      <>
-                        <Grid item xs={12} sm={4}>
-                          <Typography variant="body2" className="detail-value">
-                            Quantity: <span>{orderDetails.quantity}</span>
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                          <Typography variant="body2" className="detail-value">
-                            Rate: <span>₹{orderDetails.rate?.toLocaleString() || "N/A"}</span>
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                          <Typography variant="body2" className="detail-value">
-                            Batch Size (Strips): <span>{orderDetails.batchSizeStrips || "N/A"}</span>
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                          <Typography variant="body2" className="detail-value">
-                            Batch Size (Tabs): <span>{orderDetails.batchSizeTabs || "N/A"}</span>
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                          <Typography variant="body2" className="detail-value">
-                            MRP: <span>₹{orderDetails.mrp?.toLocaleString() || "N/A"}</span>
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                          <Typography variant="body2" className="detail-value">
-                            Size Code: <span>{orderDetails.sizeCode || "N/A"}</span>
-                          </Typography>
-                        </Grid>
-                      </>
-                    )}
-                  </Grid>
-                </CardContent>
-              </Card>
-            )}
+
+{isEditing ? (
+  <Card className="details-card">
+    <CardContent>
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label="Quantity"
+            name="quantity"
+            value={editFormData.quantity || ""}
+            onChange={handleChange}
+            variant="outlined"
+            margin="normal"
+            type="number"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label="Rate"
+            name="rate"
+            value={editFormData.rate || ""}
+            onChange={handleChange}
+            variant="outlined"
+            margin="normal"
+            type="number"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label="Batch Size (Strips)"
+            name="batchSizeStrips"
+            value={editFormData.batchSizeStrips || ""}
+            onChange={handleChange}
+            variant="outlined"
+            margin="normal"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label="Batch Size (Tabs)"
+            name="batchSizeTabs"
+            value={editFormData.batchSizeTabs || ""}
+            onChange={handleChange}
+            variant="outlined"
+            margin="normal"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label="MRP"
+            name="mrp"
+            value={editFormData.mrp || ""}
+            onChange={handleChange}
+            variant="outlined"
+            margin="normal"
+            type="number"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label="Size Code"
+            name="sizeCode"
+            value={editFormData.sizeCode || ""}
+            onChange={handleChange}
+            variant="outlined"
+            margin="normal"
+          />
+        </Grid>
+      </Grid>
+    </CardContent>
+  </Card>
+) : (
+  <Card className="details-card">
+    <CardContent>
+      <Grid container spacing={3}>
+        {orderDetails.items?.map((item, index) => (
+          <React.Fragment key={index}>
+            <Grid item xs={12} sm={4}>
+              <Typography variant="body2" className="detail-value">
+                Product: <span>{item.productName}</span>
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Typography variant="body2" className="detail-value">
+                Quantity: <span>{item.quantity}</span>
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Typography variant="body2" className="detail-value">
+                Price: <span>₹{item.unitPrice?.toLocaleString()}</span>
+              </Typography>
+            </Grid>
+          </React.Fragment>
+        ))}
+        {orderDetails.quantity && !orderDetails.items?.length && (
+          <>
+            <Grid item xs={12} sm={4}>
+              <Typography variant="body2" className="detail-value">
+                Quantity: <span>{orderDetails.quantity}</span>
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Typography variant="body2" className="detail-value">
+                Rate: <span>₹{orderDetails.rate?.toLocaleString() || "N/A"}</span>
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Typography variant="body2" className="detail-value">
+                Batch Size (Strips): <span>{orderDetails.batchSizeStrips || "N/A"}</span>
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Typography variant="body2" className="detail-value">
+                Batch Size (Tabs): <span>{orderDetails.batchSizeTabs || "N/A"}</span>
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Typography variant="body2" className="detail-value">
+                MRP: <span>₹{orderDetails.mrp?.toLocaleString() || "N/A"}</span>
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Typography variant="body2" className="detail-value">
+                Size Code: <span>{orderDetails.sizeCode || "N/A"}</span>
+              </Typography>
+            </Grid>
+          </>
+        )}
+      </Grid>
+    </CardContent>
+  </Card>
+)}
           </>
         )}
 
