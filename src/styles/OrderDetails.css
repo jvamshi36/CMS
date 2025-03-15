@@ -189,31 +189,25 @@
 }
 
 /* Status Badge */
-.status {
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 0.85rem;
+.detail-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.detail-label {
   font-weight: 500;
-  color: white;
-  display: inline-block;
-  min-width: 80px;
-  text-align: center;
+  margin-right: 4px;
 }
 
-.status.completed {
-  background: linear-gradient(135deg, #10b981, #059669);
-}
 
-.status.processing, .status.pending {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-}
 
-.status.rejected, .status.cancelled {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-}
 
-.status.shipped {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+
+
+.value-text {
+  color: #333;
 }
 
 /* Form field styling */

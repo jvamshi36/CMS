@@ -14,47 +14,50 @@ const ForgotPassword = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("error");
-  
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Basic validation
     if (!email.trim()) {
       setError("Email is required");
       return;
     }
-    
+
     // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError("Please enter a valid email address");
       return;
     }
-    
+
     setError("");
     setLoading(true);
 
     try {
-      // This would be implemented on the backend
+      // Call the actual backend API
       await apiService.post("/api/auth/forgot-password", { email });
-      
+
+      // Always show success, even if the email doesn't exist
+      // This prevents email enumeration attacks
       setSuccess(true);
       setSnackbarSeverity("success");
-      setSnackbarMessage("Password reset instructions sent to your email!");
+      setSnackbarMessage("If your email is registered with us, you'll receive password reset instructions shortly.");
       setOpenSnackbar(true);
     } catch (error) {
       console.error("Error requesting password reset:", error);
-      setError(error.message || "Failed to send reset instructions. Please try again.");
-      setSnackbarSeverity("error");
-      setSnackbarMessage(error.message || "Failed to send reset instructions");
+      // Even if there's an error, we don't want to reveal if the email exists or not
+      setSuccess(true);
+      setSnackbarSeverity("success");
+      setSnackbarMessage("If your email is registered with us, you'll receive password reset instructions shortly.");
       setOpenSnackbar(true);
     } finally {
       setLoading(false);
     }
   };
-  
+
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
@@ -66,22 +69,22 @@ const ForgotPassword = () => {
       </Box>
 
       <Box className="login-form-container">
-        <Button 
+        <Button
           startIcon={<ArrowBack />}
           onClick={() => navigate("/login")}
           sx={{ alignSelf: 'flex-start', mb: 2 }}
         >
           Back to Login
         </Button>
-        
+
         <Typography variant="h5" className="login-title">
           Reset Your Password
         </Typography>
 
         {success ? (
-          <Box sx={{ 
-            textAlign: 'center', 
-            py: 4, 
+          <Box sx={{
+            textAlign: 'center',
+            py: 4,
             px: 2,
             backgroundColor: 'rgba(220, 252, 231, 0.5)',
             borderRadius: 2,
@@ -93,7 +96,7 @@ const ForgotPassword = () => {
             <Typography variant="body1" sx={{ mb: 3 }}>
               We've sent password reset instructions to {email}. Please check your inbox.
             </Typography>
-            <Button 
+            <Button
               variant="contained"
               onClick={() => navigate("/login")}
               sx={{
@@ -111,7 +114,7 @@ const ForgotPassword = () => {
             <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
               Enter your email address and we'll send you instructions to reset your password.
             </Typography>
-            
+
             <TextField
               fullWidth
               label="Email Address"
@@ -129,9 +132,9 @@ const ForgotPassword = () => {
               }}
             />
 
-            <Button 
-              type="submit" 
-              variant="contained" 
+            <Button
+              type="submit"
+              variant="contained"
               className="login-button"
               disabled={loading}
               sx={{ mt: 3 }}
@@ -142,15 +145,15 @@ const ForgotPassword = () => {
         )}
       </Box>
 
-      <Snackbar 
-        open={openSnackbar} 
-        autoHideDuration={6000} 
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <Alert 
-          onClose={handleCloseSnackbar} 
-          severity={snackbarSeverity} 
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarSeverity}
           variant="filled"
           sx={{ width: '100%' }}
         >

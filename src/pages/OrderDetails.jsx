@@ -500,16 +500,16 @@ const OrderDetails = () => {
               <Grid container spacing={2}>
                 {Object.entries(getOrderDetailsData()).map(([key, value]) => (
                   <Grid item xs={12} sm={4} key={key}>
-                  <Typography variant="body2" className="detail-value">
-                    {key}: <span>
-                      {typeof value === "string" &&
-                      ["processing", "pending", "completed", "cancelled", "shipped", "delivered"].includes(value.toLowerCase()) ? (
-                        <span className={`status ${value.toLowerCase()}`}>{value}</span>
-                      ) : (
-                        value?.toString() ?? "N/A"
-                      )}
-                    </span>
-                  </Typography>
+                   <Typography variant="body2" className="detail-value">
+                     {key}: <span>
+                       {typeof value === "string" &&
+                       ["processing", "pending", "completed", "cancelled", "shipped", "delivered"].includes(value.toLowerCase()) ? (
+                         <span >{value}</span>
+                       ) : (
+                         value?.toString() ?? "N/A"
+                       )}
+                     </span>
+                   </Typography>
                   </Grid>
                 ))}
               </Grid>
