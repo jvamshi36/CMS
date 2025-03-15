@@ -1,4 +1,4 @@
-/* src/styles/OrgDetails.css */
+/* src/styles/Details.css */
 .details-container {
   padding: 30px;
   max-width: 1400px;
@@ -103,11 +103,159 @@
   padding-left: 10px;
 }
 
+/* Edit Mode Styling */
+.edit-form-container {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Form Field Styling */
+.MuiTextField-root {
+  margin: 8px 0 !important;
+}
+
+.MuiInputBase-root {
+  background: rgba(255, 255, 255, 0.7) !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+}
+
+.MuiInputBase-root:hover {
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #2563EB !important;
+  border-width: 2px !important;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Button Styles */
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.edit-button {
+  background: linear-gradient(135deg, #2563EB, #1d4ed8) !important;
+  color: white !important;
+  border-radius: 10px !important;
+  padding: 10px 20px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2) !important;
+}
+
+.edit-button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3) !important;
+}
+
+.save-button {
+  background: linear-gradient(135deg, #10B981, #059669) !important;
+  color: white !important;
+  border-radius: 10px !important;
+  padding: 10px 20px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2) !important;
+}
+
+.save-button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3) !important;
+}
+
+.cancel-button {
+  background: white !important;
+  color: #6B7280 !important;
+  border: 1px solid rgba(107, 114, 128, 0.5) !important;
+  border-radius: 10px !important;
+  padding: 10px 20px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s ease !important;
+}
+
+.cancel-button:hover {
+  background: rgba(107, 114, 128, 0.05) !important;
+  transform: translateY(-2px) !important;
+}
+
+.cancel-order-button {
+  background-color: white !important;
+  color: #ef4444 !important;
+  border: 1px solid #ef4444 !important;
+  padding: 10px 20px !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  transition: all 0.3s ease !important;
+}
+
+.cancel-order-button:hover {
+  background-color: rgba(239, 68, 68, 0.05) !important;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Form field styling */
+.MuiTextField-root {
+  margin: 8px 0 !important;
+}
+
+.MuiInputBase-root {
+  background: rgba(255, 255, 255, 0.7) !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+}
+
+.MuiInputBase-root:hover {
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #2563EB !important;
+  border-width: 2px !important;
+}
+
 /* Loading Animation */
 @keyframes gradientFlow {
   0% { background-position: 0% 50% }
   50% { background-position: 100% 50% }
   100% { background-position: 0% 50% }
+}
+
+/* Dialog Styling */
+.MuiDialog-paper {
+  border-radius: 15px !important;
+  padding: 10px !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+.MuiDialogTitle-root {
+  background: linear-gradient(135deg, #2563EB, #1d4ed8);
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 600 !important;
 }
 
 /* Responsive Design */
@@ -127,5 +275,47 @@
   .detail-value {
     padding: 12px 15px;
   }
-}
 
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .action-buttons button {
+    width: 100%;
+  }
+
+  .save-button {
+    background: linear-gradient(135deg, #10B981, #059669) !important;
+    color: white !important;
+    border-radius: 10px !important;
+    padding: 10px 20px !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    letter-spacing: 0.5px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2) !important;
+  }
+
+  .save-button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3) !important;
+  }
+
+  .cancel-button {
+    background: white !important;
+    color: #6B7280 !important;
+    border: 1px solid rgba(107, 114, 128, 0.5) !important;
+    border-radius: 10px !important;
+    padding: 10px 20px !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    letter-spacing: 0.5px !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .cancel-button:hover {
+    background: rgba(107, 114, 128, 0.05) !important;
+    transform: translateY(-2px) !important;
+  }
+}
