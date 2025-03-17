@@ -111,7 +111,7 @@ const OrgDetails = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
+    console.log(`Field changed: ${name}, New value: ${value}`);
     // Field-specific validation
     let fieldError = null;
 
@@ -155,6 +155,8 @@ const OrgDetails = () => {
 
   const hasChanges = () => {
     // Check if any fields have been changed
+     console.log("Original username:", organizationData.websiteUsername);
+      console.log("Edited username:", editFormData.websiteUsername);
     for (const key in editFormData) {
       if (organizationData[key] !== editFormData[key]) {
         return true;
@@ -165,6 +167,7 @@ const OrgDetails = () => {
 
   const handleSaveClick = async () => {
     // Validate the form data before submitting
+    console.log("Website username before save:", editFormData.websiteUsername);
     const validationErrors = validateFormData(editFormData);
     if (Object.keys(validationErrors).length > 0) {
       // Display the first validation error in a snackbar

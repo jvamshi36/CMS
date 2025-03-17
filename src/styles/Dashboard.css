@@ -499,4 +499,122 @@ body {
   .dashboard-value {
     font-size: 22px;
   }
+  /* Additional Dashboard CSS styles */
+
+  /* Status Color Extensions */
+  .dashboard-icon.pending {
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+  }
+
+  .dashboard-icon.completed {
+    background: linear-gradient(135deg, #10B981, #059669);
+  }
+
+  /* Material Icons Support */
+  .dashboard-icon .material-icons {
+    color: white;
+    font-size: 24px;
+  }
+
+  /* Empty state message */
+  .empty-message {
+    text-align: center;
+    color: #64748b;
+    padding: 30px;
+    font-style: italic;
+  }
+
+  /* Dashboard table enhancements */
+  .dashboard-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 20px;
+  }
+
+  .dashboard-table th {
+    text-align: left;
+    padding: 12px 15px;
+    background-color: rgba(248, 250, 252, 0.8);
+    font-weight: 600;
+    color: #64748b;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .dashboard-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #334155;
+  }
+
+  .dashboard-table tr:hover {
+    background-color: rgba(243, 244, 246, 0.5);
+  }
+
+  /* Status badges */
+  .status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: white;
+    display: inline-block;
+    text-align: center;
+    min-width: 80px;
+  }
+
+  .status.completed, .status.delivered {
+    background: linear-gradient(135deg, #10b981, #059669);
+  }
+
+  .status.processing, .status.pending {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+  }
+
+  .status.cancelled, .status.rejected {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+  }
+
+  .status.shipped {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+  }
+
+  /* Enhanced Card hover effect */
+  .dashboard-card:hover .dashboard-icon {
+    transform: scale(1.1) rotate(8deg);
+    box-shadow: 0 12px 25px rgba(37, 99, 235, 0.4);
+  }
+
+  /* Dashboard Alert styles */
+  .MuiAlert-root {
+    border-radius: 12px !important;
+    padding: 10px 16px !important;
+    margin-bottom: 20px !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .MuiAlert-standardError {
+    background-color: rgba(239, 68, 68, 0.1) !important;
+    color: #ef4444 !important;
+    border: 1px solid rgba(239, 68, 68, 0.2) !important;
+  }
+
+  /* Chart title styling */
+  .chart-title {
+    margin-bottom: 15px !important;
+    font-weight: 600 !important;
+    color: #1e293b !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .chart-title::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(to bottom, #2563EB, #1d4ed8);
+    border-radius: 4px;
+    display: inline-block;
+  }
 }

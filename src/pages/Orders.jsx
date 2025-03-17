@@ -1,104 +1,182 @@
-// src/pages/Orders.jsx - Optimized version
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout/Layout";
 import "../styles/Orders.css";
-import { useNavigate, NavLink, useParams } from "react-router-dom";
-import { Box, CircularProgress, Typography, Button } from "@mui/material";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
+import { Box, CircularProgress, Typography, Button, Alert } from "@mui/material";
+import AdvancedSearchFilter from "../components/AdvancedSearchFilter/AdvancedSearchFilter";
 import { useAuth } from "../context/AuthContext";
+import apiService from "../utils/api";
 
 const Orders = () => {
     const navigate = useNavigate();
     const { companyId } = useParams();
+
+    // State for orders data and pagination
     const [ordersData, setOrdersData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [currentPage, setCurrentPage] = useState(1);
-    const ordersPerPage = 9;
-    const apiCallInProgress = useRef(false);
+
+    // Pagination state
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 1,
+        totalItems: 0,
+        itemsPerPage: 10
+    });
+
+    // Search and filter state
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filters, setFilters] = useState({
+        status: 'all',
+        startDate: null,
+        endDate: null,
+        minPrice: '',
+        maxPrice: ''
+    });
 
     // Use the auth context for API calls and auth state
-    const { api, isAuthenticated, isAdmin } = useAuth();
+    const { api, isAuthenticated } = useAuth();
 
     useEffect(() => {
-        const fetchOrders = async () => {
-            // Skip if we already have an API call in progress
-            if (apiCallInProgress.current) return;
-
-            apiCallInProgress.current = true;
-
-            try {
-                console.log("Is authenticated?", isAuthenticated());
-                console.log("Is admin?", isAdmin());
-                console.log("Token:", sessionStorage.getItem('_auth_token'));
-
-                if (!isAuthenticated()) {
-                    console.error("Authentication required");
-                    setError("You must be logged in to view orders");
-                    setLoading(false);
-                    return;
-                }
-
-                // Validate companyId exists
-                if (!companyId) {
-                    console.error("Company ID is missing");
-                    setError("Invalid company ID");
-                    setLoading(false);
-                    return;
-                }
-
-                console.log(`Fetching orders for company ID: ${companyId}`);
-
-                // Make API call using the authenticated api instance from context
-                // Update: Use the correct endpoint with companyId in the path, following company/{companyId}/orders format
-                const response = await api.get(`/api/admin/company/${companyId}/orders`);
-                console.log("API response:", response);
-
-                setOrdersData(Array.isArray(response.data) ? response.data : []);
-                setError(null);
-            } catch (err) {
-                console.error("Error fetching orders:", err);
-                console.error("Error details:", {
-                    status: err.status || err.response?.status,
-                    message: err.message,
-                    response: err.response
-                });
-
-                // Handle specific error cases
-                if (err.response?.status === 401) {
-                    setError("Unauthorized. Please log in again.");
-                    // Optionally redirect to login page
-                    // navigate("/login");
-                } else if (err.response?.status === 404) {
-                    // Not found - just show empty state
-                    console.log("No orders found - showing empty state");
-                    setOrdersData([]);
-                } else {
-                    // For other errors, show the error message
-                    setError(err.message || "Failed to load orders. Please try again later.");
-                }
-            } finally {
-                setLoading(false);
-                apiCallInProgress.current = false;
-            }
-        };
-
         fetchOrders();
+    }, [companyId, pagination.currentPage]); // Fetch when company ID or page changes
 
-        // Cleanup function
-        return () => {
-            apiCallInProgress.current = false;
-        };
-    }, [companyId, api, isAuthenticated, isAdmin, navigate]);
+    // Fetch orders with pagination and filters
+    const fetchOrders = async () => {
+        setLoading(true);
 
-    // Get current orders
-    const indexOfLastOrder = currentPage * ordersPerPage;
-    const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-    const currentOrders = ordersData.slice(indexOfFirstOrder, indexOfLastOrder);
+        try {
+            if (!isAuthenticated()) {
+                console.error("Authentication required");
+                setError("You must be logged in to view orders");
+                setLoading(false);
+                return;
+            }
 
-    // Change page
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+            // Validate companyId exists
+            if (!companyId) {
+                console.error("Company ID is missing");
+                setError("Invalid company ID");
+                setLoading(false);
+                return;
+            }
 
-    if (loading) {
+            // Build query parameters
+            const queryParams = new URLSearchParams({
+                page: pagination.currentPage,
+                size: pagination.itemsPerPage
+            });
+
+            // Add search term if provided
+            if (searchTerm) {
+                queryParams.append('search', searchTerm);
+            }
+
+            // Add filters if available
+            if (filters.status && filters.status !== 'all') {
+                queryParams.append('status', filters.status);
+            }
+
+            if (filters.startDate) {
+                queryParams.append('startDate', filters.startDate.toISOString().split('T')[0]);
+            }
+
+            if (filters.endDate) {
+                queryParams.append('endDate', filters.endDate.toISOString().split('T')[0]);
+            }
+
+            if (filters.minPrice) {
+                queryParams.append('minPrice', filters.minPrice);
+            }
+
+            if (filters.maxPrice) {
+                queryParams.append('maxPrice', filters.maxPrice);
+            }
+
+            const endpoint = `/api/admin/company/${companyId}/orders?${queryParams.toString()}`;
+            console.log("Fetching orders from:", endpoint);
+
+            // Make API call using the authenticated api instance from context
+            const response = await api.get(endpoint);
+
+            // If the response includes pagination data
+            if (response.data && response.data.content) {
+                setOrdersData(response.data.content);
+                setPagination({
+                    currentPage: response.data.number + 1, // Backend page is 0-based
+                    totalPages: response.data.totalPages,
+                    totalItems: response.data.totalElements,
+                    itemsPerPage: response.data.size
+                });
+            } else {
+                // Fallback for non-paginated responses
+                setOrdersData(Array.isArray(response.data) ? response.data : []);
+                const totalItems = Array.isArray(response.data) ? response.data.length : 0;
+                setPagination({
+                    ...pagination,
+                    totalItems,
+                    totalPages: Math.ceil(totalItems / pagination.itemsPerPage)
+                });
+            }
+
+            setError(null);
+        } catch (err) {
+            console.error("Error fetching orders:", err);
+
+            if (err.response?.status === 401) {
+                setError("Unauthorized. Please log in again.");
+            } else if (err.response?.status === 404) {
+                // Not found - just show empty state
+                console.log("No orders found - showing empty state");
+                setOrdersData([]);
+                setPagination({
+                    ...pagination,
+                    totalItems: 0,
+                    totalPages: 1
+                });
+            } else {
+                setError(err.message || "Failed to load orders. Please try again later.");
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Handle search
+    const handleSearch = (term) => {
+        setSearchTerm(term);
+        setPagination({...pagination, currentPage: 1}); // Reset to first page
+        fetchOrders();
+    };
+
+    // Handle filter
+    const handleFilter = (filterValues) => {
+        setFilters(filterValues);
+        setPagination({...pagination, currentPage: 1}); // Reset to first page
+        fetchOrders();
+    };
+
+    // Handle reset
+    const handleReset = () => {
+        setSearchTerm('');
+        setFilters({
+            status: 'all',
+            startDate: null,
+            endDate: null,
+            minPrice: '',
+            maxPrice: ''
+        });
+        setPagination({...pagination, currentPage: 1}); // Reset to first page
+        fetchOrders();
+    };
+
+    // Handle page change
+    const paginate = (pageNumber) => {
+        setPagination({...pagination, currentPage: pageNumber});
+        // fetchOrders will be called due to the dependency array
+    };
+
+    if (loading && ordersData.length === 0) {
         return (
             <Layout>
                 <Box
@@ -115,96 +193,6 @@ const Orders = () => {
         );
     }
 
-    // Show error state
-    if (error) {
-        return (
-            <Layout>
-                <Box
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                    minHeight="60vh"
-                    flexDirection="column"
-                    sx={{
-                        background: 'rgba(255, 255, 255, 0.8)',
-                        borderRadius: '15px',
-                        padding: '30px',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255, 255, 255, 0.3)',
-                        margin: '20px'
-                    }}
-                >
-                    <Typography color="error" variant="h6" gutterBottom>{error}</Typography>
-                    <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
-                        <Button
-                            variant="outlined"
-                            onClick={() => navigate("/dashboard")}
-                        >
-                            Back to Dashboard
-                        </Button>
-                        <Button
-                            variant="contained"
-                            onClick={() => {
-                                setLoading(true);
-                                apiCallInProgress.current = false; // Reset flag to allow retry
-                                window.location.reload();
-                            }}
-                        >
-                            Try Again
-                        </Button>
-                    </Box>
-                </Box>
-            </Layout>
-        );
-    }
-
-    // Handle empty state - No orders
-    if (!ordersData || ordersData.length === 0) {
-        return (
-            <Layout>
-                <div className="orders-header">
-                    <h2 className="page-title">Order Lists</h2>
-                    <button
-                        className="new-order-button"
-                        onClick={() => navigate(`/new-order?companyId=${companyId}`)}
-                    >
-                        New Order
-                    </button>
-                </div>
-                <Box
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                    minHeight="50vh"
-                    flexDirection="column"
-                    sx={{
-                        background: 'rgba(255, 255, 255, 0.8)',
-                        borderRadius: '15px',
-                        padding: '30px',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255, 255, 255, 0.3)',
-                        margin: '20px 0'
-                    }}
-                >
-                    <Typography variant="h5" gutterBottom>No Orders Found</Typography>
-                    <Typography variant="body1" color="textSecondary" paragraph>
-                        This company doesn't have any orders yet.
-                    </Typography>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => navigate(`/new-order?companyId=${companyId}`)}
-                        sx={{ mt: 2 }}
-                    >
-                        Create First Order
-                    </Button>
-                </Box>
-            </Layout>
-        );
-    }
-
     return (
         <Layout>
             <div className="orders-header">
@@ -216,65 +204,196 @@ const Orders = () => {
                     New Order
                 </button>
             </div>
-            <table className="styled-table">
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>PRN NO. </th>
-                        <th>Date Of Order</th>
-                        <th>Product Name</th>
-                        <th>Type</th>
-                        <th>Batch Size</th>
-                        <th>Total Amount</th>
-                        <th>Status</th>
-                        <th>Order Details</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {currentOrders.map((order) => (
-                        <tr key={order.id}>
-                            <td>{order.id || 'N/A'}</td>
-                            <td>{order.prnNo|| 'N/A'}</td>
-                           <td>
-                             {order.date
-                               ? new Date(order.date).toLocaleString('en-US', {
-                                   year: 'numeric',
-                                   month: 'short',
-                                   day: 'numeric'
-                                 })
-                               : 'N/A'
-                             }
-                           </td>
-                            <td>{order.productName || 'N/A'}</td>
-                            <td>{order.type || 'N/A'}</td>
-                            <td>{order.batchSizeStrips || 'N/A'}</td>
-                            <td>₹{order.totalAmount?.toFixed(2) || '0.00'}</td>
-                            <td>
-                                <span className={`status ${(order.status || '').toLowerCase()}`}>
-                                    {order.status || 'Processing'}
-                                </span>
-                            </td>
-                            <td>
-                                <NavLink to={`/companies/${companyId}/orders/${order.id}/order-details`}>
-                                    Details
-                                </NavLink>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            {Math.ceil(ordersData.length / ordersPerPage) > 1 && (
-                <div className="pagination">
-                    {Array.from({ length: Math.ceil(ordersData.length / ordersPerPage) }).map((_, index) => (
-                        <button
-                            key={index + 1}
-                            onClick={() => paginate(index + 1)}
-                            className={currentPage === index + 1 ? 'active' : ''}
-                        >
-                            {index + 1}
-                        </button>
-                    ))}
+
+            {/* Advanced Search and Filter */}
+            <AdvancedSearchFilter
+                onSearch={handleSearch}
+                onFilter={handleFilter}
+                onReset={handleReset}
+                filterOptions={{
+                    status: true,
+                    dateRange: true,
+                    price: true
+                }}
+            />
+
+            {/* Error alert */}
+            {error && (
+                <Alert severity="error" sx={{ mb: 3 }}>
+                    {error}
+                </Alert>
+            )}
+
+            {ordersData.length === 0 ? (
+                <div className="no-data">
+                    <p>No orders found</p>
+                    <Button
+                        variant="outlined"
+                        onClick={() => navigate(`/new-order?companyId=${companyId}`)}
+                        sx={{ mt: 2 }}
+                    >
+                        Create First Order
+                    </Button>
                 </div>
+            ) : (
+                <>
+                    {/* Desktop table view */}
+                    <div className="table-container desktop-table-view">
+                        <table className="styled-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>PRN NO.</th>
+                                    <th>Date Of Order</th>
+                                    <th>Product Name</th>
+                                    <th>Type</th>
+                                    <th>Batch Size</th>
+                                    <th>Total Amount</th>
+                                    <th>Status</th>
+                                    <th>Order Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {currentOrders.map((order) => (
+                                    <tr key={order.id}>
+                                        <td>{order.id || 'N/A'}</td>
+                                        <td>{order.prnNo|| 'N/A'}</td>
+                                        <td>
+                                            {order.date
+                                            ? new Date(order.date).toLocaleString('en-US', {
+                                                year: 'numeric',
+                                                month: 'short',
+                                                day: 'numeric'
+                                                })
+                                            : 'N/A'
+                                            }
+                                        </td>
+                                        <td>{order.productName || 'N/A'}</td>
+                                        <td>{order.type || 'N/A'}</td>
+                                        <td>{order.batchSizeStrips || 'N/A'}</td>
+                                        <td>₹{order.totalAmount?.toFixed(2) || '0.00'}</td>
+                                        <td>
+                                            <span className={`status ${(order.status || '').toLowerCase()}`}>
+                                                {order.status || 'Processing'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <NavLink
+                                                to={`/companies/${companyId}/orders/${order.id}/order-details`}
+                                                className="table-link"
+                                            >
+                                                Details
+                                            </NavLink>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Mobile card view */}
+                    <div className="mobile-card-view">
+                        {currentOrders.map((order) => (
+                            <div className="mobile-card" key={order.id}>
+                                <div className="mobile-card-header">
+                                    <strong>Order #{order.id}</strong>
+                                    <span className={`status ${(order.status || '').toLowerCase()}`}>
+                                        {order.status || 'Processing'}
+                                    </span>
+                                </div>
+
+                                <div className="mobile-card-row">
+                                    <span className="mobile-card-label">Date:</span>
+                                    <span className="mobile-card-value">
+                                        {order.date
+                                            ? new Date(order.date).toLocaleString('en-US', {
+                                                year: 'numeric',
+                                                month: 'short',
+                                                day: 'numeric'
+                                                })
+                                            : 'N/A'
+                                        }
+                                    </span>
+                                </div>
+
+                                <div className="mobile-card-row">
+                                    <span className="mobile-card-label">Product:</span>
+                                    <span className="mobile-card-value">{order.productName || 'N/A'}</span>
+                                </div>
+
+                                <div className="mobile-card-row">
+                                    <span className="mobile-card-label">Amount:</span>
+                                    <span className="mobile-card-value">₹{order.totalAmount?.toFixed(2) || '0.00'}</span>
+                                </div>
+
+                                <div className="mobile-card-actions">
+                                    <NavLink
+                                        to={`/companies/${companyId}/orders/${order.id}/order-details`}
+                                        className="mobile-view-button"
+                                    >
+                                        View Details
+                                    </NavLink>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Pagination */}
+                    {pagination.totalPages > 1 && (
+                        <div className="pagination">
+                            {/* Previous button */}
+                            <button
+                                onClick={() => paginate(pagination.currentPage - 1)}
+                                disabled={pagination.currentPage === 1}
+                                className={pagination.currentPage === 1 ? 'disabled' : ''}
+                            >
+                                &laquo; Prev
+                            </button>
+
+                            {/* Page numbers */}
+                            {[...Array(pagination.totalPages).keys()].map((pageNum) => {
+                                // Show limited page numbers for better UI
+                                const pageNumber = pageNum + 1;
+
+                                // Always show first, last, current, and pages adjacent to current
+                                if (
+                                    pageNumber === 1 ||
+                                    pageNumber === pagination.totalPages ||
+                                    Math.abs(pageNumber - pagination.currentPage) <= 1
+                                ) {
+                                    return (
+                                        <button
+                                            key={pageNumber}
+                                            onClick={() => paginate(pageNumber)}
+                                            className={pagination.currentPage === pageNumber ? 'active' : ''}
+                                        >
+                                            {pageNumber}
+                                        </button>
+                                    );
+                                }
+
+                                // Show ellipsis for skipped pages
+                                if (
+                                    pageNumber === 2 && pagination.currentPage > 3 ||
+                                    pageNumber === pagination.totalPages - 1 && pagination.currentPage < pagination.totalPages - 2
+                                ) {
+                                    return <span key={pageNumber} className="pagination-ellipsis">...</span>;
+                                }
+
+                                return null;
+                            })}
+
+                            {/* Next button */}
+                            <button
+                                onClick={() => paginate(pagination.currentPage + 1)}
+                                disabled={pagination.currentPage === pagination.totalPages}
+                                className={pagination.currentPage === pagination.totalPages ? 'disabled' : ''}
+                            >
+                                Next &raquo;
+                            </button>
+                        </div>
+                    )}
+                </>
             )}
         </Layout>
     );

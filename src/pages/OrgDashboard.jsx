@@ -1,7 +1,6 @@
-// src/pages/OrgDashboard.jsx - Optimized version
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import OrgLayout from "../components/Layout/OrgLayout";
-import { Box, Typography, Paper, Grid, CircularProgress, Button } from "@mui/material";
+import { Box, Typography, Paper, Grid, CircularProgress, Button, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import apiService from "../utils/api";
 import { useAuth } from "../context/AuthContext";
@@ -9,19 +8,20 @@ import "../styles/Dashboard.css";
 
 const OrgDashboard = () => {
   const [orgData, setOrgData] = useState(null);
-  const [orders, setOrders] = useState([]);  // Initialize as empty array
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [stats, setStats] = useState({
+    totalOrders: 0,
+    pendingOrders: 0,
+    completedOrders: 0,
+    totalAmount: 0
+  });
   const { user } = useAuth();
   const navigate = useNavigate();
-  const fetchInProgress = useRef(false);
 
   useEffect(() => {
     const fetchOrgData = async () => {
-      // Skip if we already have a fetch in progress
-      if (fetchInProgress.current) return;
-
-      fetchInProgress.current = true;
       setLoading(true);
 
       try {
@@ -29,10 +29,15 @@ const OrgDashboard = () => {
         const profileData = await apiService.get("/api/org/dashboard/profile");
         setOrgData(profileData);
 
-        // Fetch organization orders - UPDATED PATH to match backend controller
+        // Fetch organization orders
         const ordersData = await apiService.get("/api/org/orders");
+
         // Ensure orders is always an array
-        setOrders(Array.isArray(ordersData) ? ordersData : []);
+        const ordersArray = Array.isArray(ordersData) ? ordersData : [];
+        setOrders(ordersArray);
+
+        // Calculate dashboard statistics
+        calculateStats(ordersArray);
 
         setError(null);
       } catch (err) {
@@ -40,10 +45,7 @@ const OrgDashboard = () => {
 
         // Check if it's an authentication error
         if (err.status === 401 || (err.response && err.response.status === 401)) {
-          // Handle authentication error
           setError("Your session has expired. Please login again.");
-
-          // You might want to redirect to login page
           setTimeout(() => {
             navigate("/login");
           }, 3000);
@@ -52,19 +54,50 @@ const OrgDashboard = () => {
         }
       } finally {
         setLoading(false);
-        fetchInProgress.current = false;
       }
     };
 
     fetchOrgData();
+  }, [navigate]);
 
-    // Cleanup function
-    return () => {
-      fetchInProgress.current = false;
-      // Cancel any pending requests
-      apiService.clearPendingRequests && apiService.clearPendingRequests();
-    };
-  }, [navigate]); // Only depends on navigate, will run once on mount
+  // Calculate dashboard statistics from orders data
+  const calculateStats = (ordersData) => {
+    if (!Array.isArray(ordersData) || ordersData.length === 0) {
+      return;
+    }
+
+    const totalOrders = ordersData.length;
+
+    const pendingOrders = ordersData.filter(order =>
+      order.status === "Pending" || order.status === "Processing"
+    ).length;
+
+    const completedOrders = ordersData.filter(order =>
+      order.status === "Completed" || order.status === "Delivered"
+    ).length;
+
+    // Calculate total amount from all orders
+    const totalAmount = ordersData.reduce((sum, order) => {
+      const orderAmount = order.totalAmount ? parseFloat(order.totalAmount) : 0;
+      return sum + orderAmount;
+    }, 0);
+
+    setStats({
+      totalOrders,
+      pendingOrders,
+      completedOrders,
+      totalAmount
+    });
+  };
+
+  // Format currency
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
 
   if (loading) {
     return (
@@ -86,7 +119,6 @@ const OrgDashboard = () => {
           <Button
             variant="contained"
             onClick={() => {
-              fetchInProgress.current = false; // Reset the flag
               window.location.reload();
             }}
             className="retry-button"
@@ -110,7 +142,56 @@ const OrgDashboard = () => {
           </Typography>
         </div>
 
+        {/* Stats Grid */}
         <Grid container spacing={3} className="dashboard-grid">
+          <Grid item xs={12} md={3}>
+            <Paper className="dashboard-card">
+              <div className="dashboard-icon orders">
+                <span className="material-icons">shopping_bag</span>
+              </div>
+              <div className="dashboard-content">
+                <div className="dashboard-text">Total Orders</div>
+                <div className="dashboard-value">{stats.totalOrders}</div>
+              </div>
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <Paper className="dashboard-card">
+              <div className="dashboard-icon pending">
+                <span className="material-icons">pending</span>
+              </div>
+              <div className="dashboard-content">
+                <div className="dashboard-text">Pending Orders</div>
+                <div className="dashboard-value">{stats.pendingOrders}</div>
+              </div>
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <Paper className="dashboard-card">
+              <div className="dashboard-icon completed">
+                <span className="material-icons">check_circle</span>
+              </div>
+              <div className="dashboard-content">
+                <div className="dashboard-text">Completed Orders</div>
+                <div className="dashboard-value">{stats.completedOrders}</div>
+              </div>
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <Paper className="dashboard-card">
+              <div className="dashboard-icon revenue">
+                <span className="material-icons">payments</span>
+              </div>
+              <div className="dashboard-content">
+                <div className="dashboard-text">Total Amount</div>
+                <div className="dashboard-value">{formatCurrency(stats.totalAmount)}</div>
+              </div>
+            </Paper>
+          </Grid>
+
           {/* Organization Info Card */}
           <Grid item xs={12} md={6}>
             <Paper className="dashboard-card">
@@ -189,19 +270,19 @@ const OrgDashboard = () => {
                   <thead>
                     <tr>
                         <th>Order ID</th>
-                        <th>PRN NO. </th>
-                        <th>Date Of Order</th>
+                        <th>PRN NO.</th>
+                        <th>Date</th>
                         <th>Product Name</th>
                         <th>Total Amount</th>
                         <th>Status</th>
-                        <th>Order Details</th>
+                        <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {orders.slice(0, 5).map((order) => (
                       <tr key={order.id}>
                            <td>{order.id || 'N/A'}</td>
-                            <td>{order.prnNo|| 'N/A'}</td>
+                           <td>{order.prnNo || 'N/A'}</td>
                            <td>
                              {order.date
                                ? new Date(order.date).toLocaleString('en-US', {
