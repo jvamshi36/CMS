@@ -37,9 +37,12 @@ const Orders = () => {
     // Use the auth context for API calls and auth state
     const { api, isAuthenticated } = useAuth();
 
+    // Only fetch when these dependencies change - prevents infinite loops
     useEffect(() => {
         fetchOrders();
-    }, [companyId, pagination.currentPage]); // Fetch when company ID or page changes
+    }, [companyId, pagination.currentPage, searchTerm,
+        filters.status, filters.startDate, filters.endDate,
+        filters.minPrice, filters.maxPrice]);
 
     // Fetch orders with pagination and filters
     const fetchOrders = async () => {
@@ -63,7 +66,7 @@ const Orders = () => {
 
             // Build query parameters
             const queryParams = new URLSearchParams({
-                page: pagination.currentPage,
+                page: pagination.currentPage - 1, // API may be 0-based
                 size: pagination.itemsPerPage
             });
 
@@ -142,21 +145,19 @@ const Orders = () => {
         }
     };
 
-    // Handle search
+    // Handle search - don't call fetchOrders directly, the useEffect will trigger it
     const handleSearch = (term) => {
         setSearchTerm(term);
         setPagination({...pagination, currentPage: 1}); // Reset to first page
-        fetchOrders();
     };
 
-    // Handle filter
+    // Handle filter - don't call fetchOrders directly
     const handleFilter = (filterValues) => {
         setFilters(filterValues);
         setPagination({...pagination, currentPage: 1}); // Reset to first page
-        fetchOrders();
     };
 
-    // Handle reset
+    // Handle reset - don't call fetchOrders directly
     const handleReset = () => {
         setSearchTerm('');
         setFilters({
@@ -167,7 +168,6 @@ const Orders = () => {
             maxPrice: ''
         });
         setPagination({...pagination, currentPage: 1}); // Reset to first page
-        fetchOrders();
     };
 
     // Handle page change
@@ -175,6 +175,9 @@ const Orders = () => {
         setPagination({...pagination, currentPage: pageNumber});
         // fetchOrders will be called due to the dependency array
     };
+
+    // Use the orders directly from state - server already handles pagination
+    const currentOrders = ordersData;
 
     if (loading && ordersData.length === 0) {
         return (

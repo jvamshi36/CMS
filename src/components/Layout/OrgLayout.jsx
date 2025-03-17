@@ -1,8 +1,20 @@
 import React, { useState, useEffect } from "react";
 import OrgSidebar from "../SideBar/OrgSidebar";
 import Header from "../Header/Header";
-import { FiX } from "react-icons/fi";
+import { FiX, FiMenu } from "react-icons/fi";
 import "./Layout.css";
+
+// Mobile Header Component
+const MobileHeader = ({ title, onMenuToggle }) => {
+  return (
+    <div className="mobile-header">
+      <button className="hamburger-menu" onClick={onMenuToggle}>
+        <FiMenu size={24} />
+      </button>
+      <div className="mobile-header-title">{title || "Organization Portal"}</div>
+    </div>
+  );
+};
 
 const OrgLayout = ({ children, title }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -39,9 +51,9 @@ const OrgLayout = ({ children, title }) => {
       )}
 
       {/* Mobile Menu Overlay */}
-      {isMobile && (
+      {isMobile && mobileMenuOpen && (
         <div
-          className={`mobile-nav-overlay ${mobileMenuOpen ? 'open' : ''}`}
+          className="mobile-nav-overlay"
           onClick={toggleMobileMenu}
         />
       )}
