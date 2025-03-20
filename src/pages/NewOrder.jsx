@@ -157,14 +157,9 @@ const NewOrder = () => {
     setProducts(updatedProducts);
   };
 
-  // Debug function to check form data
-  const debugFormData = () => {
+  // This function seems to be missing its implementation
+  const handleLogData = () => {
     const currentProduct = products[activeStep];
-    console.log("Current form data:", currentProduct.formData);
-    console.log("Required fields for Order entity:", [
-      "orgId", "status", "totalAmount", "shippingAddress", "productName",
-      "brand", "type", "quantity", "price"
-    ]);
 
     // Check for missing required fields
     const missingFields = ["productName", "brand", "type", "quantity", "price"]
@@ -318,6 +313,7 @@ const NewOrder = () => {
     }
   }, [products[activeStep]?.formData.rate, products[activeStep]?.formData.quantity]);
 
+  // The component's return should be within the component function
   return (
     <Layout>
       <div className="order-container">
@@ -678,17 +674,6 @@ const NewOrder = () => {
               disabled={loading}
             >
               Add Product
-            </Button>
-
-            <Button
-              variant="outlined"
-              onClick={debugFormData}
-              startIcon={<BugReportIcon />}
-              color="secondary"
-              className="debug-button"
-              disabled={loading}
-            >
-              Debug Form Data
             </Button>
           </Box>
         </div>

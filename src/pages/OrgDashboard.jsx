@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import OrgLayout from "../components/Layout/OrgLayout";
-import { Box, Typography, Paper, Grid, CircularProgress, Button, Alert } from "@mui/material";
+import { Box, Typography, Grid, CircularProgress, Button, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import apiService from "../utils/api";
 import { useAuth } from "../context/AuthContext";
-import "../styles/Dashboard.css";
+import "../styles/Dashboard.css"; // Using the same Dashboard.css file
+import { TrendingUp, ShoppingCart, BarChart, Clock } from "lucide-react";
 
 const OrgDashboard = () => {
   const [orgData, setOrgData] = useState(null);
@@ -134,67 +135,68 @@ const OrgDashboard = () => {
     <OrgLayout>
       <div className="dashboard-container">
         <div className="dashboard-header">
-          <Typography variant="h4" className="page-title">
-            Organization Dashboard
-          </Typography>
-          <Typography variant="subtitle1" className="welcome-message">
-            Welcome, {orgData?.organizationName}
-          </Typography>
+            <h2 className="page-title">Oragnization Dashboard</h2>
+
+<Typography variant="subtitle1" className="welcome-message">
+  Welcome, <span style={{fontWeight: 'bold' }}>{orgData?.organizationName}</span>
+</Typography>
         </div>
 
-        {/* Stats Grid */}
-        <Grid container spacing={3} className="dashboard-grid">
-          <Grid item xs={12} md={3}>
-            <Paper className="dashboard-card">
+        {/* Stats Grid - Styled like Admin Dashboard */}
+        <Grid container spacing={3} className="dashboard-stats-container">
+          <Grid item xs={12} sm={6} md={3}>
+            <div className="dashboard-card">
               <div className="dashboard-icon orders">
-                <span className="material-icons">shopping_bag</span>
+                 <ShoppingCart size={24} />
               </div>
               <div className="dashboard-content">
                 <div className="dashboard-text">Total Orders</div>
                 <div className="dashboard-value">{stats.totalOrders}</div>
               </div>
-            </Paper>
+            </div>
           </Grid>
 
-          <Grid item xs={12} md={3}>
-            <Paper className="dashboard-card">
+          <Grid item xs={12} sm={6} md={3}>
+            <div className="dashboard-card">
               <div className="dashboard-icon pending">
-                <span className="material-icons">pending</span>
+                  <Clock size={24} />
               </div>
               <div className="dashboard-content">
                 <div className="dashboard-text">Pending Orders</div>
                 <div className="dashboard-value">{stats.pendingOrders}</div>
               </div>
-            </Paper>
+            </div>
           </Grid>
 
-          <Grid item xs={12} md={3}>
-            <Paper className="dashboard-card">
+          <Grid item xs={12} sm={6} md={3}>
+            <div className="dashboard-card">
               <div className="dashboard-icon completed">
-                <span className="material-icons">check_circle</span>
+                 <TrendingUp size={24} />
               </div>
               <div className="dashboard-content">
                 <div className="dashboard-text">Completed Orders</div>
                 <div className="dashboard-value">{stats.completedOrders}</div>
               </div>
-            </Paper>
+            </div>
           </Grid>
 
-          <Grid item xs={12} md={3}>
-            <Paper className="dashboard-card">
+          <Grid item xs={12} sm={6} md={3}>
+            <div className="dashboard-card">
               <div className="dashboard-icon revenue">
-                <span className="material-icons">payments</span>
+                <BarChart size={24} />
               </div>
               <div className="dashboard-content">
                 <div className="dashboard-text">Total Amount</div>
                 <div className="dashboard-value">{formatCurrency(stats.totalAmount)}</div>
               </div>
-            </Paper>
+            </div>
           </Grid>
+        </Grid>
 
-          {/* Organization Info Card */}
+        {/* Organization Info Card */}
+        <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
-            <Paper className="dashboard-card">
+            <div className="dashboard-card">
               <Typography variant="h6" className="card-title">
                 Organization Information
               </Typography>
@@ -221,7 +223,7 @@ const OrgDashboard = () => {
                 </div>
                 <div className="info-row">
                   <span className="info-label">Status:</span>
-                  <span className={`status-badge ${orgData?.status?.toLowerCase() || "pending"}`}>
+                  <span className={`status ${orgData?.status?.toLowerCase() || "pending"}`}>
                     {orgData?.status || "Pending"}
                   </span>
                 </div>
@@ -233,12 +235,12 @@ const OrgDashboard = () => {
               >
                 View Full Profile
               </Button>
-            </Paper>
+            </div>
           </Grid>
 
           {/* Representative Info Card */}
           <Grid item xs={12} md={6}>
-            <Paper className="dashboard-card">
+            <div className="dashboard-card">
               <Typography variant="h6" className="card-title">
                 Representative Information
               </Typography>
@@ -256,88 +258,86 @@ const OrgDashboard = () => {
                   <span className="info-value">{orgData?.representativeNumber}</span>
                 </div>
               </Box>
-            </Paper>
-          </Grid>
-
-          {/* Orders Overview */}
-          <Grid item xs={12}>
-            <Paper className="dashboard-card">
-              <Typography variant="h6" className="card-title">
-                Recent Orders
-              </Typography>
-              {Array.isArray(orders) && orders.length > 0 ? (
-                <table className="dashboard-table">
-                  <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>PRN NO.</th>
-                        <th>Date</th>
-                        <th>Product Name</th>
-                        <th>Total Amount</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {orders.slice(0, 5).map((order) => (
-                      <tr key={order.id}>
-                           <td>{order.id || 'N/A'}</td>
-                           <td>{order.prnNo || 'N/A'}</td>
-                           <td>
-                             {order.date
-                               ? new Date(order.date).toLocaleString('en-US', {
-                                   year: 'numeric',
-                                   month: 'short',
-                                   day: 'numeric'
-                                 })
-                               : 'N/A'
-                             }
-                           </td>
-                            <td>{order.productName || 'N/A'}</td>
-                            <td>₹{order.totalAmount?.toFixed(2) || '0.00'}</td>
-                            <td>
-                                <span className={`status ${(order.status || '').toLowerCase()}`}>
-                                    {order.status || 'Processing'}
-                                </span>
-                            </td>
-                        <td>
-                          <Button
-                            variant="contained"
-                            size="small"
-                            className="view-button"
-                            onClick={() => navigate(`/org/orders/${order.id}`)}
-                          >
-                            View
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <Typography variant="body1" className="empty-message">
-                  No orders found.
-                </Typography>
-              )}
-              {Array.isArray(orders) && orders.length > 0 && (
-                <Button
-                  variant="outlined"
-                  className="card-button"
-                  onClick={() => navigate("/org/orders")}
-                >
-                  View All Orders
-                </Button>
-              )}
-              <Button
-                variant="contained"
-                className="new-order-button"
-                onClick={() => navigate("/org/new-order")}
-              >
-                Place New Order
-              </Button>
-            </Paper>
+            </div>
           </Grid>
         </Grid>
+
+        {/* Orders Overview */}
+        <div className="dashboard-card" style={{ marginTop: "20px" }}>
+          <Typography variant="h6" className="card-title">
+            Recent Orders
+          </Typography>
+          {Array.isArray(orders) && orders.length > 0 ? (
+            <table className="dashboard-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>PRN NO.</th>
+                  <th>Date</th>
+                  <th>Product Name</th>
+                  <th>Total Amount</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.slice(0, 5).map((order) => (
+                  <tr key={order.id}>
+                    <td>{order.id || 'N/A'}</td>
+                    <td>{order.prnNo || 'N/A'}</td>
+                    <td>
+                      {order.date
+                        ? new Date(order.date).toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })
+                        : 'N/A'
+                      }
+                    </td>
+                    <td>{order.productName || 'N/A'}</td>
+                    <td>₹{order.totalAmount?.toFixed(2) || '0.00'}</td>
+                    <td>
+                      <span className={`status ${(order.status || '').toLowerCase()}`}>
+                        {order.status || 'Processing'}
+                      </span>
+                    </td>
+                    <td>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        className="view-button"
+                        onClick={() => navigate(`/org/orders/${order.id}`)}
+                      >
+                        View
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <Typography variant="body1" className="empty-message">
+              No orders found.
+            </Typography>
+          )}
+          {Array.isArray(orders) && orders.length > 0 && (
+            <Button
+              variant="outlined"
+              className="card-button"
+              onClick={() => navigate("/org/orders")}
+            >
+              View All Orders
+            </Button>
+          )}
+          <Button
+            variant="contained"
+            className="new-order-button"
+            onClick={() => navigate("/org/new-order")}
+          >
+            Place New Order
+          </Button>
+        </div>
       </div>
     </OrgLayout>
   );

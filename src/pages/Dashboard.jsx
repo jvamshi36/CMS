@@ -3,7 +3,6 @@ import { Grid, Typography, Card, Box, CircularProgress, Alert } from "@mui/mater
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp, ShoppingCart, BarChart, Clock } from "lucide-react";
 import "../styles/Dashboard.css";
-// Note: Make sure to update the Dashboard.css file with the new styles
 import Layout from "../components/Layout/Layout";
 import apiService from "../utils/api";
 

@@ -439,4 +439,322 @@ code {
     margin-top: 10px;
     gap: 8px;
   }
+  /* FilterComponents.css - Futuristic styling for Companies and Orders filter components */
+
+  /* Filter Container with Glass Morphism */
+  .filter-section {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  /* Filter Button with Gradient and Animation */
+  .filter-button {
+    background: linear-gradient(135deg, #2563EB, #1d4ed8) !important;
+    color: white !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3) !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .filter-button:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4) !important;
+  }
+
+  .filter-button::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to bottom right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(45deg);
+    transition: all 0.5s ease;
+    opacity: 0;
+  }
+
+  .filter-button:hover::after {
+    animation: shine 1.5s ease;
+    opacity: 1;
+  }
+
+  @keyframes shine {
+    0% {
+      left: -100%;
+      opacity: 0;
+    }
+    20% {
+      opacity: 0.3;
+    }
+    100% {
+      left: 100%;
+      opacity: 0;
+    }
+  }
+
+  /* Filter Chips with Animations */
+  .active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 16px 0;
+    padding: 10px 15px;
+    border-radius: 12px;
+    background: rgba(248, 250, 252, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.1);
+    border: 1px solid rgba(37, 99, 235, 0.1);
+  }
+
+  .filter-chip {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(37, 99, 235, 0.2) !important;
+    color: #2563EB !important;
+    font-weight: 500 !important;
+    border-radius: 20px !important;
+    padding: 4px 2px 4px 12px !important;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1) !important;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  }
+
+  .filter-chip:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.9)) !important;
+  }
+
+  .filter-chip.clear-all {
+    background: linear-gradient(135deg, #f87171, #ef4444) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    border-color: transparent !important;
+  }
+
+  .filter-chip.clear-all:hover {
+    transform: translateY(-2px) scale(1.03) !important;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3) !important;
+  }
+
+  .filter-chip .MuiChip-deleteIcon {
+    color: #2563EB;
+    transition: all 0.3s ease;
+  }
+
+  .filter-chip:hover .MuiChip-deleteIcon {
+    color: #1d4ed8;
+    transform: scale(1.1);
+  }
+
+  .filter-chip.clear-all .MuiChip-deleteIcon {
+    color: white;
+  }
+
+  /* Filter Accordion */
+  .filters-accordion {
+    margin-bottom: 24px !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    box-shadow: 0 8px 32px rgba(37, 99, 235, 0.15) !important;
+    background: linear-gradient(
+      to bottom right,
+      rgba(255, 255, 255, 0.95),
+      rgba(248, 250, 252, 0.9)
+    ) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(37, 99, 235, 0.1) !important;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  }
+
+  .filters-accordion:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      45deg,
+      rgba(37, 99, 235, 0.05) 0%,
+      rgba(37, 99, 235, 0) 70%
+    );
+    z-index: 0;
+  }
+
+  /* Filter Form Fields */
+  .filters-accordion .MuiFormControl-root {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .filters-accordion .MuiFormControl-root:hover {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+  }
+
+  .filters-accordion .MuiInputLabel-root {
+    color: #4B5563;
+    font-weight: 500;
+  }
+
+  .filters-accordion .MuiOutlinedInput-root {
+    border-radius: 10px;
+  }
+
+  .filters-accordion .MuiOutlinedInput-notchedOutline {
+    border-color: rgba(37, 99, 235, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .filters-accordion .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+    border-color: rgba(37, 99, 235, 0.5);
+  }
+
+  .filters-accordion .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #2563EB;
+    border-width: 2px;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+  }
+
+  /* Filter Buttons */
+  .filters-accordion .MuiButton-outlined {
+    border: 1px solid rgba(37, 99, 235, 0.5) !important;
+    color: #2563EB !important;
+    border-radius: 10px !important;
+    padding: 10px 20px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+    backdrop-filter: blur(5px) !important;
+    -webkit-backdrop-filter: blur(5px) !important;
+  }
+
+  .filters-accordion .MuiButton-outlined:hover {
+    background-color: rgba(37, 99, 235, 0.04) !important;
+    border-color: #2563EB !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15) !important;
+  }
+
+  .filters-accordion .MuiButton-contained {
+    background: linear-gradient(135deg, #2563EB, #1d4ed8) !important;
+    color: white !important;
+    border-radius: 10px !important;
+    padding: 10px 24px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3) !important;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .filters-accordion .MuiButton-contained:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4) !important;
+  }
+
+  .filters-accordion .MuiButton-contained::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to bottom right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(45deg);
+    transition: all 0.5s ease;
+    opacity: 0;
+  }
+
+  .filters-accordion .MuiButton-contained:hover::after {
+    animation: shine 1.5s ease;
+    opacity: 1;
+  }
+
+  /* When buttons are disabled */
+  .filters-accordion .MuiButton-root.Mui-disabled {
+    background: rgba(203, 213, 225, 0.3) !important;
+    color: rgba(100, 116, 139, 0.6) !important;
+    border-color: rgba(203, 213, 225, 0.5) !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  .filter-chip.Mui-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Search and Filter Container */
+  .search-filter-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 16px;
+    padding: 8px 16px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.1);
+    border: 1px solid rgba(37, 99, 235, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .search-filter-container:hover {
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.15);
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .filter-section {
+      width: 100%;
+    }
+
+    .filter-button {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .active-filters {
+      padding: 8px;
+    }
+
+    .filters-accordion .MuiAccordionDetails-root {
+      padding: 12px 8px !important;
+    }
+
+    .filters-accordion .MuiGrid-container {
+      gap: 8px !important;
+    }
+
+    .search-filter-container {
+      flex-direction: column;
+      padding: 8px;
+    }
+  }
 }

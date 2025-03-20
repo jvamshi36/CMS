@@ -44,8 +44,6 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   margin-top: 25px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   overflow: hidden;
   display: flex;
@@ -227,9 +225,12 @@ body {
 
 /* Stats Dashboard Items */
 .dashboard-content {
-  position: relative;
+position: relative;
   z-index: 2;
-  padding-top: 25px; /* Add space for the icon */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: 10px; /* Add padding at the top */
 }
 
 .value-trend-container {
@@ -266,9 +267,24 @@ body {
 }
 
 .dashboard-text {
-  font-size: 14px;
+font-size: 14px;
   color: #6b7280;
-  letter-spacing: 0.3px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 8px;
+  background: linear-gradient(120deg, #6b7280, #9ca3af);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: all 0.3s ease;
+}
+
+.dashboard-card:hover .dashboard-text {
+  letter-spacing: 1.5px;
+  background-position: right center;
+  transform: translateZ(5px);
+  text-shadow: 0 0 5px rgba(107, 114, 128, 0.3);
 }
 
 .dashboard-trend {
@@ -380,8 +396,6 @@ body {
   background: rgba(255, 255, 255, 0.7);
   border-radius: 15px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
 }
@@ -412,8 +426,6 @@ body {
   align-items: center;
   justify-content: space-between;
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -446,8 +458,6 @@ body {
 /* Glass Morphism Helper Class */
 .glass-effect {
   background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }

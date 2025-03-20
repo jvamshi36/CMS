@@ -19,8 +19,11 @@ import {
   MenuItem,
   Select,
   FormControl,
-  InputLabel
+  InputLabel,
+  Chip,
+  Grid
 } from "@mui/material";
+import { FilterList, Clear } from '@mui/icons-material';
 import apiService from "../utils/api";
 import "../styles/Orders.css";
 
@@ -30,9 +33,17 @@ const OrgOrders = () => {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+
+  // Filter states
+  const [filters, setFilters] = useState({
+    status: 'all',
+    searchTerm: '',
+    startDate: null,
+    endDate: null
+  });
+  const [showFilters, setShowFilters] = useState(false);
+  const [activeFilters, setActiveFilters] = useState([]);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -62,28 +73,108 @@ const OrgOrders = () => {
     setPage(0);
   };
 
-  const handleStatusFilterChange = (event) => {
-    setStatusFilter(event.target.value);
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({ ...prev, [name]: value }));
+  };
+
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
+  };
+
+  const applyFilters = () => {
+    // Build active filters array for display
+    const newActiveFilters = [];
+
+    if (filters.status && filters.status !== 'all') {
+      newActiveFilters.push({
+        key: 'status',
+        label: `Status: ${filters.status}`,
+        value: filters.status
+      });
+    }
+
+    if (filters.searchTerm) {
+      newActiveFilters.push({
+        key: 'searchTerm',
+        label: `Search: ${filters.searchTerm}`,
+        value: filters.searchTerm
+      });
+    }
+
+    if (filters.startDate) {
+      newActiveFilters.push({
+        key: 'startDate',
+        label: `From: ${new Date(filters.startDate).toLocaleDateString()}`,
+        value: filters.startDate
+      });
+    }
+
+    if (filters.endDate) {
+      newActiveFilters.push({
+        key: 'endDate',
+        label: `To: ${new Date(filters.endDate).toLocaleDateString()}`,
+        value: filters.endDate
+      });
+    }
+
+    setActiveFilters(newActiveFilters);
     setPage(0);
   };
 
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
+  const resetFilters = () => {
+    setFilters({
+      status: 'all',
+      searchTerm: '',
+      startDate: null,
+      endDate: null
+    });
+    setActiveFilters([]);
     setPage(0);
   };
 
-  // Filter orders based on status and search term
+  const removeFilter = (key) => {
+    const resetValue = key === 'status' ? 'all' :
+                      (key === 'startDate' || key === 'endDate') ? null : '';
+
+    setFilters(prev => ({ ...prev, [key]: resetValue }));
+    setActiveFilters(prev => prev.filter(filter => filter.key !== key));
+    setPage(0);
+  };
+
+  // Filter orders based on all filters
   const filteredOrders = Array.isArray(orders) ? orders.filter(order => {
-    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-    const matchesSearch = order.id.toString().includes(searchTerm) ||
-                         (order.items && order.items.toLowerCase().includes(searchTerm.toLowerCase()));
-    return matchesStatus && matchesSearch;
+    // Status filter
+    const matchesStatus = filters.status === 'all' || order.status === filters.status;
+
+    // Search term filter
+    const matchesSearch = !filters.searchTerm ||
+                         order.id.toString().includes(filters.searchTerm) ||
+                         (order.productName && order.productName.toLowerCase().includes(filters.searchTerm.toLowerCase())) ||
+                         (order.prnNo && order.prnNo.toLowerCase().includes(filters.searchTerm.toLowerCase()));
+
+    // Date range filter
+    let matchesDateRange = true;
+    if (filters.startDate) {
+      const orderDate = new Date(order.date);
+      const startDate = new Date(filters.startDate);
+      matchesDateRange = orderDate >= startDate;
+    }
+
+    if (filters.endDate && matchesDateRange) {
+      const orderDate = new Date(order.date);
+      const endDate = new Date(filters.endDate);
+      endDate.setHours(23, 59, 59, 999); // End of the day
+      matchesDateRange = orderDate <= endDate;
+    }
+
+    return matchesStatus && matchesSearch && matchesDateRange;
   }) : [];
 
   // Get current page orders
   const currentOrders = filteredOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
-  if (loading) {
+  if (loading && !orders.length) {
     return (
       <OrgLayout>
         <Box className="orders-loading">
@@ -94,7 +185,7 @@ const OrgOrders = () => {
     );
   }
 
-  if (error) {
+  if (error && !orders.length) {
     return (
       <OrgLayout>
         <Box className="orders-error">
@@ -128,32 +219,134 @@ const OrgOrders = () => {
           </Button>
         </Box>
 
-        <Paper className="orders-filters">
-          <TextField
-            label="Search Orders"
-            variant="outlined"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="search-field"
-            placeholder="Search by order ID or items"
-            size="small"
-          />
-          <FormControl variant="outlined" className="status-filter" size="small">
-            <InputLabel>Status</InputLabel>
-            <Select
-              value={statusFilter}
-              onChange={handleStatusFilterChange}
-              label="Status"
-            >
-              <MenuItem value="all">All Orders</MenuItem>
-              <MenuItem value="Pending">Pending</MenuItem>
-              <MenuItem value="Processing">Processing</MenuItem>
-              <MenuItem value="Shipped">Shipped</MenuItem>
-              <MenuItem value="Delivered">Delivered</MenuItem>
-              <MenuItem value="Cancelled">Cancelled</MenuItem>
-            </Select>
-          </FormControl>
-        </Paper>
+        {/* Filter Bar */}
+        {/* Filter Component */}
+        <div className="filter-component">
+          {/* Filter Bar */}
+          <div className="search-filter-container">
+            <div className="filter-section">
+              <Button
+                variant={showFilters ? "contained" : "outlined"}
+                color="primary"
+                startIcon={<FilterList />}
+                onClick={toggleFilters}
+                className="filter-button"
+              >
+                Filters {activeFilters.length > 0 && (
+                  <span className="filter-count">{activeFilters.length}</span>
+                )}
+              </Button>
+            </div>
+          </div>
+
+          {/* Active Filters */}
+          {activeFilters.length > 0 && (
+            <div className="active-filters">
+              {activeFilters.map((filter) => (
+                <Chip
+                  key={filter.key}
+                  label={filter.label}
+                  onDelete={() => removeFilter(filter.key)}
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  className="filter-chip"
+                />
+              ))}
+
+              <Chip
+                label="Clear All"
+                onClick={resetFilters}
+                color="secondary"
+                size="small"
+                className="filter-chip clear-all"
+                disabled={loading}
+              />
+            </div>
+          )}
+
+          {/* Filters Panel */}
+          <div className={`filters-collapse ${showFilters ? 'expanded' : 'collapsed'}`}>
+            <div className="filters-panel">
+              <Typography variant="h6" className="filters-title">
+                Advanced Filters
+              </Typography>
+
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6} md={4}>
+                  <FormControl fullWidth size="small" className="filter-control">
+                    <InputLabel>Status</InputLabel>
+                    <Select
+                      value={filters.status}
+                      label="Status"
+                      name="status"
+                      onChange={handleFilterChange}
+                    >
+                      <MenuItem value="all">All Orders</MenuItem>
+                      <MenuItem value="Pending">Pending</MenuItem>
+                      <MenuItem value="Processing">Processing</MenuItem>
+                      <MenuItem value="Shipped">Shipped</MenuItem>
+                      <MenuItem value="Delivered">Delivered</MenuItem>
+                      <MenuItem value="Cancelled">Cancelled</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    label="From Date"
+                    type="date"
+                    name="startDate"
+                    value={filters.startDate || ""}
+                    onChange={handleFilterChange}
+                    fullWidth
+                    size="small"
+                    className="filter-date"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    label="To Date"
+                    type="date"
+                    name="endDate"
+                    value={filters.endDate || ""}
+                    onChange={handleFilterChange}
+                    fullWidth
+                    size="small"
+                    className="filter-date"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                </Grid>
+              </Grid>
+
+              <Box className="filter-actions">
+                <Button
+                  variant="outlined"
+                  onClick={resetFilters}
+                  startIcon={<Clear />}
+                  disabled={loading}
+                  className="reset-button"
+                >
+                  Reset
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={applyFilters}
+                  startIcon={<FilterList />}
+                  className="apply-button"
+                >
+                  Apply Filters
+                </Button>
+              </Box>
+            </div>
+          </div>
+        </div>
 
         <Paper className="orders-table-container">
           {Array.isArray(currentOrders) && currentOrders.length > 0 ? (
@@ -163,12 +356,12 @@ const OrgOrders = () => {
                   <TableHead>
                     <TableRow>
                       <TableCell>Order ID</TableCell>
-                       <TableCell>PRN NO.</TableCell>
+                      <TableCell>PRN NO.</TableCell>
                       <TableCell>Date Of Order</TableCell>
                       <TableCell>Product Name</TableCell>
                       <TableCell>Type</TableCell>
                       <TableCell>Batch Size</TableCell>
-                       <TableCell>Total Amount</TableCell>
+                      <TableCell>Total Amount</TableCell>
                       <TableCell>Status</TableCell>
                       <TableCell>Actions</TableCell>
                     </TableRow>
@@ -190,9 +383,11 @@ const OrgOrders = () => {
                         <TableCell>{order.type || 'N/A'}</TableCell>
                         <TableCell>{order.batchSizeStrips || 'N/A'}</TableCell>
                         <TableCell>₹{order.totalAmount?.toFixed(2) || '0.00'}</TableCell>
-                         <TableCell><span className={`status ${(order.status || '').toLowerCase()}`}>
-                                                            {order.status || 'Processing'}
-                                                        </span> </TableCell>
+                        <TableCell>
+                          <span className={`status ${(order.status || '').toLowerCase()}`}>
+                            {order.status || 'Processing'}
+                          </span>
+                        </TableCell>
                         <TableCell>
                           <Button
                             variant="contained"
@@ -222,11 +417,11 @@ const OrgOrders = () => {
             <Box className="no-orders">
               <Typography variant="h6">No orders found</Typography>
               <Typography variant="body1">
-                {searchTerm || statusFilter !== 'all'
+                {activeFilters.length > 0
                   ? "Try adjusting your search or filter criteria."
                   : "You haven't placed any orders yet."}
               </Typography>
-              {!searchTerm && statusFilter === 'all' && (
+              {activeFilters.length === 0 && (
                 <Button
                   variant="contained"
                   onClick={() => navigate("/org/new-order")}

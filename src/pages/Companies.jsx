@@ -1,40 +1,190 @@
-// src/pages/Companies.jsx - Optimized version
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Layout from "../components/Layout/Layout";
 import "../styles/Companies.css";
-import { NavLink, useNavigate } from "react-router-dom";
-import { Alert, Snackbar, CircularProgress, Box, Button } from "@mui/material";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import {
+  Alert,
+  Snackbar,
+  CircularProgress,
+  Box,
+  Button,
+  TextField,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+  Grid,
+  IconButton,
+  Chip,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Typography
+} from "@mui/material";
+import { FilterList, Clear, ArrowDownward, ArrowUpward } from '@mui/icons-material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import apiService from "../utils/api";
+
 
 const Companies = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // State for companies data and pagination
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [companiesPerPage, setCompaniesPerPage] = useState(9);
+
+    // Reference to track if a request is in progress
+    const requestInProgressRef = useRef(false);
+
+    // Ref to ensure URL parsing only runs once
+    const hasRunUrlParsing = useRef(false);
+
+    // Ref to track if component is mounted
+    const isMountedRef = useRef(true);
+
+    // State for filters
+    const [filters, setFilters] = useState({
+        status: 'all',
+        constitution: 'all',
+        createdAtStart: null,
+        createdAtEnd: null
+    });
+    const [sortConfig, setSortConfig] = useState({ key: "createdAt", direction: "desc" });
+    const [showFilters, setShowFilters] = useState(false);
+    const [activeFilters, setActiveFilters] = useState([]);
+
+    // Snackbar state
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: "",
         severity: "info"
     });
-    const companiesPerPage = 9;
 
-    const [sortConfig, setSortConfig] = useState({ key: "createdAt", direction: "desc" });
-    const [fetchCount, setFetchCount] = useState(0); // Track API call count to prevent duplicates
+    // Clean up on unmount
+    useEffect(() => {
+        return () => {
+            isMountedRef.current = false;
+        };
+    }, []);
 
-    // Fetch companies with protection against duplicate calls
+    // Completely ignore location.search changes to prevent infinite loops with header search
+    // Parse URL query parameters on component mount - ONE TIME ONLY
+    useEffect(() => {
+        // Skip if already run
+        if (hasRunUrlParsing.current) return;
+
+        hasRunUrlParsing.current = true;
+
+        const params = new URLSearchParams(location.search);
+
+        // Extract filters from URL
+        const status = params.get('status');
+        if (status) {
+            setFilters(prev => ({ ...prev, status }));
+        }
+
+        const constitution = params.get('constitution');
+        if (constitution) {
+            setFilters(prev => ({ ...prev, constitution }));
+        }
+
+        // Extract sort config from URL
+        const sortKey = params.get('sortKey');
+        const sortDirection = params.get('sortDirection');
+        if (sortKey && sortDirection) {
+            setSortConfig({ key: sortKey, direction: sortDirection });
+        }
+    }, []);
+
+    // Fetch companies with robust protection against duplicate calls
     const fetchCompanies = useCallback(async () => {
-        // If already fetched or currently fetching, don't fetch again
-        if (fetchCount > 0 || companies.length > 0) return;
+        // Prevent duplicate calls
+        if (requestInProgressRef.current) {
+            console.log("Request already in progress, skipping duplicate call");
+            return;
+        }
 
+        // Skip if component unmounted
+        if (!isMountedRef.current) return;
+
+        // Track the request
+        requestInProgressRef.current = true;
         setLoading(true);
-        setFetchCount(prev => prev + 1); // Increment fetch count to prevent duplicates
 
         try {
-            const data = await apiService.get("/api/new-org");
-            setCompanies(data);
+            // In a real implementation, you would pass filter parameters to your API
+            const response = await apiService.get("/api/new-org");
+
+            // Skip if component unmounted during API call
+            if (!isMountedRef.current) return;
+
+            // Apply client-side filtering if needed
+            let filteredCompanies = response;
+
+            // Apply status filter
+            if (filters.status && filters.status !== 'all') {
+                filteredCompanies = filteredCompanies.filter(company => {
+                    // Handle case where status is null or undefined by treating it as "processing"
+                    const companyStatus = company.status ? company.status.toLowerCase() : "processing";
+                    return companyStatus === filters.status.toLowerCase();
+                });
+            }
+
+            // Apply constitution filter
+            if (filters.constitution && filters.constitution !== 'all') {
+                filteredCompanies = filteredCompanies.filter(company =>
+                    company.constitution?.toLowerCase() === filters.constitution.toLowerCase()
+                );
+            }
+
+            // Apply date range filters
+            if (filters.createdAtStart) {
+                const startDate = new Date(filters.createdAtStart);
+                filteredCompanies = filteredCompanies.filter(company => {
+                    if (!company.createdAt) return true;
+                    return new Date(company.createdAt) >= startDate;
+                });
+            }
+
+            if (filters.createdAtEnd) {
+                const endDate = new Date(filters.createdAtEnd);
+                filteredCompanies = filteredCompanies.filter(company => {
+                    if (!company.createdAt) return true;
+                    return new Date(company.createdAt) <= endDate;
+                });
+            }
+
+            // Sort the data
+            const sortedData = [...filteredCompanies].sort((a, b) => {
+                if (sortConfig.key === "createdAt") {
+                    return sortConfig.direction === "asc"
+                        ? new Date(a.createdAt || 0) - new Date(b.createdAt || 0)
+                        : new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+                } else if (sortConfig.key === "status") {
+                    return sortConfig.direction === "asc"
+                        ? (a.status || "").localeCompare(b.status || "")
+                        : (b.status || "").localeCompare(a.status || "");
+                } else if (sortConfig.key === "organizationName") {
+                    return sortConfig.direction === "asc"
+                        ? (a.organizationName || "").localeCompare(b.organizationName || "")
+                        : (b.organizationName || "").localeCompare(a.organizationName || "");
+                }
+                return 0;
+            });
+
+            setCompanies(sortedData);
             setError(null);
+
+            // Don't update URL params - this prevents conflicts with header search
+
         } catch (err) {
+            // Skip if component unmounted during API call
+            if (!isMountedRef.current) return;
+
             console.error("Error fetching companies:", err);
             setError(err.message || "Failed to load companies. Please try again later.");
             setSnackbar({
@@ -43,41 +193,44 @@ const Companies = () => {
                 severity: "error"
             });
         } finally {
-            setLoading(false);
+            // Skip if component unmounted during API call
+            if (isMountedRef.current) {
+                setLoading(false);
+            }
+            requestInProgressRef.current = false;
         }
-    }, [fetchCount, companies.length]);
+    }, [filters, sortConfig, isMountedRef]);
 
-    // Load companies on component mount - with empty dependency array to execute only once
+    // Don't update URLs to prevent conflicts with header search
+    const updateUrlParams = useCallback(() => {
+        return; // Do nothing
+    }, []);
+
+    // Use a single effect to fetch companies only when needed
     useEffect(() => {
+        // Only fetch once on initial load
         fetchCompanies();
-    }, []); // Intentionally empty to run once on mount
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Empty dependency array - only runs once
 
-    // Handle sorting - isolated from the fetchCompanies flow
+    // Separate effect to handle filter changes
+    useEffect(() => {
+        // Skip the initial render
+        if (activeFilters.length > 0 || sortConfig.key !== "createdAt" || sortConfig.direction !== "desc") {
+            // Reset the request tracking flag to ensure we can make a new request
+            requestInProgressRef.current = false;
+            fetchCompanies();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeFilters, sortConfig]); // Only depend on filters and sort
+
+    // Handle sorting
     const handleSort = (key) => {
         let direction = "asc";
         if (sortConfig.key === key && sortConfig.direction === "asc") {
             direction = "desc";
         }
         setSortConfig({ key, direction });
-
-        const sortedCompanies = [...companies].sort((a, b) => {
-            if (key === "createdAt") {
-                return direction === "asc"
-                    ? new Date(a.createdAt) - new Date(b.createdAt)
-                    : new Date(b.createdAt) - new Date(a.createdAt);
-            } else if (key === "status") {
-                return direction === "asc"
-                    ? a.status?.localeCompare(b.status || "")
-                    : b.status?.localeCompare(a.status || "");
-            } else if (key === "organizationName") {
-                return direction === "asc"
-                    ? a.organizationName?.localeCompare(b.organizationName || "")
-                    : b.organizationName?.localeCompare(a.organizationName || "");
-            }
-            return 0;
-        });
-
-        setCompanies(sortedCompanies);
     };
 
     // Pagination Logic
@@ -86,6 +239,139 @@ const Companies = () => {
     const currentCompanies = companies.slice(indexOfFirstCompany, indexOfLastCompany);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    // Handle filter change
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilters(prev => ({ ...prev, [name]: value }));
+    };
+
+    // Handle date filter change
+    const handleDateChange = (e) => {
+        const { name, value } = e.target;
+        setFilters(prev => ({ ...prev, [name]: value }));
+    };
+
+    // Apply filters
+    const applyFilters = () => {
+        // Build active filters array for display
+        const newActiveFilters = [];
+
+        if (filters.status && filters.status !== 'all') {
+            newActiveFilters.push({
+                key: 'status',
+                label: `Status: ${filters.status}`,
+                value: filters.status
+            });
+        }
+
+        if (filters.constitution && filters.constitution !== 'all') {
+            newActiveFilters.push({
+                key: 'constitution',
+                label: `Constitution: ${filters.constitution}`,
+                value: filters.constitution
+            });
+        }
+
+        if (filters.createdAtStart) {
+            newActiveFilters.push({
+                key: 'createdAtStart',
+                label: `From: ${new Date(filters.createdAtStart).toLocaleDateString()}`,
+                value: filters.createdAtStart
+            });
+        }
+
+        if (filters.createdAtEnd) {
+            newActiveFilters.push({
+                key: 'createdAtEnd',
+                label: `To: ${new Date(filters.createdAtEnd).toLocaleDateString()}`,
+                value: filters.createdAtEnd
+            });
+        }
+
+        setActiveFilters(newActiveFilters);
+        setCurrentPage(1); // Reset to first page on filter apply
+
+        // Reset the request flag to allow a new fetch
+        requestInProgressRef.current = false;
+
+        // Wait a tick before fetching to avoid race conditions
+        setTimeout(() => {
+            fetchCompanies();
+        }, 0);
+    };
+
+    // Reset filters with a single click
+    const resetFilters = () => {
+        // Reset everything in a single operation to prevent delays
+        const defaultFilters = {
+            status: 'all',
+            constitution: 'all',
+            createdAtStart: null,
+            createdAtEnd: null
+        };
+
+        // Update all states at once before fetching
+        setFilters(defaultFilters);
+        setActiveFilters([]);
+        setCurrentPage(1);
+
+        // Reset the request flag
+        requestInProgressRef.current = false;
+
+        // Directly fetch companies with the default filters rather than waiting for state updates
+        const fetchWithDefaults = async () => {
+            try {
+                setLoading(true);
+
+                // Make API call with no filters
+                const response = await apiService.get("/api/new-org");
+
+                if (!isMountedRef.current) return;
+
+                // Just sort by default and don't filter anything
+                const sortedData = [...response].sort((a, b) => {
+                    // Default sort by createdAt desc
+                    return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+                });
+
+                setCompanies(sortedData);
+                setError(null);
+            } catch (err) {
+                if (!isMountedRef.current) return;
+
+                console.error("Error resetting companies:", err);
+                setError(err.message || "Failed to reset companies. Please try again.");
+                setSnackbar({
+                    open: true,
+                    message: err.message || "Failed to reset companies",
+                    severity: "error"
+                });
+            } finally {
+                if (isMountedRef.current) {
+                    setLoading(false);
+                }
+                requestInProgressRef.current = false;
+            }
+        };
+
+        // Execute the fetch immediately
+        fetchWithDefaults();
+    };
+
+    // Remove specific filter
+    const removeFilter = (key) => {
+        setFilters(prev => ({ ...prev, [key]: key.includes('createdAt') ? null : 'all' }));
+        setActiveFilters(prev => prev.filter(filter => filter.key !== key));
+
+        // Reset the request flag to allow a new fetch
+        requestInProgressRef.current = false;
+
+        // Wait a tick before fetching to avoid race conditions
+        setTimeout(() => {
+            fetchCompanies();
+        }, 0);
+    };
 
     // Format date from createdAt timestamp
     const formatDate = (dateString) => {
@@ -110,12 +396,17 @@ const Companies = () => {
 
     // Retry fetching data if there was an error
     const handleRetry = () => {
-        setFetchCount(0); // Reset fetch count to allow a retry
+        requestInProgressRef.current = false; // Reset the flag
         fetchCompanies();
     };
 
+    // Toggle filters visibility
+    const toggleFilters = () => {
+        setShowFilters(!showFilters);
+    };
+
     // Loading state
-    if (loading) {
+    if (loading && !companies.length) {
         return (
             <Layout>
                 <Box className="loading-container">
@@ -127,7 +418,7 @@ const Companies = () => {
     }
 
     // Error state with retry button
-    if (error) {
+    if (error && !companies.length) {
         return (
             <Layout>
                 <Box className="error-container">
@@ -153,7 +444,148 @@ const Companies = () => {
                     Add New Organization
                 </button>
             </div>
-            {companies.length === 0 ? (
+ <div className="filter-component">
+      {/* Filter Bar */}
+      <div className="search-filter-container">
+        <div className="filter-section">
+          <Button
+            variant={showFilters ? "contained" : "outlined"}
+            color="primary"
+            startIcon={<FilterList />}
+            onClick={toggleFilters}
+            className="filter-button"
+          >
+            Filters {activeFilters.length > 0 && (
+              <span className="filter-count">{activeFilters.length}</span>
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {/* Active Filters */}
+      {activeFilters.length > 0 && (
+        <div className="active-filters">
+          {activeFilters.map((filter) => (
+            <Chip
+              key={filter.key}
+              label={filter.label}
+              onDelete={() => removeFilter(filter.key)}
+              color="primary"
+              variant="outlined"
+              size="small"
+              className="filter-chip"
+            />
+          ))}
+
+          <Chip
+            label="Clear All"
+            onClick={resetFilters}
+            color="secondary"
+            size="small"
+            className="filter-chip clear-all"
+            disabled={loading}
+          />
+        </div>
+      )}
+
+      {/* Filters Panel */}
+      <div className={`filters-collapse ${showFilters ? 'expanded' : 'collapsed'}`}>
+        <div className="filters-panel">
+          <Typography variant="h6" className="filters-title">
+            Advanced Filters
+          </Typography>
+
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={3}>
+              <FormControl fullWidth size="small" className="filter-control">
+                <InputLabel>Status</InputLabel>
+                <Select
+                  value={filters.status}
+                  label="Status"
+                  name="status"
+                  onChange={handleFilterChange}
+                >
+                  <MenuItem value="all">All Statuses</MenuItem>
+                  <MenuItem value="completed">Completed</MenuItem>
+                  <MenuItem value="processing">Processing</MenuItem>
+                  <MenuItem value="rejected">Rejected</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <FormControl fullWidth size="small" className="filter-control">
+                <InputLabel>Constitution</InputLabel>
+                <Select
+                  value={filters.constitution}
+                  label="Constitution"
+                  name="constitution"
+                  onChange={handleFilterChange}
+                >
+                  <MenuItem value="all">All Constitutions</MenuItem>
+                  <MenuItem value="Private">Private</MenuItem>
+                  <MenuItem value="Public">Public</MenuItem>
+                  <MenuItem value="Non-Profit">Non-Profit</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <TextField
+                label="From Date"
+                type="date"
+                name="createdAtStart"
+                value={filters.createdAtStart || ""}
+                onChange={handleDateChange}
+                fullWidth
+                size="small"
+                className="filter-date"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <TextField
+                label="To Date"
+                type="date"
+                name="createdAtEnd"
+                value={filters.createdAtEnd || ""}
+                onChange={handleDateChange}
+                fullWidth
+                size="small"
+                className="filter-date"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+            </Grid>
+          </Grid>
+
+          <Box className="filter-actions">
+            <Button
+              variant="outlined"
+              onClick={resetFilters}
+              startIcon={<Clear />}
+              disabled={loading}
+              className="reset-button"
+            >
+              Reset
+            </Button>
+            <Button
+              variant="contained"
+              onClick={applyFilters}
+              startIcon={<FilterList />}
+              className="apply-button"
+            >
+              Apply Filters
+            </Button>
+          </Box>
+        </div>
+      </div>
+ </div>
+              {companies.length === 0 ? (
                 <div className="no-data">
                     <p>No companies found</p>
                     <Button
@@ -175,15 +607,27 @@ const Companies = () => {
                                         onClick={() => handleSort("organizationName")}
                                         className="sortable"
                                     >
-                                        Name {sortConfig.key === "organizationName" ? (sortConfig.direction === "asc" ? "▲" : "▼") : "▲▼"}
+                                        Name {sortConfig.key === "organizationName" ? (
+                                            sortConfig.direction === "asc" ?
+                                                <ArrowUpward fontSize="small" /> :
+                                                <ArrowDownward fontSize="small" />
+                                        ) : null}
                                     </th>
                                     <th>Address</th>
                                     <th onClick={() => handleSort("createdAt")} className="sortable">
-                                        Date {sortConfig.key === "createdAt" ? (sortConfig.direction === "asc" ? "▲" : "▼") : "▲▼"}
+                                        Date {sortConfig.key === "createdAt" ? (
+                                            sortConfig.direction === "asc" ?
+                                                <ArrowUpward fontSize="small" /> :
+                                                <ArrowDownward fontSize="small" />
+                                        ) : null}
                                     </th>
                                     <th>GST</th>
                                     <th onClick={() => handleSort("status")} className="sortable">
-                                        Status {sortConfig.key === "status" ? (sortConfig.direction === "asc" ? "▲" : "▼") : "▲▼"}
+                                        Status {sortConfig.key === "status" ? (
+                                            sortConfig.direction === "asc" ?
+                                                <ArrowUpward fontSize="small" /> :
+                                                <ArrowDownward fontSize="small" />
+                                        ) : null}
                                     </th>
                                     <th>Details</th>
                                     <th>Orders</th>
@@ -224,6 +668,7 @@ const Companies = () => {
                         </table>
                     </div>
 
+                    {/* Pagination */}
                     <div className="pagination">
                         {Array.from({ length: Math.ceil(companies.length / companiesPerPage) }).map((_, index) => (
                             <button

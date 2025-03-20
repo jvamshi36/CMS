@@ -339,19 +339,33 @@ const OrderDetails = () => {
   return (
     <Layout>
       <Box className="details-container">
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-          <Button
-            variant="outlined"
-            startIcon={<ArrowBack />}
-            onClick={() => navigate(`/companies/${companyId}/orders`)}
-            sx={{ mr: 2 }}
-          >
-            Back to Orders
-          </Button>
-          <Typography variant="h6" className="section-title">
-            Order Details #{orderId}
-          </Typography>
-        </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column', mb: 1 }}>
+<Button
+  variant="outlined"
+  startIcon={<ArrowBack />}
+  onClick={() => navigate(`/companies/${companyId}/orders`)}
+  sx={{
+    mb: 2,
+    alignSelf: 'flex-start',
+    borderRadius: '12px !important',
+    padding: '10px 20px !important',
+    fontWeight: '600 !important',
+    letterSpacing: '0.5px !important',
+    boxShadow: '0 4px 16px rgba(37, 99, 235, 0.15) !important',
+    backdropFilter: 'blur(10px) !important',
+    WebkitBackdropFilter: 'blur(10px) !important',
+    border: '1px solid rgb(255, 255, 255, 0.2) !important',
+    transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important',
+    position: 'relative !important',
+    overflow: 'hidden !important'
+  }}
+>
+  Back to Orders
+</Button>
+        <Typography variant="h6" className="section-title">
+          Order Details #{orderId}
+        </Typography>
+      </Box>
 
         {/* Order Details */}
         {isEditing ? (

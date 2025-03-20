@@ -1,20 +1,48 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Layout from "../components/Layout/Layout";
 import "../styles/Orders.css";
-import { NavLink, useNavigate, useParams } from "react-router-dom";
-import { Box, CircularProgress, Typography, Button, Alert } from "@mui/material";
-import AdvancedSearchFilter from "../components/AdvancedSearchFilter/AdvancedSearchFilter";
+import { NavLink, useNavigate, useParams, useLocation } from "react-router-dom";
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  Button,
+  Alert,
+  Chip,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
+  Grid,
+  IconButton
+} from "@mui/material";
+import { FilterList, Clear, ArrowDownward, ArrowUpward } from '@mui/icons-material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useAuth } from "../context/AuthContext";
 import apiService from "../utils/api";
 
 const Orders = () => {
     const navigate = useNavigate();
     const { companyId } = useParams();
+    const location = useLocation();
 
     // State for orders data and pagination
     const [ordersData, setOrdersData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    // Reference to track if a request is in progress
+    const requestInProgressRef = useRef(false);
+
+    // Ref to ensure URL parsing only runs once
+    const hasRunUrlParsing = useRef(false);
+
+    // Ref to track if component is mounted
+    const isMountedRef = useRef(true);
 
     // Pagination state
     const [pagination, setPagination] = useState({
@@ -24,8 +52,7 @@ const Orders = () => {
         itemsPerPage: 10
     });
 
-    // Search and filter state
-    const [searchTerm, setSearchTerm] = useState('');
+    // State for filters
     const [filters, setFilters] = useState({
         status: 'all',
         startDate: null,
@@ -33,19 +60,68 @@ const Orders = () => {
         minPrice: '',
         maxPrice: ''
     });
+    const [showFilters, setShowFilters] = useState(false);
+    const [activeFilters, setActiveFilters] = useState([]);
 
     // Use the auth context for API calls and auth state
     const { api, isAuthenticated } = useAuth();
 
-    // Only fetch when these dependencies change - prevents infinite loops
+    // Clean up on unmount
     useEffect(() => {
-        fetchOrders();
-    }, [companyId, pagination.currentPage, searchTerm,
-        filters.status, filters.startDate, filters.endDate,
-        filters.minPrice, filters.maxPrice]);
+        return () => {
+            isMountedRef.current = false;
+        };
+    }, []);
 
-    // Fetch orders with pagination and filters
-    const fetchOrders = async () => {
+    // Parse URL query parameters on component mount - ONE TIME ONLY
+    useEffect(() => {
+        // Skip if already run
+        if (hasRunUrlParsing.current) return;
+
+        hasRunUrlParsing.current = true;
+
+        const params = new URLSearchParams(location.search);
+
+        // Extract filters from URL
+        const status = params.get('status');
+        if (status) {
+            setFilters(prev => ({ ...prev, status }));
+        }
+
+        const startDate = params.get('startDate');
+        if (startDate) {
+            setFilters(prev => ({ ...prev, startDate }));
+        }
+
+        const endDate = params.get('endDate');
+        if (endDate) {
+            setFilters(prev => ({ ...prev, endDate }));
+        }
+
+        const minPrice = params.get('minPrice');
+        if (minPrice) {
+            setFilters(prev => ({ ...prev, minPrice }));
+        }
+
+        const maxPrice = params.get('maxPrice');
+        if (maxPrice) {
+            setFilters(prev => ({ ...prev, maxPrice }));
+        }
+    }, []);
+
+    // Fetch orders with robust protection against duplicate calls
+    const fetchOrders = useCallback(async () => {
+        // Prevent duplicate calls
+        if (requestInProgressRef.current) {
+            console.log("Request already in progress, skipping duplicate call");
+            return;
+        }
+
+        // Skip if component unmounted
+        if (!isMountedRef.current) return;
+
+        // Track the request
+        requestInProgressRef.current = true;
         setLoading(true);
 
         try {
@@ -53,6 +129,7 @@ const Orders = () => {
                 console.error("Authentication required");
                 setError("You must be logged in to view orders");
                 setLoading(false);
+                requestInProgressRef.current = false;
                 return;
             }
 
@@ -61,6 +138,7 @@ const Orders = () => {
                 console.error("Company ID is missing");
                 setError("Invalid company ID");
                 setLoading(false);
+                requestInProgressRef.current = false;
                 return;
             }
 
@@ -70,22 +148,17 @@ const Orders = () => {
                 size: pagination.itemsPerPage
             });
 
-            // Add search term if provided
-            if (searchTerm) {
-                queryParams.append('search', searchTerm);
-            }
-
             // Add filters if available
             if (filters.status && filters.status !== 'all') {
                 queryParams.append('status', filters.status);
             }
 
             if (filters.startDate) {
-                queryParams.append('startDate', filters.startDate.toISOString().split('T')[0]);
+                queryParams.append('startDate', filters.startDate);
             }
 
             if (filters.endDate) {
-                queryParams.append('endDate', filters.endDate.toISOString().split('T')[0]);
+                queryParams.append('endDate', filters.endDate);
             }
 
             if (filters.minPrice) {
@@ -101,6 +174,9 @@ const Orders = () => {
 
             // Make API call using the authenticated api instance from context
             const response = await api.get(endpoint);
+
+            // Skip if component unmounted during API call
+            if (!isMountedRef.current) return;
 
             // If the response includes pagination data
             if (response.data && response.data.content) {
@@ -124,6 +200,9 @@ const Orders = () => {
 
             setError(null);
         } catch (err) {
+            // Skip if component unmounted during API call
+            if (!isMountedRef.current) return;
+
             console.error("Error fetching orders:", err);
 
             if (err.response?.status === 401) {
@@ -141,44 +220,229 @@ const Orders = () => {
                 setError(err.message || "Failed to load orders. Please try again later.");
             }
         } finally {
-            setLoading(false);
+            // Skip if component unmounted during API call
+            if (isMountedRef.current) {
+                setLoading(false);
+            }
+            requestInProgressRef.current = false;
         }
+    }, [companyId, pagination.currentPage, pagination.itemsPerPage, filters, api, isAuthenticated, isMountedRef]);
+
+    // Use a single effect to fetch orders only when needed
+    useEffect(() => {
+        // Only fetch once on initial load
+        fetchOrders();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Empty dependency array - only runs once
+
+    // Separate effect to handle filter changes
+    useEffect(() => {
+        // Skip the initial render
+        if (activeFilters.length > 0) {
+            // Reset the request tracking flag to ensure we can make a new request
+            requestInProgressRef.current = false;
+            fetchOrders();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeFilters]); // Only depend on filters
+
+    // Handle filter change
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilters(prev => ({ ...prev, [name]: value }));
     };
 
-    // Handle search - don't call fetchOrders directly, the useEffect will trigger it
-    const handleSearch = (term) => {
-        setSearchTerm(term);
-        setPagination({...pagination, currentPage: 1}); // Reset to first page
+    // Apply filters
+    const applyFilters = () => {
+        // Build active filters array for display
+        const newActiveFilters = [];
+
+        if (filters.status && filters.status !== 'all') {
+            newActiveFilters.push({
+                key: 'status',
+                label: `Status: ${filters.status}`,
+                value: filters.status
+            });
+        }
+
+        if (filters.startDate) {
+            newActiveFilters.push({
+                key: 'startDate',
+                label: `From: ${filters.startDate}`,
+                value: filters.startDate
+            });
+        }
+
+        if (filters.endDate) {
+            newActiveFilters.push({
+                key: 'endDate',
+                label: `To: ${filters.endDate}`,
+                value: filters.endDate
+            });
+        }
+
+        if (filters.minPrice) {
+            newActiveFilters.push({
+                key: 'minPrice',
+                label: `Min Price: ₹${filters.minPrice}`,
+                value: filters.minPrice
+            });
+        }
+
+        if (filters.maxPrice) {
+            newActiveFilters.push({
+                key: 'maxPrice',
+                label: `Max Price: ₹${filters.maxPrice}`,
+                value: filters.maxPrice
+            });
+        }
+
+        setActiveFilters(newActiveFilters);
+        setPagination({...pagination, currentPage: 1}); // Reset to first page on filter apply
+
+        // Reset the request flag to allow a new fetch
+        requestInProgressRef.current = false;
+
+        // Wait a tick before fetching to avoid race conditions
+        setTimeout(() => {
+            fetchOrders();
+        }, 0);
     };
 
-    // Handle filter - don't call fetchOrders directly
-    const handleFilter = (filterValues) => {
-        setFilters(filterValues);
-        setPagination({...pagination, currentPage: 1}); // Reset to first page
-    };
-
-    // Handle reset - don't call fetchOrders directly
-    const handleReset = () => {
-        setSearchTerm('');
-        setFilters({
+    // Reset filters with a single click
+    const resetFilters = () => {
+        // Reset everything in a single operation to prevent delays
+        const defaultFilters = {
             status: 'all',
             startDate: null,
             endDate: null,
             minPrice: '',
             maxPrice: ''
-        });
-        setPagination({...pagination, currentPage: 1}); // Reset to first page
+        };
+
+        // Update all states at once before fetching
+        setFilters(defaultFilters);
+        setActiveFilters([]);
+        setPagination({...pagination, currentPage: 1});
+
+        // Reset the request flag
+        requestInProgressRef.current = false;
+
+        // Directly fetch orders with the default filters rather than waiting for state updates
+        const fetchWithDefaults = async () => {
+            try {
+                setLoading(true);
+
+                if (!isAuthenticated()) {
+                    setError("You must be logged in to view orders");
+                    setLoading(false);
+                    return;
+                }
+
+                if (!companyId) {
+                    setError("Invalid company ID");
+                    setLoading(false);
+                    return;
+                }
+
+                // Build simple query params with just pagination
+                const queryParams = new URLSearchParams({
+                    page: 0, // Reset to first page
+                    size: pagination.itemsPerPage
+                });
+
+                const endpoint = `/api/admin/company/${companyId}/orders?${queryParams.toString()}`;
+                console.log("Resetting and fetching orders from:", endpoint);
+
+                const response = await api.get(endpoint);
+
+                if (response.data && response.data.content) {
+                    setOrdersData(response.data.content);
+                    setPagination({
+                        currentPage: 1, // Force to page 1
+                        totalPages: response.data.totalPages,
+                        totalItems: response.data.totalElements,
+                        itemsPerPage: pagination.itemsPerPage
+                    });
+                } else {
+                    setOrdersData(Array.isArray(response.data) ? response.data : []);
+                    const totalItems = Array.isArray(response.data) ? response.data.length : 0;
+                    setPagination({
+                        currentPage: 1,
+                        totalPages: Math.ceil(totalItems / pagination.itemsPerPage),
+                        totalItems,
+                        itemsPerPage: pagination.itemsPerPage
+                    });
+                }
+
+                setError(null);
+            } catch (err) {
+                console.error("Error resetting orders:", err);
+                if (err.response?.status === 401) {
+                    setError("Unauthorized. Please log in again.");
+                } else if (err.response?.status === 404) {
+                    setOrdersData([]);
+                    setPagination({
+                        currentPage: 1,
+                        totalPages: 1,
+                        totalItems: 0,
+                        itemsPerPage: pagination.itemsPerPage
+                    });
+                } else {
+                    setError(err.message || "Failed to reset orders. Please try again.");
+                }
+            } finally {
+                setLoading(false);
+                requestInProgressRef.current = false;
+            }
+        };
+
+        // Execute the fetch immediately
+        fetchWithDefaults();
+    };
+
+    // Remove specific filter
+    const removeFilter = (key) => {
+        // For date and price fields, set to null or empty string
+        // For status, set to 'all'
+        const resetValue = key === 'status' ? 'all' :
+                          (key === 'startDate' || key === 'endDate') ? null : '';
+
+        setFilters(prev => ({ ...prev, [key]: resetValue }));
+        setActiveFilters(prev => prev.filter(filter => filter.key !== key));
+
+        // Reset the request flag to allow a new fetch
+        requestInProgressRef.current = false;
+
+        // Wait a tick before fetching to avoid race conditions
+        setTimeout(() => {
+            fetchOrders();
+        }, 0);
+    };
+
+    // Toggle filters visibility
+    const toggleFilters = () => {
+        setShowFilters(!showFilters);
     };
 
     // Handle page change
     const paginate = (pageNumber) => {
         setPagination({...pagination, currentPage: pageNumber});
-        // fetchOrders will be called due to the dependency array
+        requestInProgressRef.current = false; // Reset the request flag
+
+        // Wait a tick before fetching
+        setTimeout(() => {
+            fetchOrders();
+        }, 0);
     };
 
-    // Use the orders directly from state - server already handles pagination
-    const currentOrders = ordersData;
+    // Retry fetching data if there was an error
+    const handleRetry = () => {
+        requestInProgressRef.current = false; // Reset the flag
+        fetchOrders();
+    };
 
+    // Loading state
     if (loading && ordersData.length === 0) {
         return (
             <Layout>
@@ -208,17 +472,161 @@ const Orders = () => {
                 </button>
             </div>
 
-            {/* Advanced Search and Filter */}
-            <AdvancedSearchFilter
-                onSearch={handleSearch}
-                onFilter={handleFilter}
-                onReset={handleReset}
-                filterOptions={{
-                    status: true,
-                    dateRange: true,
-                    price: true
-                }}
-            />
+
+          {/* Filter Bar */}
+          <div className="search-filter-container">
+            <div className="filter-section">
+              <Button
+                variant={showFilters ? "contained" : "outlined"}
+                color="primary"
+                startIcon={<FilterList />}
+                onClick={toggleFilters}
+                className="filter-button"
+              >
+                Filters {activeFilters.length > 0 && (
+                  <span className="filter-count">{activeFilters.length}</span>
+                )}
+              </Button>
+            </div>
+          </div>
+
+          {/* Active Filters */}
+          {activeFilters.length > 0 && (
+            <div className="active-filters">
+              {activeFilters.map((filter) => (
+                <Chip
+                  key={filter.key}
+                  label={filter.label}
+                  onDelete={() => removeFilter(filter.key)}
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  className="filter-chip"
+                />
+              ))}
+
+              <Chip
+                label="Clear All"
+                onClick={resetFilters}
+                color="secondary"
+                size="small"
+                className="filter-chip clear-all"
+                disabled={loading}
+              />
+            </div>
+          )}
+
+          {/* Filters Panel */}
+          <div className={`filters-collapse ${showFilters ? 'expanded' : 'collapsed'}`}>
+            <div className="filters-panel">
+              <Typography variant="h6" className="filters-title">
+                Advanced Filters
+              </Typography>
+
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6} md={2}>
+                  <FormControl fullWidth size="small" className="filter-control">
+                    <InputLabel>Status</InputLabel>
+                    <Select
+                      value={filters.status}
+                      label="Status"
+                      name="status"
+                      onChange={handleFilterChange}
+                    >
+                      <MenuItem value="all">All Statuses</MenuItem>
+                      <MenuItem value="completed">Completed</MenuItem>
+                      <MenuItem value="processing">Processing</MenuItem>
+                      <MenuItem value="pending">Pending</MenuItem>
+                      <MenuItem value="cancelled">Cancelled</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={2}>
+                  <TextField
+                    label="From Date"
+                    type="date"
+                    name="startDate"
+                    value={filters.startDate || ""}
+                    onChange={handleFilterChange}
+                    fullWidth
+                    size="small"
+                    className="filter-date"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={2}>
+                  <TextField
+                    label="To Date"
+                    type="date"
+                    name="endDate"
+                    value={filters.endDate || ""}
+                    onChange={handleFilterChange}
+                    fullWidth
+                    size="small"
+                    className="filter-date"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={2}>
+                  <TextField
+                    label="Min Price"
+                    type="number"
+                    name="minPrice"
+                    value={filters.minPrice}
+                    onChange={handleFilterChange}
+                    fullWidth
+                    size="small"
+                    className="filter-control"
+                    InputProps={{
+                      startAdornment: "₹",
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={2}>
+                  <TextField
+                    label="Max Price"
+                    type="number"
+                    name="maxPrice"
+                    value={filters.maxPrice}
+                    onChange={handleFilterChange}
+                    fullWidth
+                    size="small"
+                    className="filter-control"
+                    InputProps={{
+                      startAdornment: "₹",
+                    }}
+                  />
+                </Grid>
+              </Grid>
+
+              <Box className="filter-actions">
+                <Button
+                  variant="outlined"
+                  onClick={resetFilters}
+                  startIcon={<Clear />}
+                  className="reset-button"
+                >
+                  Reset
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={applyFilters}
+                  startIcon={<FilterList />}
+                  className="apply-button"
+                >
+                  Apply Filters
+               </Button>
+              </Box>
+            </div>
+          </div>
 
             {/* Error alert */}
             {error && (
@@ -257,7 +665,7 @@ const Orders = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {currentOrders.map((order) => (
+                                {ordersData.map((order) => (
                                     <tr key={order.id}>
                                         <td>{order.id || 'N/A'}</td>
                                         <td>{order.prnNo|| 'N/A'}</td>
@@ -296,7 +704,7 @@ const Orders = () => {
 
                     {/* Mobile card view */}
                     <div className="mobile-card-view">
-                        {currentOrders.map((order) => (
+                        {ordersData.map((order) => (
                             <div className="mobile-card" key={order.id}>
                                 <div className="mobile-card-header">
                                     <strong>Order #{order.id}</strong>
