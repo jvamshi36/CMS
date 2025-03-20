@@ -1,0 +1,136 @@
+/* Export Center Styles */
+.export-center-container {
+  padding: 20px 0;
+}
+
+/* Responsive design for mobile devices */
+@media (max-width: 768px) {
+  .export-card {
+    padding: 20px;
+  }
+
+  .export-button {
+    width: 100%;
+  }
+
+  .export-header {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: center;
+  }
+
+  .export-icon {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+}
+
+.export-card {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 15px;
+  padding: 25px;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.export-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  border-color: rgba(37, 99, 235, 0.2);
+}
+
+.export-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.export-icon {
+  margin-right: 12px;
+  color: #2563EB;
+  font-size: 24px;
+}
+
+.export-button {
+  min-width: 150px;
+  height: 45px;
+  padding: 0 20px !important;
+  transition: all 0.3s ease !important;
+}
+
+.export-button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3) !important;
+}
+
+/* Export History Item */
+.export-history-item {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 10px 15px !important;
+  transition: background-color 0.2s ease;
+}
+
+.export-history-item:hover {
+  background-color: rgba(37, 99, 235, 0.05);
+}
+
+.export-history-item:last-child {
+  border-bottom: none;
+}
+
+/* Custom styles for different data types */
+.data-type-icon {
+  font-size: 36px !important;
+  color: #2563EB;
+  margin-bottom: 10px;
+}
+
+.data-type-card.companies .data-type-icon {
+  color: #8B5CF6;
+}
+
+.data-type-card.orders .data-type-icon {
+  color: #F59E0B;
+}
+
+.data-type-card.sales .data-type-icon {
+  color: #10B981;
+}
+
+.data-type-card.products .data-type-icon {
+  color: #EC4899;
+}
+
+.data-type-card.companies:hover {
+  border-left: 3px solid #8B5CF6;
+}
+
+.data-type-card.orders:hover {
+  border-left: 3px solid #F59E0B;
+}
+
+.data-type-card.sales:hover {
+  border-left: 3px solid #10B981;
+}
+
+.data-type-card.products:hover {
+  border-left: 3px solid #EC4899;
+}
+
+/* Data Type Cards */
+.data-type-card {
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  overflow: hidden !important;
+  height: 100%;
+}
+
+.data-type-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+}

@@ -628,3 +628,210 @@ font-size: 14px;
     display: inline-block;
   }
 }
+/* Enhanced Dashboard.css */
+
+/* Additional styles for the enhanced dashboard with real-time data visualization */
+.dashboard-header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Export button styles */
+.export-button {
+  background-color: #fff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #334155 !important;
+  font-weight: 500 !important;
+  padding: 6px 12px !important;
+  border-radius: 6px !important;
+  text-transform: none !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05) !important;
+}
+
+.export-button:hover {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Responsive adjustments for enhanced dashboard */
+@media (max-width: 768px) {
+  .dashboard-header-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard-actions {
+    margin-top: 10px;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .chart-controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .chart-control {
+    width: 100% !important;
+    margin-bottom: 10px;
+  }
+}
+
+.dashboard-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.action-button {
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  padding: 6px 16px !important;
+  text-transform: none !important;
+  transition: all 0.3s ease !important;
+}
+
+.action-button:hover {
+  background-color: rgba(37, 99, 235, 0.08) !important;
+  transform: translateY(-2px) !important;
+}
+
+.refresh-button {
+  margin-left: 5px !important;
+  color: #2563EB !important;
+  transition: all 0.3s ease !important;
+}
+
+.refresh-button:hover {
+  background-color: rgba(37, 99, 235, 0.08) !important;
+  transform: rotate(30deg) !important;
+}
+
+.refresh-button .spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Widget styles */
+.dashboard-widget {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.widget-content {
+  width: 100%;
+}
+
+/* Chart controls */
+.chart-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.chart-control {
+  min-width: 120px !important;
+}
+
+/* Table actions */
+.table-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+}
+
+/* Widget customization */
+.widget-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #e2e8f0;
+  transition: background-color 0.2s ease;
+}
+
+.widget-list-item:hover {
+  background-color: rgba(240, 242, 245, 0.8);
+}
+
+.widget-list-item:last-child {
+  border-bottom: none;
+}
+
+/* No data state */
+.no-data-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background-color: rgba(240, 242, 245, 0.4);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.no-data-text {
+  margin-top: 16px !important;
+  color: #64748b !important;
+  font-size: 1rem !important;
+}
+
+/* Enhancements for stat cards */
+.stat-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.1);
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #2563EB, #1d4ed8);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover::after {
+  transform: scaleX(1);
+}
+
+/* Chart container */
+.chart-container {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}

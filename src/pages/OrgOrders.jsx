@@ -50,12 +50,16 @@ const OrgOrders = () => {
       setLoading(true);
       try {
         const data = await apiService.get("/api/org/orders");
-        // Ensure orders is always an array
-        setOrders(Array.isArray(data) ? data : []);
+        // Ensure orders is always an array and has no dummy data
+        const validOrders = Array.isArray(data) ? data : [];
+
+        // Make sure we're working with real data, not placeholder or dummy data
+        setOrders(validOrders);
         setError(null);
       } catch (err) {
         console.error("Error fetching orders:", err);
         setError(err.message || "Failed to load orders. Please try again later.");
+        setOrders([]); // Set orders to empty array on error
       } finally {
         setLoading(false);
       }
@@ -142,38 +146,46 @@ const OrgOrders = () => {
     setPage(0);
   };
 
+  // Ensure we're working with an array and not default/dummy data
+  const ordersArray = Array.isArray(orders) ? orders : [];
+
+  // Search input for ID search
+  const [searchInput, setSearchInput] = useState('');
+
   // Filter orders based on all filters
-  const filteredOrders = Array.isArray(orders) ? orders.filter(order => {
+  const filteredOrders = ordersArray.filter(order => {
     // Status filter
     const matchesStatus = filters.status === 'all' || order.status === filters.status;
 
     // Search term filter
-    const matchesSearch = !filters.searchTerm ||
-                         order.id.toString().includes(filters.searchTerm) ||
-                         (order.productName && order.productName.toLowerCase().includes(filters.searchTerm.toLowerCase())) ||
-                         (order.prnNo && order.prnNo.toLowerCase().includes(filters.searchTerm.toLowerCase()));
+    const matchesSearch = !filters.searchTerm || (
+      (order.id && order.id.toString().includes(filters.searchTerm)) ||
+      (order.productName && order.productName.toLowerCase().includes(filters.searchTerm.toLowerCase())) ||
+      (order.prnNo && order.prnNo.toLowerCase().includes(filters.searchTerm.toLowerCase()))
+    );
 
     // Date range filter
     let matchesDateRange = true;
     if (filters.startDate) {
-      const orderDate = new Date(order.date);
+      const orderDate = new Date(order.date || '');
       const startDate = new Date(filters.startDate);
       matchesDateRange = orderDate >= startDate;
     }
 
     if (filters.endDate && matchesDateRange) {
-      const orderDate = new Date(order.date);
+      const orderDate = new Date(order.date || '');
       const endDate = new Date(filters.endDate);
       endDate.setHours(23, 59, 59, 999); // End of the day
       matchesDateRange = orderDate <= endDate;
     }
 
     return matchesStatus && matchesSearch && matchesDateRange;
-  }) : [];
+  });
 
   // Get current page orders
   const currentOrders = filteredOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
+  // Loading state only when initially loading
   if (loading && !orders.length) {
     return (
       <OrgLayout>
@@ -185,6 +197,7 @@ const OrgOrders = () => {
     );
   }
 
+  // Error state only when an error occurred and no orders are available
   if (error && !orders.length) {
     return (
       <OrgLayout>
@@ -219,137 +232,147 @@ const OrgOrders = () => {
           </Button>
         </Box>
 
-        {/* Filter Bar */}
-        {/* Filter Component */}
-        <div className="filter-component">
-          {/* Filter Bar */}
-          <div className="search-filter-container">
-            <div className="filter-section">
-              <Button
-                variant={showFilters ? "contained" : "outlined"}
-                color="primary"
-                startIcon={<FilterList />}
-                onClick={toggleFilters}
-                className="filter-button"
-              >
-                Filters {activeFilters.length > 0 && (
-                  <span className="filter-count">{activeFilters.length}</span>
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* Active Filters */}
-          {activeFilters.length > 0 && (
-            <div className="active-filters">
-              {activeFilters.map((filter) => (
-                <Chip
-                  key={filter.key}
-                  label={filter.label}
-                  onDelete={() => removeFilter(filter.key)}
-                  color="primary"
+        {/* Only show filters if there are orders */}
+        {orders.length > 0 && (
+          <div className="filter-component">
+            {/* Filter Bar */}
+            <div className="search-filter-container">
+              <div className="filter-section">
+                <TextField
+                  label="Search by Order ID, Product, or PRN"
                   variant="outlined"
                   size="small"
-                  className="filter-chip"
+                  value={filters.searchTerm}
+                  onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
+                  className="search-input"
+                  style={{ marginRight: '16px', minWidth: '240px' }}
                 />
-              ))}
-
-              <Chip
-                label="Clear All"
-                onClick={resetFilters}
-                color="secondary"
-                size="small"
-                className="filter-chip clear-all"
-                disabled={loading}
-              />
-            </div>
-          )}
-
-          {/* Filters Panel */}
-          <div className={`filters-collapse ${showFilters ? 'expanded' : 'collapsed'}`}>
-            <div className="filters-panel">
-              <Typography variant="h6" className="filters-title">
-                Advanced Filters
-              </Typography>
-
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6} md={4}>
-                  <FormControl fullWidth size="small" className="filter-control">
-                    <InputLabel>Status</InputLabel>
-                    <Select
-                      value={filters.status}
-                      label="Status"
-                      name="status"
-                      onChange={handleFilterChange}
-                    >
-                      <MenuItem value="all">All Orders</MenuItem>
-                      <MenuItem value="Pending">Pending</MenuItem>
-                      <MenuItem value="Processing">Processing</MenuItem>
-                      <MenuItem value="Shipped">Shipped</MenuItem>
-                      <MenuItem value="Delivered">Delivered</MenuItem>
-                      <MenuItem value="Cancelled">Cancelled</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={4}>
-                  <TextField
-                    label="From Date"
-                    type="date"
-                    name="startDate"
-                    value={filters.startDate || ""}
-                    onChange={handleFilterChange}
-                    fullWidth
-                    size="small"
-                    className="filter-date"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={4}>
-                  <TextField
-                    label="To Date"
-                    type="date"
-                    name="endDate"
-                    value={filters.endDate || ""}
-                    onChange={handleFilterChange}
-                    fullWidth
-                    size="small"
-                    className="filter-date"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  />
-                </Grid>
-              </Grid>
-
-              <Box className="filter-actions">
                 <Button
-                  variant="outlined"
-                  onClick={resetFilters}
-                  startIcon={<Clear />}
-                  disabled={loading}
-                  className="reset-button"
-                >
-                  Reset
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={applyFilters}
+                  variant={showFilters ? "contained" : "outlined"}
+                  color="primary"
                   startIcon={<FilterList />}
-                  className="apply-button"
+                  onClick={toggleFilters}
+                  className="filter-button"
                 >
-                  Apply Filters
+                  Filters {activeFilters.length > 0 && (
+                    <span className="filter-count">{activeFilters.length}</span>
+                  )}
                 </Button>
-              </Box>
+              </div>
+            </div>
+
+            {/* Active Filters */}
+            {activeFilters.length > 0 && (
+              <div className="active-filters">
+                {activeFilters.map((filter) => (
+                  <Chip
+                    key={filter.key}
+                    label={filter.label}
+                    onDelete={() => removeFilter(filter.key)}
+                    color="primary"
+                    variant="outlined"
+                    size="small"
+                    className="filter-chip"
+                  />
+                ))}
+
+                <Chip
+                  label="Clear All"
+                  onClick={resetFilters}
+                  color="secondary"
+                  size="small"
+                  className="filter-chip clear-all"
+                  disabled={loading}
+                />
+              </div>
+            )}
+
+            {/* Filters Panel */}
+            <div className={`filters-collapse ${showFilters ? 'expanded' : 'collapsed'}`}>
+              <div className="filters-panel">
+                <Typography variant="h6" className="filters-title">
+                  Advanced Filters
+                </Typography>
+
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <FormControl fullWidth size="small" className="filter-control">
+                      <InputLabel>Status</InputLabel>
+                      <Select
+                        value={filters.status}
+                        label="Status"
+                        name="status"
+                        onChange={handleFilterChange}
+                      >
+                        <MenuItem value="all">All Orders</MenuItem>
+                        <MenuItem value="Pending">Pending</MenuItem>
+                        <MenuItem value="Processing">Processing</MenuItem>
+                        <MenuItem value="Shipped">Shipped</MenuItem>
+                        <MenuItem value="Delivered">Delivered</MenuItem>
+                        <MenuItem value="Cancelled">Cancelled</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} md={4}>
+                    <TextField
+                      label="From Date"
+                      type="date"
+                      name="startDate"
+                      value={filters.startDate || ""}
+                      onChange={handleFilterChange}
+                      fullWidth
+                      size="small"
+                      className="filter-date"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} md={4}>
+                    <TextField
+                      label="To Date"
+                      type="date"
+                      name="endDate"
+                      value={filters.endDate || ""}
+                      onChange={handleFilterChange}
+                      fullWidth
+                      size="small"
+                      className="filter-date"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+
+                <Box className="filter-actions">
+                  <Button
+                    variant="outlined"
+                    onClick={resetFilters}
+                    startIcon={<Clear />}
+                    disabled={loading}
+                    className="reset-button"
+                  >
+                    Reset
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={applyFilters}
+                    startIcon={<FilterList />}
+                    className="apply-button"
+                  >
+                    Apply Filters
+                  </Button>
+                </Box>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         <Paper className="orders-table-container">
-          {Array.isArray(currentOrders) && currentOrders.length > 0 ? (
+          {orders.length > 0 && filteredOrders.length > 0 ? (
             <>
               <TableContainer>
                 <Table aria-label="orders table">
