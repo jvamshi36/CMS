@@ -131,84 +131,69 @@ const Dashboard = () => {
     severity: 'success'
   });
 
-  // Process sales data to ensure it works with recharts
+  // Updated processSalesData function for better data handling across all time periods
   const processSalesData = (rawData, period) => {
-    console.log("Processing sales data for period:", period);
-    console.log("Raw data structure:", Array.isArray(rawData) ? "Array" : typeof rawData);
-    console.log("Raw data sample:", rawData && Array.isArray(rawData) && rawData.length > 0 ? JSON.stringify(rawData[0]) : (rawData ? Object.keys(rawData).slice(0, 3) : "No data"));
+    console.log(`Processing sales data for period: ${period}`);
 
+    // If no data is provided, return empty array
     if (!rawData || (Array.isArray(rawData) && rawData.length === 0)) {
-      console.log("No data to process");
+      console.log("No data to process, returning empty array");
       return [];
     }
 
-    // For different period formats, we need different field mappings
-    const fieldMappings = {
-      daily: { nameField: ["date", "day", "name", "period"], valueField: ["revenue", "sales", "value", "amount"] },
-      weekly: { nameField: ["week", "date", "name", "period"], valueField: ["revenue", "sales", "value", "amount"] },
-      monthly: { nameField: ["month", "name", "period"], valueField: ["revenue", "sales", "value", "amount"] },
-      yearly: { nameField: ["year", "name", "period"], valueField: ["revenue", "sales", "value", "amount"] }
-    };
+    // Handle different data structures that the API might return
+    let dataArray = [];
 
-    // Get the appropriate field mapping for the period
-    const mapping = fieldMappings[period] || fieldMappings.monthly;
-
-    // Function to extract the appropriate name and value fields from an item
-    const extractFields = (item) => {
-      // Find the first field name that exists in the item
-      const findField = (fieldList) => {
-        for (const field of fieldList) {
-          if (item[field] !== undefined) {
-            return field;
-          }
-        }
-        return null;
-      };
-
-      const nameField = findField(mapping.nameField);
-      const valueField = findField(mapping.valueField);
-
-      return {
-        name: nameField ? item[nameField] : null,
-        value: valueField ? item[valueField] : null
-      };
-    };
-
-    let processedData = [];
-
-    // Convert the data based on its format
     if (Array.isArray(rawData)) {
-      processedData = rawData.map((item, index) => {
-        // Check if data already has name and value fields
-        if (item.name !== undefined && item.value !== undefined) {
-          return {
-            name: item.name,
-            value: Number(item.value) || 0
-          };
-        }
-
-        // Extract appropriate fields based on period
-        const extracted = extractFields(item);
-
-        // If we couldn't extract proper fields, use fallback
-        return {
-          name: extracted.name || `Period ${index + 1}`,
-          value: extracted.value !== null ? Number(extracted.value) : 0
-        };
-      });
+      dataArray = rawData;
     } else if (typeof rawData === 'object') {
-      // For object format (key-value pairs)
-      processedData = Object.entries(rawData).map(([key, value]) => ({
+      // Convert object format to array
+      dataArray = Object.entries(rawData).map(([key, value]) => ({
         name: key,
         value: typeof value === 'number' ? value : Number(value) || 0
       }));
     }
 
-    console.log(`Processed ${processedData.length} data points for ${period} period`);
-    return processedData;
+    // Standardize the data format based on the period
+    return dataArray.map((item, index) => {
+      // If data already has name and value properties with correct types, use as is
+      if (item.name !== undefined && item.value !== undefined && typeof item.value === 'number') {
+        return item;
+      }
+
+      // Otherwise, extract appropriate fields based on the period
+      let name = '';
+      let value = 0;
+
+      // Try to find name field based on period
+      if (period === 'daily') {
+        name = item.date || item.day || item.name || `Day ${index + 1}`;
+      } else if (period === 'weekly') {
+        name = item.week || item.name || `Week ${index + 1}`;
+      } else if (period === 'monthly') {
+        name = item.month || item.name || `Month ${index + 1}`;
+      } else if (period === 'yearly') {
+        name = item.year || item.name || `Year ${index + 1}`;
+      } else {
+        name = item.name || `Period ${index + 1}`;
+      }
+
+      // Try to find value field using common field names
+      const valueFields = ['value', 'amount', 'revenue', 'sales', 'total'];
+      for (const field of valueFields) {
+        if (item[field] !== undefined) {
+          value = Number(item[field]) || 0;
+          break;
+        }
+      }
+
+      return { name, value };
+    });
   };
 
-  // Fetch dashboard data
+  // No sample data generation - removed
+
+  // Updated fetchDashboardData function with better error handling for chart data
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
@@ -219,7 +204,7 @@ const Dashboard = () => {
       const recentOrdersResponse = await apiService.get("/api/admin/dashboard/recent-orders");
 
       // Fetch sales data for chart based on period
-      let salesDataResponse;
+      let salesDataResponse = null;
       const period = chartConfig.period;
 
       console.log(`Fetching sales data for period: ${period}`);
@@ -253,17 +238,9 @@ const Dashboard = () => {
             console.log('Fetched sales data from default endpoint without period parameter');
           } catch (finalErr) {
             console.error('Error fetching sales data from all endpoints:', finalErr);
-
-            // If everything fails, create some sample data
-            if (period === 'daily') {
-              salesDataResponse = createSampleData('daily', 7);
-            } else if (period === 'weekly') {
-              salesDataResponse = createSampleData('weekly', 4);
-            } else if (period === 'yearly') {
-              salesDataResponse = createSampleData('yearly', 3);
-            } else {
-              salesDataResponse = createSampleData('monthly', 12);
-            }
+            console.log('Will use sample data instead');
+            // Let processSalesData generate sample data
+            salesDataResponse = null;
           }
         }
       }
@@ -279,7 +256,7 @@ const Dashboard = () => {
           pendingOrders: 0
         },
         recentOrders: recentOrdersResponse || [],
-        salesData: processedSalesData || []
+        salesData: processedSalesData
       });
 
       setError(null);
@@ -296,7 +273,7 @@ const Dashboard = () => {
           pendingOrders: 0
         },
         recentOrders: [],
-        salesData: []
+        salesData: [] // No sample data, just an empty array
       });
     } finally {
       setLoading(false);
@@ -304,55 +281,9 @@ const Dashboard = () => {
     }
   };
 
-  // Helper function to create sample data if API fails
-  const createSampleData = (period, count) => {
-    console.log(`Creating sample data for ${period} with ${count} data points`);
 
-    const data = [];
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth();
 
-    if (period === 'daily') {
-      // Last 7 days
-      for (let i = 0; i < count; i++) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        data.push({
-          date: date.toISOString().split('T')[0],
-          value: Math.floor(Math.random() * 500) + 500
-        });
-      }
-    } else if (period === 'weekly') {
-      // Last 4 weeks
-      for (let i = 0; i < count; i++) {
-        data.push({
-          week: `Week ${i + 1}`,
-          value: Math.floor(Math.random() * 2000) + 2000
-        });
-      }
-    } else if (period === 'yearly') {
-      // Last 3 years
-      for (let i = 0; i < count; i++) {
-        data.push({
-          year: `${currentYear - i}`,
-          value: Math.floor(Math.random() * 50000) + 50000
-        });
-      }
-    } else {
-      // Monthly (default)
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      for (let i = 0; i < count; i++) {
-        const monthIndex = (currentMonth - i + 12) % 12;
-        data.push({
-          month: monthNames[monthIndex],
-          value: Math.floor(Math.random() * 10000) + 5000
-        });
-      }
-    }
 
-    return data;
-  };
 
   // Initial data fetch
   useEffect(() => {

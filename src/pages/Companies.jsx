@@ -14,15 +14,10 @@ import {
   InputLabel,
   FormControl,
   Grid,
-  IconButton,
   Chip,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Typography
 } from "@mui/material";
 import { FilterList, Clear, ArrowDownward, ArrowUpward } from '@mui/icons-material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import apiService from "../utils/api";
 
 

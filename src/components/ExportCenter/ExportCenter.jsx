@@ -13,7 +13,6 @@ import {
   MenuItem,
   TextField,
   CircularProgress,
-  Chip,
   Snackbar,
   Card,
   CardContent,
@@ -25,16 +24,15 @@ import {
 import {
   Download,
   FileDownload,
-  DateRange,
   Business,
   ShoppingCart,
   AttachMoney,
   Description,
   CloudDownload,
-  History,
   Dashboard as DashboardIcon
 } from "@mui/icons-material";
 import apiService from "../../utils/api";
+import "./ExportCenter.css"
 // Remove useAuth import if not available or causing issues
 
 // Utility to format date for exports
@@ -46,7 +44,6 @@ const formatDate = (date) => {
 // Export Center component
 const ExportCenter = () => {
   // Use apiService directly instead of from context
-  const api = apiService;
 
   // Export configuration state
   const [exportConfig, setExportConfig] = useState({
@@ -68,9 +65,6 @@ const ExportCenter = () => {
     error: null,
     success: false
   });
-
-  // Recent exports history
-  const [recentExports, setRecentExports] = useState([]);
 
   // Available companies for filtering orders
   const [companies, setCompanies] = useState([]);
@@ -128,12 +122,6 @@ const ExportCenter = () => {
     };
 
     fetchCompanies();
-
-    // Load export history from localStorage
-    const savedExports = localStorage.getItem('recent-exports');
-    if (savedExports) {
-      setRecentExports(JSON.parse(savedExports));
-    }
   }, []);
 
   // Handle export configuration changes
@@ -589,23 +577,6 @@ const ExportCenter = () => {
       const success = await exportToClientSide(exportConfig.dataType, exportConfig.format);
 
       if (success) {
-        // Add to recent exports history
-        const newExport = {
-          id: Date.now(),
-          dataType: exportConfig.dataType,
-          format: exportConfig.format,
-          date: new Date().toISOString(),
-          filters: JSON.stringify(exportConfig.filters),
-          status: "completed",
-          filename: `${exportConfig.dataType}_export_${formatDate(new Date())}.${exportConfig.format}`
-        };
-
-        const updatedExports = [newExport, ...recentExports.slice(0, 9)];
-        setRecentExports(updatedExports);
-
-        // Save to localStorage
-        localStorage.setItem('recent-exports', JSON.stringify(updatedExports));
-
         setExportStatus({ loading: false, error: null, success: true });
 
         // Show success notification
@@ -831,39 +802,6 @@ const ExportCenter = () => {
     }
   };
 
-  // Delete export history item
-  const deleteExportHistory = (id) => {
-    const updatedExports = recentExports.filter(item => item.id !== id);
-    setRecentExports(updatedExports);
-    localStorage.setItem('recent-exports', JSON.stringify(updatedExports));
-  };
-
-  // Rerun a previous export
-  const rerunExport = (exportItem) => {
-    try {
-      // Parse the saved filters
-      const savedFilters = JSON.parse(exportItem.filters);
-
-      // Set the export configuration
-      setExportConfig({
-        ...exportConfig,
-        dataType: exportItem.dataType,
-        format: exportItem.format,
-        filters: savedFilters
-      });
-
-      // Trigger the export
-      handleExport();
-    } catch (error) {
-      console.error("Error rerunning export:", error);
-      setNotification({
-        open: true,
-        message: "Failed to rerun export. Please try again.",
-        severity: "error"
-      });
-    }
-  };
-
   // Close notification
   const handleCloseNotification = () => {
     setNotification({ ...notification, open: false });
@@ -1060,53 +998,6 @@ const ExportCenter = () => {
             )}
           </Paper>
         </Grid>
-
-        {/* Recent Exports Card */}
-        <Grid item xs={12} md={4}>
-          <Paper className="export-card">
-            <Box className="export-header">
-              <History className="export-icon" />
-              <Typography variant="h6">Recent Exports</Typography>
-            </Box>
-            <Divider sx={{ mb: 2 }} />
-
-            {recentExports.length === 0 ? (
-              <Box sx={{ p: 2, textAlign: 'center' }}>
-                <Typography color="text.secondary">No recent exports</Typography>
-              </Box>
-            ) : (
-              <List>
-                {recentExports.map((item) => (
-                  <ListItem
-                    key={item.id}
-                    secondaryAction={
-                      <Button
-                        size="small"
-                        onClick={() => rerunExport(item)}
-                        startIcon={<Download />}
-                      >
-                        Rerun
-                      </Button>
-                    }
-                    className="export-history-item"
-                  >
-                    <ListItemIcon>
-                      {item.dataType === "companies" && <Business />}
-                      {item.dataType === "orders" && <ShoppingCart />}
-                      {item.dataType === "sales" && <AttachMoney />}
-                      {item.dataType === "products" && <Description />}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={`${item.dataType.charAt(0).toUpperCase() + item.dataType.slice(1)} (${item.format.toUpperCase()})`}
-                      secondary={`${new Date(item.date).toLocaleString()}`}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            )}
-          </Paper>
-        </Grid>
-
         {/* Export Overview Card */}
         <Grid item xs={12}>
           <Paper className="export-card">

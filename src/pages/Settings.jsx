@@ -18,7 +18,8 @@ import {
   CloudDownload
 } from "@mui/icons-material";
 import "../styles/Settings.css";
-import ExportCenter from "../components/ExportCenter/ExportCenter"; // Import the Export Center component
+import ExportCenter from "../components/ExportCenter/ExportCenter";
+
 
 // Tab Panel Component
 function TabPanel(props) {

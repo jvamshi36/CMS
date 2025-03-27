@@ -3,28 +3,7 @@
   padding: 20px 0;
 }
 
-/* Responsive design for mobile devices */
-@media (max-width: 768px) {
-  .export-card {
-    padding: 20px;
-  }
-
-  .export-button {
-    width: 100%;
-  }
-
-  .export-header {
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: center;
-  }
-
-  .export-icon {
-    margin-right: 0;
-    margin-bottom: 10px;
-  }
-}
-
+/* Card styling */
 .export-card {
   background: rgba(255, 255, 255, 0.8);
   border-radius: 15px;
@@ -43,6 +22,23 @@
   border-color: rgba(37, 99, 235, 0.2);
 }
 
+/* Add decorative background effect */
+.export-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(
+    circle,
+    rgba(37, 99, 235, 0.03) 0%,
+    transparent 70%
+  );
+  z-index: 1;
+}
+
+/* Header styling */
 .export-header {
   display: flex;
   align-items: center;
@@ -52,13 +48,20 @@
 .export-icon {
   margin-right: 12px;
   color: #2563EB;
-  font-size: 24px;
+  font-size: 24px !important;
 }
 
+/* Button styling */
 .export-button {
   min-width: 150px;
   height: 45px;
   padding: 0 20px !important;
+  background: linear-gradient(135deg, #2563EB, #1d4ed8) !important;
+  color: white !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  text-transform: none !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
   transition: all 0.3s ease !important;
 }
 
@@ -70,8 +73,9 @@
 /* Export History Item */
 .export-history-item {
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  padding: 10px 15px !important;
+  padding: 12px 15px !important;
   transition: background-color 0.2s ease;
+  min-height: 80px !important;
 }
 
 .export-history-item:hover {
@@ -89,6 +93,21 @@
   margin-bottom: 10px;
 }
 
+.data-type-card {
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  overflow: hidden !important;
+  height: 100%;
+  border-left: 3px solid transparent;
+}
+
+.data-type-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Data type specific styling */
 .data-type-card.companies .data-type-icon {
   color: #8B5CF6;
 }
@@ -103,6 +122,10 @@
 
 .data-type-card.products .data-type-icon {
   color: #EC4899;
+}
+
+.data-type-card.dashboard .data-type-icon {
+  color: #2563EB;
 }
 
 .data-type-card.companies:hover {
@@ -121,16 +144,126 @@
   border-left: 3px solid #EC4899;
 }
 
-/* Data Type Cards */
-.data-type-card {
-  border-radius: 12px !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
-  overflow: hidden !important;
-  height: 100%;
+.data-type-card.dashboard:hover {
+  border-left: 3px solid #2563EB;
 }
 
-.data-type-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+/* Form styling */
+.MuiInputLabel-root,
+.MuiFormLabel-root {
+  color: #64748b !important;
+}
+
+.MuiOutlinedInput-root {
+  border-radius: 10px !important;
+}
+
+.MuiOutlinedInput-notchedOutline {
+  border-color: rgba(37, 99, 235, 0.2) !important;
+}
+
+.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(37, 99, 235, 0.4) !important;
+}
+
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #2563EB !important;
+}
+
+/* Select dropdown styling */
+.MuiSelect-select {
+  padding: 12px 14px !important;
+}
+
+/* Alert styling */
+.MuiAlert-root {
+  border-radius: 12px !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
+}
+
+.MuiAlert-standardError {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  color: #ef4444 !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+}
+
+.MuiAlert-standardSuccess {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  color: #10b981 !important;
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Quick export buttons */
+.MuiButton-outlined {
+  border-color: rgba(37, 99, 235, 0.5) !important;
+  color: #2563EB !important;
+  padding: 6px 16px !important;
+  border-radius: 8px !important;
+  text-transform: none !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+.MuiButton-outlined:hover {
+  background-color: rgba(37, 99, 235, 0.05) !important;
+  border-color: #2563EB !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Run button styling for recent exports */
+.export-history-item .MuiButton-root,
+.run-button {
+  color: #2563EB !important;
+  transition: all 0.3s ease !important;
+  font-weight: 500 !important;
+  min-width: 0 !important;
+  border-radius: 6px !important;
+  white-space: nowrap !important;
+  padding: 4px 12px !important;
+  margin-left: 8px !important;
+}
+
+.export-history-item .MuiButton-root:hover,
+.run-button:hover {
+  background-color: rgba(37, 99, 235, 0.1) !important;
+}
+
+/* Typography for export history items */
+.export-history-item .MuiTypography-subtitle1 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.export-history-item .MuiTypography-body2 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+/* Responsive design for mobile devices */
+@media (max-width: 768px) {
+  .export-card {
+    padding: 20px;
+  }
+
+  .export-button {
+    width: 100%;
+  }
+
+  .export-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .export-icon {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .data-type-card {
+    margin-bottom: 16px;
+  }
 }

@@ -1,0 +1,7 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "CI=false DISABLE_ESLINT_PLUGIN=true npm run build"
+
+[deploy]
+startCommand = "npx serve -s build"
+restartPolicyType = "ON_FAILURE"
