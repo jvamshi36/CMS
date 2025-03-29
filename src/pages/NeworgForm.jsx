@@ -19,6 +19,7 @@ import Layout from "../components/Layout/Layout"; // Adjust the path as necessar
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { Snackbar, Alert } from "@mui/material";
 import "../styles/NeworgForm.css";
+import apiService from "../utils/api";
 
 const steps = [
   "Organization Details",
@@ -113,8 +114,8 @@ const NeworgForm = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post(
-        "https://localhost:8081/api/new-org/submit",
+      const response = await apiService.post(
+        '/api/new-org/submit',
         formData,
         {
           headers: {
