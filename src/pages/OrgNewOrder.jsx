@@ -33,6 +33,70 @@ import apiService from "../utils/api";
 import { useAuth } from "../context/AuthContext";
 import "../styles/NewOrder.css";
 
+
+const OrderSubmissionInfo = () => {
+  const [expanded, setExpanded] = useState(false);
+  
+  return (
+    <Paper 
+      elevation={0} 
+      sx={{ 
+        mb: 3, 
+        p: 2, 
+        bgcolor: 'rgba(37, 99, 235, 0.05)', 
+        border: '1px solid rgba(37, 99, 235, 0.2)',
+        borderRadius: '10px',
+        overflow: 'hidden'
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+
+        <Typography variant="h6" sx={{ color: '#2563EB', fontWeight: 600, fontSize: '1rem' }}>
+          Important Information About Order Submission
+        </Typography>
+      </Box>
+      
+      <Typography variant="body2" sx={{ color: '#4B5563', mb: 1 }}>
+        When you submit an order, it will be sent to our admin team for review and approval. 
+        Orders are typically processed within 24-48 hours.
+      </Typography>
+      
+      {expanded && (
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="body2" sx={{ color: '#4B5563', mb: 1 }}>
+            <strong>Order approval process:</strong>
+          </Typography>
+          <ol style={{ margin: '0 0 16px 16px', paddingLeft: 0 }}>
+            <li>Your order is submitted with status "Pending"</li>
+            <li>Admin reviews the order details and product availability</li>
+            <li>If approved, status changes to "Processing"</li>
+            <li>Once shipped, status will update to "Shipped"</li>
+            <li>When delivery is complete, status will be "Delivered"</li>
+          </ol>
+          <Typography variant="body2" sx={{ color: '#4B5563' }}>
+            You can track the status of your orders in the Orders section. You'll receive notifications 
+            when your order status changes.
+          </Typography>
+        </Box>
+      )}
+      
+      <Button 
+        onClick={() => setExpanded(!expanded)} 
+        sx={{ 
+          mt: 1, 
+          color: '#2563EB', 
+          textTransform: 'none',
+          p: 0,
+          fontSize: '0.875rem',
+          fontWeight: 500
+        }}
+      >
+        {expanded ? "Show less" : "Learn more about the order process"}
+      </Button>
+    </Paper>
+  );
+};
+
 const OrgNewOrder = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -315,6 +379,7 @@ const OrgNewOrder = () => {
         >
           Place New Order
         </Typography>
+        <OrderSubmissionInfo />
 
         {loadingProducts ? (
           <Box display="flex" justifyContent="center" my={4}>

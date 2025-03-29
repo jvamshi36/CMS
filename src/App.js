@@ -44,6 +44,8 @@ const OrgOrders = lazy(() => import('./pages/OrgOrders'));
 const OrgOrderDetails = lazy(() => import('./pages/OrgOrderDetails'));
 const OrgSettings = lazy(() =>import ('./pages/OrgSettings'));
 const OrgNewOrder = lazy(() =>import ('./pages/OrgNewOrder'));
+const PendingOrders = lazy(() => import('./pages/PendingOrders'));
+const PendingOrderDetail = lazy(() => import('./pages/PendingOrderDetail'));
 
 function App() {
   return (
@@ -67,6 +69,8 @@ function App() {
               <Route path="/companies/:companyId/orders/:orderId/order-details" element={<OrderDetails />} />
               <Route path="/team" element={<Team />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/pending-orders" element={<PendingOrders />} />
+              <Route path="/pending-orders/:orderId" element={<PendingOrderDetail />} />
             </Route>
 
             {/* Organization Protected Routes */}

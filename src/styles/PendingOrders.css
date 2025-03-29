@@ -1,0 +1,305 @@
+/* src/styles/PendingOrders.css */
+.pending-orders-container {
+    padding: 20px;
+  }
+  
+  .pending-orders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+  
+  .page-title {
+    font-size: 2rem !important;
+    font-weight: bold !important;
+    background: linear-gradient(45deg, #2563EB, #1d4ed8);
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .refresh-button {
+    border-color: #2563EB !important;
+    color: #2563EB !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    text-transform: none !important;
+    padding: 8px 16px !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .refresh-button:hover {
+    background-color: rgba(37, 99, 235, 0.05) !important;
+    transform: translateY(-2px) !important;
+  }
+  
+  /* Table Container */
+  .pending-orders-table-container {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(243, 244, 246, 1);
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .pending-orders-table-container:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+    transform: translateY(-3px);
+  }
+  
+  /* Table Row Priority Styling */
+  .priority-high {
+    background-color: rgba(239, 68, 68, 0.05) !important;
+    transition: all 0.3s ease;
+  }
+  
+  .priority-high:hover {
+    background-color: rgba(239, 68, 68, 0.1) !important;
+  }
+  
+  .priority-medium {
+    background-color: rgba(245, 158, 11, 0.05) !important;
+    transition: all 0.3s ease;
+  }
+  
+  .priority-medium:hover {
+    background-color: rgba(245, 158, 11, 0.1) !important;
+  }
+  
+  .priority-normal {
+    transition: all 0.3s ease;
+  }
+  
+  /* Priority Chips */
+  .priority-chip {
+    font-weight: 600 !important;
+    padding: 4px 8px !important;
+    border-radius: 6px !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.5px !important;
+  }
+  
+  .priority-chip.high {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    color: white !important;
+    box-shadow: 0 2px 5px rgba(239, 68, 68, 0.3) !important;
+  }
+  
+  .priority-chip.medium {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: white !important;
+    box-shadow: 0 2px 5px rgba(245, 158, 11, 0.3) !important;
+  }
+  
+  .priority-chip.normal {
+    background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+    color: white !important;
+    box-shadow: 0 2px 5px rgba(59, 130, 246, 0.3) !important;
+  }
+  
+  /* View Order Button */
+  .view-order-button {
+    background: linear-gradient(135deg, #2563EB, #1d4ed8) !important;
+    color: white !important;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    padding: 5px 12px !important;
+    border-radius: 6px !important;
+    text-transform: none !important;
+    box-shadow: 0 2px 5px rgba(37, 99, 235, 0.2) !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .view-order-button:hover {
+    background-color: #1d4ed8 !important;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3) !important;
+    transform: translateY(-2px) !important;
+  }
+  
+  /* Empty State */
+  .no-pending-orders {
+    padding: 40px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .no-pending-orders h6 {
+    color: #1e293b !important;
+    margin-bottom: 10px !important;
+  }
+  
+  /* Loading State */
+  .pending-orders-loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    gap: 20px;
+  }
+  
+  /* Order detail page specific styles */
+  .order-detail-card {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 15px !important;
+    padding: 25px !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
+    margin-bottom: 30px !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(243, 244, 246, 1) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+  }
+  
+  .order-detail-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12) !important;
+  }
+  
+  .section-title {
+    font-size: 1.5rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 20px !important;
+    color: #1e293b !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+  
+  .detail-row {
+    display: flex;
+    margin-bottom: 12px;
+    align-items: flex-start;
+  }
+  
+  .detail-label {
+    min-width: 160px;
+    font-weight: 500;
+    color: #64748b;
+  }
+  
+  .detail-value {
+    font-weight: 500;
+    color: #0f172a;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+  }
+  
+  .approve-button {
+    background: linear-gradient(135deg, #10B981, #059669) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 10px 24px !important;
+    border-radius: 10px !important;
+    text-transform: none !important;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2) !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .approve-button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3) !important;
+  }
+  
+  .reject-button {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 10px 24px !important;
+    border-radius: 10px !important;
+    text-transform: none !important;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2) !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .reject-button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3) !important;
+  }
+  
+  .organization-card {
+    background: linear-gradient(to right, rgba(37, 99, 235, 0.05), transparent) !important;
+    border-left: 4px solid #2563EB !important;
+  }
+  
+  .product-card {
+    background: linear-gradient(to right, rgba(16, 185, 129, 0.05), transparent) !important;
+    border-left: 4px solid #10B981 !important;
+  }
+  
+  .approval-form {
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(243, 244, 246, 0.5);
+    border-radius: 12px;
+  }
+  
+  .form-title {
+    font-size: 1.2rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 15px !important;
+    color: #1e293b !important;
+  }
+  
+  .form-field {
+    margin-bottom: 15px !important;
+  }
+  
+  .input-label {
+    font-weight: 500 !important;
+    color: #4b5563 !important;
+    margin-bottom: 5px !important;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .pending-orders-container {
+      padding: 15px;
+    }
+  
+    .pending-orders-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+  
+    .detail-row {
+      flex-direction: column;
+    }
+  
+    .detail-label {
+      margin-bottom: 5px;
+    }
+  
+    .action-buttons {
+      flex-direction: column;
+    }
+  
+    .action-buttons button {
+      width: 100%;
+    }
+  }
