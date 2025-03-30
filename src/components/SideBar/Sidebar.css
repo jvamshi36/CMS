@@ -1,4 +1,4 @@
-/* src/components/SideBar/Sidebar.css */
+/* src/components/SideBar/Sidebar.css - Update mobile styles */
 .sidebar {
   width: 240px;
   height: 100vh;
@@ -9,11 +9,11 @@
   box-shadow: 0 0 25px rgba(37, 99, 235, 0.5);
   color: white;
   font-family: 'Inter', sans-serif;
-  position: fixed; /* Change to fixed position */
+  position: fixed;
   top: 0;
   left: 0;
-  z-index: 100; /* Ensure sidebar is above other content */
-  overflow-y: auto; /* Allow scrolling if content is too tall */
+  z-index: 100;
+  overflow-y: auto;
 }
 
 /* Glowing border effect */
@@ -244,27 +244,40 @@ nav {
   color: #00ff99;
 }
 
-/* Responsive Adjustments */
+/* Responsive Adjustments - UPDATED FOR MOBILE */
 @media (max-width: 768px) {
   .sidebar {
-    width: 60px;
-    overflow: hidden;
+    width: 240px; /* Keep full width on mobile when shown */
+    transform: translateX(0);
+    transition: transform 0.3s ease, left 0.3s ease;
   }
 
+  .sidebar.mobile-closed {
+    transform: translateX(-240px);
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+    box-shadow: 5px 0 25px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Ensure logo is visible on mobile */
   .logo span {
-    display: none;
+    display: inline;
   }
 
+  /* Keep user info visible on mobile */
   .user-info {
-    display: none;
+    display: block;
   }
 
+  /* Keep nav item text visible */
   .nav-item span {
-    display: none;
+    display: inline;
   }
 
+  /* Keep nav icon with right margin */
   .nav-item svg {
-    margin-right: 0;
-    font-size: 22px;
+    margin-right: 12px;
   }
 }

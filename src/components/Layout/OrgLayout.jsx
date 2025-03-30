@@ -50,7 +50,7 @@ const OrgLayout = ({ children, title }) => {
         />
       )}
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu Overlay - only visible when menu is open */}
       {isMobile && mobileMenuOpen && (
         <div
           className="mobile-nav-overlay"
@@ -58,18 +58,18 @@ const OrgLayout = ({ children, title }) => {
         />
       )}
 
-      {/* Sidebar - conditional classes for mobile */}
-      <div className={`sidebar ${mobileMenuOpen && isMobile ? 'mobile-open' : ''}`}>
+      {/* Sidebar with fixed positioning for mobile */}
+      <div className={`sidebar ${mobileMenuOpen && isMobile ? 'mobile-open' : 'mobile-closed'}`}>
         {isMobile && mobileMenuOpen && (
           <button className="mobile-close-button" onClick={toggleMobileMenu}>
-            <FiX />
+            <FiX size={20} />
           </button>
         )}
         <OrgSidebar />
       </div>
 
       {/* Main Content */}
-      <div className="main-content">
+      <div className={`main-content ${isMobile ? 'mobile-layout' : ''}`}>
         {!isMobile && <Header />}
         <div className="page-content">{children}</div>
       </div>

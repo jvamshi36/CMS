@@ -3,6 +3,7 @@
   display: flex;
   min-height: 100vh;
   height: auto;
+  position: relative;
 }
 
 .main-content {
@@ -25,17 +26,33 @@
   margin-top: 80px; /* Match header height */
 }
 
+/* Sidebar positioning */
+.sidebar {
+  width: 240px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  transition: left 0.3s ease, transform 0.3s ease;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  /* Adjust main content for mobile */
   .main-content {
-    margin-left: 60px; /* Match collapsed sidebar width */
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  .main-content.mobile-layout {
+    padding-top: 60px; /* Account for mobile header */
   }
 
   .page-content {
     padding: 15px;
-    margin-top: 60px;
+    margin-top: 0; /* Reset top margin since we're using padding-top on the parent */
   }
-  /* Add these styles to your Layout.css file */
 
   /* Mobile Header Styles */
   .mobile-header {
@@ -68,12 +85,30 @@
     cursor: pointer;
     border-radius: 5px;
     transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .hamburger-menu:hover {
     background: rgba(255, 255, 255, 0.1);
   }
 
+  /* Mobile sidebar positioning */
+  .sidebar {
+    left: -100%;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .sidebar.mobile-open {
+    left: 0;
+  }
+
+  .sidebar.mobile-closed {
+    left: -240px;
+  }
+
+  /* Close button for mobile menu */
   .mobile-close-button {
     position: absolute;
     top: 15px;
@@ -87,11 +122,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
     z-index: 101;
     cursor: pointer;
   }
 
+  /* Overlay when mobile menu is open */
   .mobile-nav-overlay {
     position: fixed;
     top: 0;
@@ -101,27 +136,5 @@
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 98;
     cursor: pointer;
-  }
-
-  /* Adjustments for mobile sidebar */
-  @media (max-width: 768px) {
-    .sidebar {
-      width: 240px;
-      position: fixed;
-      top: 0;
-      left: -250px;
-      height: 100vh;
-      z-index: 100;
-      transition: left 0.3s ease;
-    }
-
-    .sidebar.mobile-open {
-      left: 0;
-    }
-
-    .main-content {
-      margin-left: 0 !important;
-      padding-top: 60px; /* Match the mobile header height */
-    }
   }
 }
