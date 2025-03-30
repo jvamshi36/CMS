@@ -33,34 +33,32 @@ import apiService from "../utils/api";
 import { useAuth } from "../context/AuthContext";
 import "../styles/NewOrder.css";
 
-
 const OrderSubmissionInfo = () => {
   const [expanded, setExpanded] = useState(false);
-  
+
   return (
-    <Paper 
-      elevation={0} 
-      sx={{ 
-        mb: 3, 
-        p: 2, 
-        bgcolor: 'rgba(37, 99, 235, 0.05)', 
+    <Paper
+      elevation={0}
+      sx={{
+        mb: 3,
+        p: 2,
+        bgcolor: 'rgba(37, 99, 235, 0.05)',
         border: '1px solid rgba(37, 99, 235, 0.2)',
         borderRadius: '10px',
         overflow: 'hidden'
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-
         <Typography variant="h6" sx={{ color: '#2563EB', fontWeight: 600, fontSize: '1rem' }}>
           Important Information About Order Submission
         </Typography>
       </Box>
-      
+
       <Typography variant="body2" sx={{ color: '#4B5563', mb: 1 }}>
-        When you submit an order, it will be sent to our admin team for review and approval. 
+        When you submit an order, it will be sent to our admin team for review and approval.
         Orders are typically processed within 24-48 hours.
       </Typography>
-      
+
       {expanded && (
         <Box sx={{ mt: 2 }}>
           <Typography variant="body2" sx={{ color: '#4B5563', mb: 1 }}>
@@ -74,17 +72,17 @@ const OrderSubmissionInfo = () => {
             <li>When delivery is complete, status will be "Delivered"</li>
           </ol>
           <Typography variant="body2" sx={{ color: '#4B5563' }}>
-            You can track the status of your orders in the Orders section. You'll receive notifications 
+            You can track the status of your orders in the Orders section. You'll receive notifications
             when your order status changes.
           </Typography>
         </Box>
       )}
-      
-      <Button 
-        onClick={() => setExpanded(!expanded)} 
-        sx={{ 
-          mt: 1, 
-          color: '#2563EB', 
+
+      <Button
+        onClick={() => setExpanded(!expanded)}
+        sx={{
+          mt: 1,
+          color: '#2563EB',
           textTransform: 'none',
           p: 0,
           fontSize: '0.875rem',
@@ -123,16 +121,17 @@ const OrgNewOrder = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoadingProducts(true);
+
         // Fetch organization profile data
         const orgResponse = await apiService.get("/api/org/dashboard/profile");
         setOrganizationData(orgResponse);
 
         // Fetch available products
         const productsResponse = await apiService.get("/api/org/available-products");
-        
-        // If the API doesn't return real data, use sample data
+
         if (!productsResponse || productsResponse.length === 0) {
-          // Sample product data
+          // If the API returns no data, create sample products as fallback
           const sampleProducts = [
             { id: 1, name: "Paracetamol 500mg", type: "Medicine", unitTypes: ["I", "II"], availableBatches: ["100", "500", "1000"] },
             { id: 2, name: "Amoxicillin 250mg", type: "Medicine", unitTypes: ["I", "II"], availableBatches: ["50", "100", "500"] },
@@ -282,69 +281,79 @@ const OrgNewOrder = () => {
   const totalOrderAmount = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
 
   // Submit order
-  const handleSubmit = async () => {
-    if (cartItems.length === 0) {
-      setSnackbar({
-        open: true,
-        message: "Your cart is empty. Please add items before submitting.",
-        severity: "warning"
-      });
-      return;
-    }
-    
-    setLoading(true);
-    
-    try {
-      // Prepare order data
-      const orderData = {
-        orgId: organizationData?.id,
-        organizationName: organizationData?.organizationName,
-        items: cartItems.map(item => ({
-          productId: item.productId,
-          productName: item.productName,
-          batchSize: item.batchSize,
-          unitType: item.units,
-          mrp: parseFloat(item.mrp),
-          quantity: parseInt(item.quantity),
-          subtotal: item.subtotal
-        })),
-        totalAmount: totalOrderAmount,
-        status: "Pending",
-        shippingAddress: organizationData?.addressLine1 || "To be provided",
-        contactEmail: organizationData?.representativeEmail,
-        contactPhone: organizationData?.representativeNumber
-      };
-      
-      console.log("Submitting order:", orderData);
-      
-      // Submit order to API
-      const response = await apiService.post('/api/org/orders/submit', orderData);
-      
-      console.log("Order submission response:", response);
-      
-      setSnackbar({
-        open: true,
-        message: "Order submitted successfully! Awaiting admin approval.",
-        severity: "success"
-      });
-      
-      // Wait a moment before redirecting
-      setTimeout(() => {
-        navigate('/org/orders');
-      }, 2000);
-      
-    } catch (error) {
-      console.error("Error submitting order:", error);
-      
-      setSnackbar({
-        open: true,
-        message: `Failed to submit order: ${error.message || "Unknown error"}`,
-        severity: "error"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+// In the handleSubmit function of OrgNewOrder.jsx
+const handleSubmit = async () => {
+  if (cartItems.length === 0) {
+    setSnackbar({
+      open: true,
+      message: "Your cart is empty. Please add items before submitting.",
+      severity: "warning"
+    });
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    // Format any dates to proper LocalDateTime format expected by the backend
+    const formatDateForBackend = (dateValue) => {
+      if (!dateValue) return null;
+      const date = new Date(dateValue);
+      return date.toISOString().slice(0, 19); // Format as YYYY-MM-DDThh:mm:ss
+    };
+
+    // Prepare order data
+    const orderData = {
+      orgId: organizationData?.id,
+      organizationName: organizationData?.organizationName,
+      items: cartItems.map(item => ({
+        productId: item.productId,
+        productName: item.productName,
+        batchSize: item.batchSize,
+        unitType: item.units,
+        mrp: parseFloat(item.mrp),
+        quantity: parseInt(item.quantity),
+        subtotal: item.subtotal
+      })),
+      totalAmount: totalOrderAmount,
+      status: "Pending",
+      shippingAddress: organizationData?.addressLine1 || "To be provided",
+      contactEmail: organizationData?.representativeEmail,
+      contactPhone: organizationData?.representativeNumber,
+      // If there's any date field in your order, format it properly
+      expectedDelivery: formatDateForBackend(new Date()), // Example if you have a delivery date
+    };
+
+    console.log("Submitting order:", orderData);
+
+    // Submit order to API
+    const response = await apiService.post('/api/org/orders/submit', orderData);
+
+    console.log("Order submission response:", response);
+
+    setSnackbar({
+      open: true,
+      message: "Order submitted successfully! Awaiting admin approval.",
+      severity: "success"
+    });
+
+    // Wait a moment before redirecting
+    setTimeout(() => {
+      navigate('/org/orders');
+    }, 2000);
+
+  } catch (error) {
+    console.error("Error submitting order:", error);
+
+    setSnackbar({
+      open: true,
+      message: `Failed to submit order: ${error.message || "Unknown error"}`,
+      severity: "error"
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleCloseSnackbar = () => {
     setSnackbar({...snackbar, open: false});

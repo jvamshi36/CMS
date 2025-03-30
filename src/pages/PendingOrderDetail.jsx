@@ -126,51 +126,58 @@ const PendingOrderDetail = () => {
   };
 
   // Handle order approval
-  const handleApproveOrder = async () => {
-    if (!validateForm()) {
-      setSnackbar({
-        open: true,
-        message: "Please fill in all required fields",
-        severity: "error"
-      });
-      return;
-    }
+ // Handle order approval
+ const handleApproveOrder = async () => {
+   if (!validateForm()) {
+     setSnackbar({
+       open: true,
+       message: "Please fill in all required fields",
+       severity: "error"
+     });
+     return;
+   }
 
-    setProcessingOrder(true);
-    try {
-      const updateData = {
-        ...order,
-        ...formData,
-        status: "Processing",
-        // Convert string values to appropriate types
-        mrp: parseFloat(formData.mrp),
-        batchSizeStrips: parseInt(formData.batchSizeStrips, 10),
-        batchSizeTabs: parseInt(formData.batchSizeTabs, 10)
-      };
+   setProcessingOrder(true);
+   try {
+     // Format the expectedDelivery date to include time component
+     const formattedDeliveryDate = formData.expectedDelivery ?
+       `${formData.expectedDelivery}T00:00:00` : null;
 
-      const response = await apiService.put(`/api/admin/orders/${orderId}/approve`, updateData);
+     const updateData = {
+       ...order,
+       ...formData,
+       status: "Processing",
+       // Add the properly formatted date
+       expectedDelivery: formattedDeliveryDate,
+       // Convert string values to appropriate types
+       mrp: parseFloat(formData.mrp),
+       batchSizeStrips: parseInt(formData.batchSizeStrips, 10),
+       batchSizeTabs: parseInt(formData.batchSizeTabs, 10)
+     };
 
-      setSnackbar({
-        open: true,
-        message: "Order approved successfully",
-        severity: "success"
-      });
+     const response = await apiService.put(`/api/admin/orders/${orderId}/approve`, updateData);
 
-      // Redirect after a short delay
-      setTimeout(() => {
-        navigate("/pending-orders");
-      }, 2000);
-    } catch (err) {
-      console.error("Error approving order:", err);
-      setSnackbar({
-        open: true,
-        message: err.message || "Failed to approve order. Please try again.",
-        severity: "error"
-      });
-    } finally {
-      setProcessingOrder(false);
-    }
-  };
+     setSnackbar({
+       open: true,
+       message: "Order approved successfully",
+       severity: "success"
+     });
+
+     // Redirect after a short delay
+     setTimeout(() => {
+       navigate("/pending-orders");
+     }, 2000);
+   } catch (err) {
+     console.error("Error approving order:", err);
+     setSnackbar({
+       open: true,
+       message: err.message || "Failed to approve order. Please try again.",
+       severity: "error"
+     });
+   } finally {
+     setProcessingOrder(false);
+   }
+ };
 
   // Open reject dialog
   const openRejectDialog = () => {
