@@ -15,7 +15,8 @@ import {
   FormControl,
   Grid,
   Chip,
-  Typography
+  Typography,
+  TablePagination,
 } from "@mui/material";
 import { FilterList, Clear, ArrowDownward, ArrowUpward } from '@mui/icons-material';
 import apiService from "../utils/api";
@@ -29,8 +30,11 @@ const Companies = () => {
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    // Add missing pagination state variables
     const [currentPage, setCurrentPage] = useState(1);
-    const [companiesPerPage, setCompaniesPerPage] = useState(9);
+    const [companiesPerPage, setCompaniesPerPage] = useState(10);
 
     // Reference to track if a request is in progress
     const requestInProgressRef = useRef(false);
@@ -234,6 +238,16 @@ const Companies = () => {
     const currentCompanies = companies.slice(indexOfFirstCompany, indexOfLastCompany);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    // Handle MUI pagination
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
 
     // Handle filter change
     const handleFilterChange = (e) => {
@@ -661,6 +675,15 @@ const Companies = () => {
                                 ))}
                             </tbody>
                         </table>
+                        <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={companies.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
                     </div>
 
                     {/* Pagination */}

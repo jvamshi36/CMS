@@ -14,44 +14,43 @@ const OrgSidebar = () => {
   };
 
   return (
-    <div className="sidebar">
+    <div className="sidebar-content">
       <div className="logo-container">
-        <HiOutlineCube size={28} className="futuristic-icon" />
-        <h2 className="logo">Suraksha <span>Pharma</span></h2>
+        <HiOutlineCube size={28} className="logo-icon" />
+        <h2 className="logo-text">Suraksha <span className="logo-highlight">Pharma</span></h2>
       </div>
 
-      <div className="user-profile">
-        <div className="user-avatar">
-          <FiUser size={22} className="futuristic-icon" />
-        </div>
-        <div className="user-info">
-          <div className="user-name">Organization Portal</div>
-          <div className="user-email">Welcome!</div>
-        </div>
-      </div>
 
-      <nav>
+      <nav className="sidebar-nav">
         <NavLink to="/org/dashboard" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
-          <FiHome className="futuristic-icon" /> Dashboard
+          <FiHome className="nav-icon" /> 
+          <div className="nav-text">Dashboard</div>
         </NavLink>
 
         <NavLink to="/org/profile" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
-          <FiUser className="futuristic-icon" /> Profile
+          <FiUser className="nav-icon" /> 
+          <div className="nav-text">Profile</div>
         </NavLink>
 
         <NavLink to="/org/orders" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
-          <FiPackage className="futuristic-icon" /> Orders
+          <FiPackage className="nav-icon" /> 
+          <div className="nav-text">Orders</div>
         </NavLink>
       </nav>
 
       <div className="sidebar-bottom">
         <NavLink to="/org/settings" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
-          <FiSettings className="futuristic-icon" /> Settings
+          <FiSettings className="nav-icon" /> 
+          <div className="nav-text">Settings</div>
         </NavLink>
 
-        <button onClick={handleLogout} className="nav-item logout-button">
-          <FiLogOut className="futuristic-icon" /> Logout
-        </button>
+        <NavLink 
+          to="/logout" 
+          className="nav-item logout-item"
+        >
+          <FiLogOut className="nav-icon" /> 
+          <div className="nav-text">Logout</div>
+        </NavLink>
       </div>
     </div>
   );
