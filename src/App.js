@@ -1,12 +1,33 @@
 // src/App.js
-import React, { Suspense, lazy } from "react";
-import { Routes, Route,Navigate,  Outlet } from "react-router-dom";
+import React, { Suspense } from "react";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import { CircularProgress, Box } from '@mui/material';
 import Dashboard from './pages/Dashboard';
 import OrgDashboard from './pages/OrgDashboard';
+import Login from './components/Login/LoginPage';
+import ForgotPassword from './components/Login/ForgotPassword';
+import ResetPassword from './components/Login/ResetPassword';
+import NeworgForm from './pages/NeworgForm';
+import NewOrder from './pages/NewOrder';
+import Companies from './pages/Companies';
+import Details from './pages/Details';
+import Orders from './pages/Orders';
+import Settings from './pages/Settings';
+import OrderDetails from './pages/OrderDetails';
+import Team from './pages/Team';
+import NotFound from './pages/NotFound';
+import Logout from './components/Logout/LogoutPage';
+import OrgProfile from './pages/OrgProfile';
+import OrgOrders from './pages/OrgOrders';
+import OrgOrderDetails from './pages/OrgOrderDetails';
+import OrgSettings from './pages/OrgSettings';
+import OrgNewOrder from './pages/OrgNewOrder';
+import PendingOrders from './pages/PendingOrders';
+import PendingOrderDetail from './pages/PendingOrderDetail';
+
 // Loading component for suspense fallback
 const LoadingPage = () => (
   <Box 
@@ -25,76 +46,52 @@ const LoadingPage = () => (
   </Box>
 );
 
-// Lazy load components for better performance
-const Login = lazy(() => import('./components/Login/LoginPage'));
-const ForgotPassword = lazy(() => import('./components/Login/ForgotPassword'));
-const ResetPassword = lazy(() => import('./components/Login/ResetPassword'));
-const NeworgForm = lazy(() => import('./pages/NeworgForm'));
-const NewOrder = lazy(() => import('./pages/NewOrder'));
-const Companies = lazy(() => import('./pages/Companies'));
-const Details = lazy(() => import('./pages/Details'));
-const Orders = lazy(() => import('./pages/Orders'));
-const Settings = lazy(() =>import ('./pages/Settings'));
-const OrderDetails = lazy(() => import('./pages/OrderDetails'));
-const Team = lazy(() => import('./pages/Team'));
-const NotFound = lazy(() => import('./pages/NotFound'));
-const Logout = lazy(() => import('./components/Logout/LogoutPage'));
-const OrgProfile = lazy(() => import('./pages/OrgProfile'));
-const OrgOrders = lazy(() => import('./pages/OrgOrders'));
-const OrgOrderDetails = lazy(() => import('./pages/OrgOrderDetails'));
-const OrgSettings = lazy(() =>import ('./pages/OrgSettings'));
-const OrgNewOrder = lazy(() =>import ('./pages/OrgNewOrder'));
-const PendingOrders = lazy(() => import('./pages/PendingOrders'));
-const PendingOrderDetail = lazy(() => import('./pages/PendingOrderDetail'));
-
 function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
-        <Suspense fallback={<LoadingPage />}>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password/:token?" element={<ResetPassword />} />
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token?" element={<ResetPassword />} />
 
-            {/* Admin Protected Routes */}
-            <Route element={<AdminProtectedRoute />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/new-org" element={<NeworgForm />} />
-              <Route path="/new-order" element={<NewOrder />} />
-              <Route path="/companies" element={<Companies />} />
-              <Route path="/companies/:companyId/org-details" element={<Details />} />
-              <Route path="/companies/:companyId/orders" element={<Orders />} />
-              <Route path="/companies/:companyId/orders/:orderId/order-details" element={<OrderDetails />} />
-              <Route path="/team" element={<Team />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/pending-orders" element={<PendingOrders />} />
-              <Route path="/pending-orders/:orderId" element={<PendingOrderDetail />} />
-            </Route>
+          {/* Admin Protected Routes */}
+          <Route element={<AdminProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/new-org" element={<NeworgForm />} />
+            <Route path="/new-order" element={<NewOrder />} />
+            <Route path="/companies" element={<Companies />} />
+            <Route path="/companies/:companyId/org-details" element={<Details />} />
+            <Route path="/companies/:companyId/orders" element={<Orders />} />
+            <Route path="/companies/:companyId/orders/:orderId/order-details" element={<OrderDetails />} />
+            <Route path="/team" element={<Team />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/pending-orders" element={<PendingOrders />} />
+            <Route path="/pending-orders/:orderId" element={<PendingOrderDetail />} />
+          </Route>
 
-            {/* Organization Protected Routes */}
-            <Route element={<OrgProtectedRoute />}>
-              <Route path="/org/dashboard" element={<OrgDashboard />} />
-              <Route path="/org/profile" element={<OrgProfile />} />
-              <Route path="/org/orders" element={<OrgOrders />} />
-              <Route path="/org/orders/:orderId" element={<OrgOrderDetails />} />
-              <Route path="/org/settings" element={<OrgSettings />} />
-              <Route path="/org/new-order" element={<OrgNewOrder />} />
-            </Route>
+          {/* Organization Protected Routes */}
+          <Route element={<OrgProtectedRoute />}>
+            <Route path="/org/dashboard" element={<OrgDashboard />} />
+            <Route path="/org/profile" element={<OrgProfile />} />
+            <Route path="/org/orders" element={<OrgOrders />} />
+            <Route path="/org/orders/:orderId" element={<OrgOrderDetails />} />
+            <Route path="/org/settings" element={<OrgSettings />} />
+            <Route path="/org/new-order" element={<OrgNewOrder />} />
+          </Route>
 
-            {/* Shared Protected Routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/logout" element={<Logout />} />
-            </Route>
+          {/* Shared Protected Routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/logout" element={<Logout />} />
+          </Route>
 
-            {/* Redirect root to appropriate dashboard based on user type */}
-            <Route path="/" element={<RootRedirect />} />
+          {/* Redirect root to appropriate dashboard based on user type */}
+          <Route path="/" element={<RootRedirect />} />
 
-            {/* 404 Page */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
+          {/* 404 Page */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </AuthProvider>
     </ErrorBoundary>
   );
