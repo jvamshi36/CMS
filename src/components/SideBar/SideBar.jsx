@@ -39,8 +39,8 @@ const Sidebar = ({ forceVisible }) => {
     };
 
     fetchPendingOrdersCount();
-    const intervalId = setInterval(fetchPendingOrdersCount, 60000);
-    return () => clearInterval(intervalId);
+//     const intervalId = setInterval(fetchPendingOrdersCount, 60000);
+//     return () ;
   }, []);
 
   return (

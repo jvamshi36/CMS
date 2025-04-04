@@ -26,15 +26,14 @@ const Companies = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // State for companies data and pagination
+    // State for companies data
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    // Single pagination state
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    // Add missing pagination state variables
-    const [currentPage, setCurrentPage] = useState(1);
-    const [companiesPerPage, setCompaniesPerPage] = useState(10);
 
     // Reference to track if a request is in progress
     const requestInProgressRef = useRef(false);
@@ -67,10 +66,11 @@ const Companies = () => {
     useEffect(() => {
         return () => {
             isMountedRef.current = false;
+            // Clear any pending API requests
+            apiService.clearPendingRequests();
         };
     }, []);
 
-    // Completely ignore location.search changes to prevent infinite loops with header search
     // Parse URL query parameters on component mount - ONE TIME ONLY
     useEffect(() => {
         // Skip if already run
@@ -97,7 +97,7 @@ const Companies = () => {
         if (sortKey && sortDirection) {
             setSortConfig({ key: sortKey, direction: sortDirection });
         }
-    }, []);
+    }, [location.search]);
 
     // Fetch companies with robust protection against duplicate calls
     const fetchCompanies = useCallback(async () => {
@@ -121,9 +121,10 @@ const Companies = () => {
             // Skip if component unmounted during API call
             if (!isMountedRef.current) return;
 
-            // Apply client-side filtering if needed
-            let filteredCompanies = response;
+            // Create a new array to avoid direct modification of the response
+            let filteredCompanies = [...response];
 
+            // Apply client-side filtering if needed
             // Apply status filter
             if (filters.status && filters.status !== 'all') {
                 filteredCompanies = filteredCompanies.filter(company => {
@@ -157,7 +158,7 @@ const Companies = () => {
                 });
             }
 
-            // Sort the data
+            // Create a new array for sorting to avoid mutation issues
             const sortedData = [...filteredCompanies].sort((a, b) => {
                 if (sortConfig.key === "createdAt") {
                     return sortConfig.direction === "asc"
@@ -178,8 +179,6 @@ const Companies = () => {
             setCompanies(sortedData);
             setError(null);
 
-            // Don't update URL params - this prevents conflicts with header search
-
         } catch (err) {
             // Skip if component unmounted during API call
             if (!isMountedRef.current) return;
@@ -198,16 +197,10 @@ const Companies = () => {
             }
             requestInProgressRef.current = false;
         }
-    }, [filters, sortConfig, isMountedRef]);
+    }, [filters, sortConfig]);
 
-    // Don't update URLs to prevent conflicts with header search
-    const updateUrlParams = useCallback(() => {
-        return; // Do nothing
-    }, []);
-
-    // Use a single effect to fetch companies only when needed
+    // Use a single effect to fetch companies once on initial load
     useEffect(() => {
-        // Only fetch once on initial load
         fetchCompanies();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // Empty dependency array - only runs once
@@ -231,13 +224,6 @@ const Companies = () => {
         }
         setSortConfig({ key, direction });
     };
-
-    // Pagination Logic
-    const indexOfLastCompany = currentPage * companiesPerPage;
-    const indexOfFirstCompany = indexOfLastCompany - companiesPerPage;
-    const currentCompanies = companies.slice(indexOfFirstCompany, indexOfLastCompany);
-
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     // Handle MUI pagination
     const handleChangePage = (event, newPage) => {
@@ -299,15 +285,7 @@ const Companies = () => {
         }
 
         setActiveFilters(newActiveFilters);
-        setCurrentPage(1); // Reset to first page on filter apply
-
-        // Reset the request flag to allow a new fetch
-        requestInProgressRef.current = false;
-
-        // Wait a tick before fetching to avoid race conditions
-        setTimeout(() => {
-            fetchCompanies();
-        }, 0);
+        setPage(0); // Reset to first page on filter apply
     };
 
     // Reset filters with a single click
@@ -323,7 +301,7 @@ const Companies = () => {
         // Update all states at once before fetching
         setFilters(defaultFilters);
         setActiveFilters([]);
-        setCurrentPage(1);
+        setPage(0);
 
         // Reset the request flag
         requestInProgressRef.current = false;
@@ -376,10 +354,8 @@ const Companies = () => {
         // Reset the request flag to allow a new fetch
         requestInProgressRef.current = false;
 
-        // Wait a tick before fetching to avoid race conditions
-        setTimeout(() => {
-            fetchCompanies();
-        }, 0);
+        // Reset pagination
+        setPage(0);
     };
 
     // Format date from createdAt timestamp
@@ -414,6 +390,13 @@ const Companies = () => {
         setShowFilters(!showFilters);
     };
 
+    // Get current companies for display based on pagination
+    const getCurrentCompanies = () => {
+        const startIndex = page * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        return companies.slice(startIndex, endIndex);
+    };
+
     // Loading state
     if (loading && !companies.length) {
         return (
@@ -445,6 +428,9 @@ const Companies = () => {
         );
     }
 
+    // Get the current companies to display
+    const currentCompanies = getCurrentCompanies();
+
     return (
         <Layout>
             <div className="companies-header">
@@ -453,148 +439,148 @@ const Companies = () => {
                     Add New Organization
                 </button>
             </div>
- <div className="filter-component">
-      {/* Filter Bar */}
-      <div className="search-filter-container">
-        <div className="filter-section">
-          <Button
-            variant={showFilters ? "contained" : "outlined"}
-            color="primary"
-            startIcon={<FilterList />}
-            onClick={toggleFilters}
-            className="filter-button"
-          >
-            Filters {activeFilters.length > 0 && (
-              <span className="filter-count">{activeFilters.length}</span>
-            )}
-          </Button>
-        </div>
-      </div>
+            <div className="filter-component">
+                {/* Filter Bar */}
+                <div className="search-filter-container">
+                    <div className="filter-section">
+                        <Button
+                            variant={showFilters ? "contained" : "outlined"}
+                            color="primary"
+                            startIcon={<FilterList />}
+                            onClick={toggleFilters}
+                            className="filter-button"
+                        >
+                            Filters {activeFilters.length > 0 && (
+                                <span className="filter-count">{activeFilters.length}</span>
+                            )}
+                        </Button>
+                    </div>
+                </div>
 
-      {/* Active Filters */}
-      {activeFilters.length > 0 && (
-        <div className="active-filters">
-          {activeFilters.map((filter) => (
-            <Chip
-              key={filter.key}
-              label={filter.label}
-              onDelete={() => removeFilter(filter.key)}
-              color="primary"
-              variant="outlined"
-              size="small"
-              className="filter-chip"
-            />
-          ))}
+                {/* Active Filters */}
+                {activeFilters.length > 0 && (
+                    <div className="active-filters">
+                        {activeFilters.map((filter) => (
+                            <Chip
+                                key={filter.key}
+                                label={filter.label}
+                                onDelete={() => removeFilter(filter.key)}
+                                color="primary"
+                                variant="outlined"
+                                size="small"
+                                className="filter-chip"
+                            />
+                        ))}
 
-          <Chip
-            label="Clear All"
-            onClick={resetFilters}
-            color="secondary"
-            size="small"
-            className="filter-chip clear-all"
-            disabled={loading}
-          />
-        </div>
-      )}
+                        <Chip
+                            label="Clear All"
+                            onClick={resetFilters}
+                            color="secondary"
+                            size="small"
+                            className="filter-chip clear-all"
+                            disabled={loading}
+                        />
+                    </div>
+                )}
 
-      {/* Filters Panel */}
-      <div className={`filters-collapse ${showFilters ? 'expanded' : 'collapsed'}`}>
-        <div className="filters-panel">
-          <Typography variant="h6" className="filters-title">
-            Advanced Filters
-          </Typography>
+                {/* Filters Panel */}
+                <div className={`filters-collapse ${showFilters ? 'expanded' : 'collapsed'}`}>
+                    <div className="filters-panel">
+                        <Typography variant="h6" className="filters-title">
+                            Advanced Filters
+                        </Typography>
 
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} md={3}>
-              <FormControl fullWidth size="small" className="filter-control">
-                <InputLabel>Status</InputLabel>
-                <Select
-                  value={filters.status}
-                  label="Status"
-                  name="status"
-                  onChange={handleFilterChange}
-                >
-                  <MenuItem value="all">All Statuses</MenuItem>
-                  <MenuItem value="completed">Completed</MenuItem>
-                  <MenuItem value="processing">Processing</MenuItem>
-                  <MenuItem value="rejected">Rejected</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6} md={3}>
+                                <FormControl fullWidth size="small" className="filter-control">
+                                    <InputLabel>Status</InputLabel>
+                                    <Select
+                                        value={filters.status}
+                                        label="Status"
+                                        name="status"
+                                        onChange={handleFilterChange}
+                                    >
+                                        <MenuItem value="all">All Statuses</MenuItem>
+                                        <MenuItem value="completed">Completed</MenuItem>
+                                        <MenuItem value="processing">Processing</MenuItem>
+                                        <MenuItem value="rejected">Rejected</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
-              <FormControl fullWidth size="small" className="filter-control">
-                <InputLabel>Constitution</InputLabel>
-                <Select
-                  value={filters.constitution}
-                  label="Constitution"
-                  name="constitution"
-                  onChange={handleFilterChange}
-                >
-                  <MenuItem value="all">All Constitutions</MenuItem>
-                  <MenuItem value="Private">Private</MenuItem>
-                  <MenuItem value="Public">Public</MenuItem>
-                  <MenuItem value="Non-Profit">Non-Profit</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                                <FormControl fullWidth size="small" className="filter-control">
+                                    <InputLabel>Constitution</InputLabel>
+                                    <Select
+                                        value={filters.constitution}
+                                        label="Constitution"
+                                        name="constitution"
+                                        onChange={handleFilterChange}
+                                    >
+                                        <MenuItem value="all">All Constitutions</MenuItem>
+                                        <MenuItem value="Private">Private</MenuItem>
+                                        <MenuItem value="Public">Public</MenuItem>
+                                        <MenuItem value="Non-Profit">Non-Profit</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
-              <TextField
-                label="From Date"
-                type="date"
-                name="createdAtStart"
-                value={filters.createdAtStart || ""}
-                onChange={handleDateChange}
-                fullWidth
-                size="small"
-                className="filter-date"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
-            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                                <TextField
+                                    label="From Date"
+                                    type="date"
+                                    name="createdAtStart"
+                                    value={filters.createdAtStart || ""}
+                                    onChange={handleDateChange}
+                                    fullWidth
+                                    size="small"
+                                    className="filter-date"
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                />
+                            </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
-              <TextField
-                label="To Date"
-                type="date"
-                name="createdAtEnd"
-                value={filters.createdAtEnd || ""}
-                onChange={handleDateChange}
-                fullWidth
-                size="small"
-                className="filter-date"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
-            </Grid>
-          </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                                <TextField
+                                    label="To Date"
+                                    type="date"
+                                    name="createdAtEnd"
+                                    value={filters.createdAtEnd || ""}
+                                    onChange={handleDateChange}
+                                    fullWidth
+                                    size="small"
+                                    className="filter-date"
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                />
+                            </Grid>
+                        </Grid>
 
-          <Box className="filter-actions">
-            <Button
-              variant="outlined"
-              onClick={resetFilters}
-              startIcon={<Clear />}
-              disabled={loading}
-              className="reset-button"
-            >
-              Reset
-            </Button>
-            <Button
-              variant="contained"
-              onClick={applyFilters}
-              startIcon={<FilterList />}
-              className="apply-button"
-            >
-              Apply Filters
-            </Button>
-          </Box>
-        </div>
-      </div>
- </div>
-              {companies.length === 0 ? (
+                        <Box className="filter-actions">
+                            <Button
+                                variant="outlined"
+                                onClick={resetFilters}
+                                startIcon={<Clear />}
+                                disabled={loading}
+                                className="reset-button"
+                            >
+                                Reset
+                            </Button>
+                            <Button
+                                variant="contained"
+                                onClick={applyFilters}
+                                startIcon={<FilterList />}
+                                className="apply-button"
+                            >
+                                Apply Filters
+                            </Button>
+                        </Box>
+                    </div>
+                </div>
+            </div>
+            {companies.length === 0 ? (
                 <div className="no-data">
                     <p>No companies found</p>
                     <Button
@@ -647,7 +633,7 @@ const Companies = () => {
                                     <tr key={company.id}>
                                         <td>{company.id}</td>
                                         <td>{company.organizationName}</td>
-                                        <td>{`${company.addressLine1}, ${company.city}, ${company.zip}`}</td>
+                                        <td>{`${company.addressLine1 || ''}, ${company.city || ''}, ${company.zip || ''}`}</td>
                                         <td>{formatDate(company.createdAt)}</td>
                                         <td>{company.gstNumber || "N/A"}</td>
                                         <td>
@@ -676,27 +662,14 @@ const Companies = () => {
                             </tbody>
                         </table>
                         <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
-                component="div"
-                count={companies.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
-                    </div>
-
-                    {/* Pagination */}
-                    <div className="pagination">
-                        {Array.from({ length: Math.ceil(companies.length / companiesPerPage) }).map((_, index) => (
-                            <button
-                                key={index + 1}
-                                onClick={() => paginate(index + 1)}
-                                className={currentPage === index + 1 ? 'active' : ''}
-                            >
-                                {index + 1}
-                            </button>
-                        ))}
+                            rowsPerPageOptions={[5, 10, 25]}
+                            component="div"
+                            count={companies.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                        />
                     </div>
                 </>
             )}
