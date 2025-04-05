@@ -150,7 +150,6 @@ export const AuthProvider = ({ children }) => {
       setUserType(storedUserType || 'ADMIN');
       setAuthError(null);
     } catch (error) {
-      console.error("Token verification failed:", error);
       sessionStorage.removeItem('_auth_token');
       sessionStorage.removeItem('_user_type');
       setAuthError("Session expired. Please login again.");
@@ -189,7 +188,6 @@ export const AuthProvider = ({ children }) => {
         message: "Invalid response from server. Please try again."
       };
     } catch (error) {
-      console.error("Login failed:", error);
       return {
         success: false,
         message: error.response?.data?.message || "Login failed. Please try again."
@@ -200,7 +198,6 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     // Prevent duplicate logout calls
     if (logoutInProgress.current) {
-      console.log("Logout already in progress, skipping duplicate call");
       return { success: true, alreadyInProgress: true };
     }
 
@@ -220,7 +217,6 @@ export const AuthProvider = ({ children }) => {
 
       return { success: true };
     } catch (error) {
-      console.error("Logout API call failed:", error);
       // Still clear local session data even if API call fails
       sessionStorage.removeItem('_auth_token');
       sessionStorage.removeItem('_user_type');

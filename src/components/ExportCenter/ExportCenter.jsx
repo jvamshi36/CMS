@@ -1,39 +1,8 @@
 import React, { useState, useEffect } from "react";
-import {
-  Typography,
-  Paper,
-  Box,
-  Grid,
-  Button,
-  Divider,
-  Alert,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  TextField,
-  CircularProgress,
-  Snackbar,
-  Card,
-  CardContent,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText
-} from "@mui/material";
-import {
-  Download,
-  FileDownload,
-  Business,
-  ShoppingCart,
-  AttachMoney,
-  Description,
-  CloudDownload,
-  Dashboard as DashboardIcon
-} from "@mui/icons-material";
+import { Typography, Paper, Box, Grid, Button, Divider, Alert, FormControl, InputLabel, Select, MenuItem, TextField, CircularProgress, Snackbar, Card, CardContent, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import { Download, FileDownload, Business, ShoppingCart, AttachMoney, Description, CloudDownload, Dashboard as DashboardIcon } from "@mui/icons-material";
 import apiService from "../../utils/api";
 import "./ExportCenter.css"
-// Remove useAuth import if not available or causing issues
 
 // Utility to format date for exports
 const formatDate = (date) => {
@@ -43,8 +12,6 @@ const formatDate = (date) => {
 
 // Export Center component
 const ExportCenter = () => {
-  // Use apiService directly instead of from context
-
   // Export configuration state
   const [exportConfig, setExportConfig] = useState({
     dataType: "companies",
@@ -81,37 +48,27 @@ const ExportCenter = () => {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        // Using apiService directly, not from context
-        console.log("Fetching companies data...");
         const response = await apiService.get("/api/new-org");
-        console.log("API response for companies:", response);
 
         // Extract companies data based on response structure
         let extractedCompanies = [];
 
         if (Array.isArray(response)) {
           extractedCompanies = response;
-          console.log("Companies response is an array with", extractedCompanies.length, "items");
         } else if (response && Array.isArray(response.data)) {
           extractedCompanies = response.data;
-          console.log("Companies response has data array with", extractedCompanies.length, "items");
         } else if (response && Array.isArray(response.content)) {
           extractedCompanies = response.content;
-          console.log("Companies response has content array with", extractedCompanies.length, "items");
         } else if (response && typeof response === 'object' && !Array.isArray(response)) {
           extractedCompanies = [response];
-          console.log("Companies response is a single object");
         }
 
         if (extractedCompanies.length > 0) {
-          console.log("Successfully extracted companies:", extractedCompanies);
           setCompanies(extractedCompanies);
         } else {
-          console.log("No companies found in response");
           setCompanies([]);
         }
       } catch (error) {
-        console.error("Error fetching companies:", error);
         setCompanies([]);
         setNotification({
           open: true,
@@ -147,18 +104,15 @@ const ExportCenter = () => {
     let dataToExport = [];
     let filename = `${dataType}_export_${formatDate(new Date())}`;
 
-    console.log(`Preparing to export ${dataType} data`);
     setExportStatus({ loading: true, error: null, success: false });
 
     try {
       // Use real data for all export types
       if (dataType === "companies") {
         if (companies && companies.length > 0) {
-          console.log(`Using ${companies.length} real companies for export`);
           dataToExport = [...companies]; // Use real company data from state
         } else {
           // Try to fetch companies if not available in state
-          console.log("Fetching companies data for export...");
           const response = await apiService.get("/api/new-org");
           let extractedCompanies = [];
 
@@ -173,12 +127,8 @@ const ExportCenter = () => {
           }
 
           dataToExport = extractedCompanies;
-          console.log(`Fetched ${dataToExport.length} companies for export`);
         }
       } else if (dataType === "orders") {
-        // Fetch real orders data for ALL companies
-        console.log("Fetching all orders data for export...");
-
         // Build query parameters for filtering
         const queryParams = new URLSearchParams();
 
@@ -216,13 +166,11 @@ const ExportCenter = () => {
 
         // Use the admin orders endpoint to get all orders across all companies
         const endpoint = `/api/admin/orders?${queryParams.toString()}`;
-        console.log("Fetching orders from:", endpoint);
 
         let response;
         try {
           response = await apiService.get(endpoint);
         } catch (error) {
-          console.error("Error fetching all orders, trying dashboard orders:", error);
           // Try the dashboard recent orders endpoint as fallback
           response = await apiService.get("/api/admin/dashboard/recent-orders");
         }
@@ -237,12 +185,8 @@ const ExportCenter = () => {
         } else if (response && response.content) {
           dataToExport = response.content;
         }
-
-        console.log(`Fetched ${dataToExport.length} orders for export`);
       } else if (dataType === "sales") {
         // Fetch sales data from the dashboard endpoint
-        console.log("Fetching sales data for export...");
-
         const period = exportConfig.dateRange === "last30days" ? "monthly" :
                       exportConfig.dateRange === "last90days" ? "quarterly" : "yearly";
 
@@ -251,7 +195,6 @@ const ExportCenter = () => {
         try {
           response = await apiService.get(`/api/admin/dashboard/sales-data?period=${period}`);
         } catch (error) {
-          console.error("Error fetching sales data from primary endpoint, trying summary:", error);
           // Try the dashboard summary endpoint as fallback
           response = await apiService.get("/api/admin/dashboard/summary");
         }
@@ -280,12 +223,8 @@ const ExportCenter = () => {
             }));
           }
         }
-
-        console.log(`Prepared ${dataToExport.length} sales records for export`);
       } else if (dataType === "products") {
         // For products, we'll fetch all orders and extract products from them
-        console.log("Fetching orders to extract products for export...");
-
         // Get all orders to extract products from
         const ordersResponse = await apiService.get("/api/admin/orders?size=1000");
 
@@ -303,7 +242,6 @@ const ExportCenter = () => {
 
         // If no orders found, try dashboard recent orders
         if (ordersData.length === 0) {
-          console.log("No orders found, trying dashboard recent orders...");
           try {
             const dashboardOrdersResponse = await apiService.get("/api/admin/dashboard/recent-orders");
 
@@ -313,11 +251,10 @@ const ExportCenter = () => {
               ordersData = dashboardOrdersResponse.data;
             }
           } catch (error) {
-            console.error("Error fetching dashboard orders:", error);
+            // Fallback to empty array if dashboard orders also fails
+            ordersData = [];
           }
         }
-
-        console.log(`Found ${ordersData.length} orders to extract products from`);
 
         // Extract unique products from orders
         const uniqueProducts = new Map();
@@ -339,10 +276,8 @@ const ExportCenter = () => {
         });
 
         dataToExport = Array.from(uniqueProducts.values());
-        console.log(`Extracted ${dataToExport.length} unique products from orders`);
       } else if (dataType === "dashboard") {
         // Export dashboard data - combines summary stats and recent activity
-        console.log("Preparing dashboard export data...");
 
         // Get dashboard summary
         const summaryResponse = await apiService.get("/api/admin/dashboard/summary");
@@ -407,45 +342,19 @@ const ExportCenter = () => {
             type: 'salesData'
           });
         });
-
-        console.log(`Prepared dashboard export with ${dataToExport.length} records`);
       }
     } catch (error) {
-      console.error(`Error fetching ${dataType} data:`, error);
       setNotification({
         open: true,
         message: `Failed to fetch ${dataType} data. Using available data instead.`,
         severity: "warning"
       });
 
-      // If we have companies in state, use those
-      if (dataType === "companies" && companies && companies.length > 0) {
-        dataToExport = [...companies];
-      } else {
-        // Create some placeholder data if the API calls fail
-        if (dataType === "orders") {
-          dataToExport = [
-            { id: "ORD-001", date: formatDate(new Date()), status: "completed", totalAmount: 1200, productName: "Sample Product" }
-          ];
-        } else if (dataType === "sales") {
-          dataToExport = [
-            { period: "Current Month", value: 25000, exportDate: formatDate(new Date()) }
-          ];
-        } else if (dataType === "products") {
-          dataToExport = [
-            { productName: "Sample Product", productId: "PROD-001", type: "Default", unitPrice: 100, status: "active" }
-          ];
-        } else if (dataType === "dashboard") {
-          dataToExport = [
-            { type: "summary", totalSales: 0, totalOrders: 0, totalUsers: 0, exportDate: formatDate(new Date()) }
-          ];
-        }
-      }
+      return false; // Return false to indicate no data
     }
 
     // Check if we have data to export
     if (!dataToExport || dataToExport.length === 0) {
-      console.log("No data available to export");
       setNotification({
         open: true,
         message: "No data available to export.",
@@ -487,8 +396,6 @@ const ExportCenter = () => {
 
       return cleanedItem;
     });
-
-    console.log(`Exporting ${dataToExport.length} records in ${format} format`);
 
     // Proceed with export if we have data
     if (format === 'csv') {
@@ -571,8 +478,6 @@ const ExportCenter = () => {
         endpoint = `${endpoint}?${queryParams.toString()}`;
       }
 
-      console.log("Would fetch data from:", endpoint);
-
       // For now, skip API endpoint and use client-side export with real data
       const success = await exportToClientSide(exportConfig.dataType, exportConfig.format);
 
@@ -593,7 +498,6 @@ const ExportCenter = () => {
         });
       }
     } catch (error) {
-      console.error("Export error:", error);
       setExportStatus({
         loading: false,
         error: error.message || "Export failed. Please try again.",
@@ -651,10 +555,7 @@ const ExportCenter = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
-      console.log("CSV export completed successfully");
     } catch (error) {
-      console.error("CSV export error:", error);
       setNotification({
         open: true,
         message: error.message || "Failed to export as CSV",
@@ -704,10 +605,7 @@ const ExportCenter = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
-      console.log("Excel export completed successfully");
     } catch (error) {
-      console.error("Excel export error:", error);
       setNotification({
         open: true,
         message: error.message || "Failed to export as Excel",
@@ -787,13 +685,10 @@ const ExportCenter = () => {
         try {
           printWindow.print();
         } catch (e) {
-          console.log("Manual printing required");
+          // Manual printing required
         }
       }, 500);
-
-      console.log("PDF export completed successfully");
     } catch (error) {
-      console.error("PDF export error:", error);
       setNotification({
         open: true,
         message: error.message || "Failed to export as PDF",
@@ -824,12 +719,7 @@ const ExportCenter = () => {
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
                   <InputLabel>Data Type</InputLabel>
-                  <Select
-                    name="dataType"
-                    value={exportConfig.dataType}
-                    onChange={handleExportConfigChange}
-                    label="Data Type"
-                  >
+                  <Select name="dataType" value={exportConfig.dataType} onChange={handleExportConfigChange} label="Data Type">
                     <MenuItem value="companies">Companies</MenuItem>
                     <MenuItem value="orders">Orders</MenuItem>
                     <MenuItem value="sales">Sales Data</MenuItem>
@@ -843,12 +733,7 @@ const ExportCenter = () => {
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
                   <InputLabel>Export Format</InputLabel>
-                  <Select
-                    name="format"
-                    value={exportConfig.format}
-                    onChange={handleExportConfigChange}
-                    label="Export Format"
-                  >
+                  <Select name="format" value={exportConfig.format} onChange={handleExportConfigChange} label="Export Format">
                     <MenuItem value="csv">CSV</MenuItem>
                     <MenuItem value="excel">Excel (CSV format)</MenuItem>
                     <MenuItem value="pdf">PDF (Print view)</MenuItem>
@@ -860,12 +745,7 @@ const ExportCenter = () => {
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
                   <InputLabel>Date Range</InputLabel>
-                  <Select
-                    name="dateRange"
-                    value={exportConfig.dateRange}
-                    onChange={handleExportConfigChange}
-                    label="Date Range"
-                  >
+                  <Select name="dateRange" value={exportConfig.dateRange} onChange={handleExportConfigChange} label="Date Range">
                     <MenuItem value="all">All Time</MenuItem>
                     <MenuItem value="last30days">Last 30 Days</MenuItem>
                     <MenuItem value="last90days">Last 90 Days</MenuItem>
@@ -879,11 +759,7 @@ const ExportCenter = () => {
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
                     <InputLabel>Company</InputLabel>
-                    <Select
-                      value={selectedCompany}
-                      onChange={(e) => setSelectedCompany(e.target.value)}
-                      label="Company"
-                    >
+                    <Select value={selectedCompany} onChange={(e) => setSelectedCompany(e.target.value)} label="Company">
                       <MenuItem value="all">All Companies</MenuItem>
                       {companies.map(company => (
                         <MenuItem key={company.id} value={company.id}>
@@ -927,12 +803,7 @@ const ExportCenter = () => {
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
                   <InputLabel>Status</InputLabel>
-                  <Select
-                    name="filters.status"
-                    value={exportConfig.filters.status}
-                    onChange={handleExportConfigChange}
-                    label="Status"
-                  >
+                  <Select name="filters.status" value={exportConfig.filters.status} onChange={handleExportConfigChange} label="Status">
                     <MenuItem value="all">All Statuses</MenuItem>
                     <MenuItem value="completed">Completed</MenuItem>
                     <MenuItem value="processing">Processing</MenuItem>
@@ -971,179 +842,92 @@ const ExportCenter = () => {
               )}
             </Grid>
 
-            {/* Export Button */}
-            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={exportStatus.loading ? <CircularProgress size={20} color="inherit" /> : <FileDownload />}
-                onClick={handleExport}
-                disabled={exportStatus.loading}
-                className="export-button"
-              >
-                {exportStatus.loading ? "Exporting..." : "Export Data"}
-              </Button>
-            </Box>
+ {/* Export Button */}
+ <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+   <Button variant="contained" color="primary" startIcon={exportStatus.loading ? <CircularProgress size={20} color="inherit" /> : <FileDownload />} onClick={handleExport} disabled={exportStatus.loading} className="export-button">{exportStatus.loading ? "Exporting..." : "Export Data"}</Button>
+ </Box>
 
-            {/* Status Messages */}
-            {exportStatus.error && (
-              <Alert severity="error" sx={{ mt: 2 }}>
-                {exportStatus.error}
-              </Alert>
-            )}
-            {exportStatus.success && (
-              <Alert severity="success" sx={{ mt: 2 }}>
-                Export completed successfully!
-              </Alert>
-            )}
-          </Paper>
-        </Grid>
-        {/* Export Overview Card */}
-        <Grid item xs={12}>
-          <Paper className="export-card">
-            <Box className="export-header">
-              <Description className="export-icon" />
-              <Typography variant="h6">Export Types Overview</Typography>
-            </Box>
-            <Divider sx={{ mb: 3 }} />
+ {/* Status Messages */}
+ {exportStatus.error && <Alert severity="error" sx={{ mt: 2 }}>{exportStatus.error}</Alert>}
+ {exportStatus.success && <Alert severity="success" sx={{ mt: 2 }}>Export completed successfully!</Alert>}
+ </Paper>
+ </Grid>
 
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6} md={3}>
-                <Card className="data-type-card companies">
-                  <CardContent>
-                    <Business className="data-type-icon" />
-                    <Typography variant="h6">Companies</Typography>
-                    <Typography variant="body2">
-                      Export company information including contact details and status.
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      sx={{ mt: 2 }}
-                      onClick={() => {
-                        setExportConfig(prev => ({...prev, dataType: "companies"}));
-                        setTimeout(() => handleExport(), 100);
-                      }}
-                    >
-                      Quick Export
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
+ {/* Export Overview Card */}
+ <Grid item xs={12}>
+   <Paper className="export-card">
+     <Box className="export-header">
+       <Description className="export-icon" />
+       <Typography variant="h6">Export Types Overview</Typography>
+     </Box>
+     <Divider sx={{ mb: 3 }} />
 
-              <Grid item xs={12} sm={6} md={3}>
-                <Card className="data-type-card orders">
-                  <CardContent>
-                    <ShoppingCart className="data-type-icon" />
-                    <Typography variant="h6">Orders</Typography>
-                    <Typography variant="body2">
-                      Export order data including customer details, amounts, and status.
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      sx={{ mt: 2 }}
-                      onClick={() => {
-                        setExportConfig(prev => ({...prev, dataType: "orders"}));
-                        setTimeout(() => handleExport(), 100);
-                      }}
-                    >
-                      Quick Export
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
+     <Grid container spacing={3}>
+       <Grid item xs={12} sm={6} md={3}>
+         <Card className="data-type-card companies">
+           <CardContent>
+             <Business className="data-type-icon" />
+             <Typography variant="h6">Companies</Typography>
+             <Typography variant="body2">Export company information including contact details and status.</Typography>
+             <Button variant="outlined" size="small" sx={{ mt: 2 }} onClick={() => { setExportConfig(prev => ({...prev, dataType: "companies"})); setTimeout(() => handleExport(), 100); }}>Quick Export</Button>
+           </CardContent>
+         </Card>
+       </Grid>
 
-              <Grid item xs={12} sm={6} md={3}>
-                <Card className="data-type-card sales">
-                  <CardContent>
-                    <AttachMoney className="data-type-icon" />
-                    <Typography variant="h6">Sales Data</Typography>
-                    <Typography variant="body2">
-                      Export sales data including revenue, expenses and profit by period.
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      sx={{ mt: 2 }}
-                      onClick={() => {
-                        setExportConfig(prev => ({...prev, dataType: "sales"}));
-                        setTimeout(() => handleExport(), 100);
-                      }}
-                    >
-                      Quick Export
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
+       <Grid item xs={12} sm={6} md={3}>
+         <Card className="data-type-card orders">
+           <CardContent>
+             <ShoppingCart className="data-type-icon" />
+             <Typography variant="h6">Orders</Typography>
+             <Typography variant="body2">Export order data including customer details, amounts, and status.</Typography>
+             <Button variant="outlined" size="small" sx={{ mt: 2 }} onClick={() => { setExportConfig(prev => ({...prev, dataType: "orders"})); setTimeout(() => handleExport(), 100); }}>Quick Export</Button>
+           </CardContent>
+         </Card>
+       </Grid>
 
-              <Grid item xs={12} sm={6} md={3}>
-                <Card className="data-type-card products">
-                  <CardContent>
-                    <Description className="data-type-icon" />
-                    <Typography variant="h6">Products</Typography>
-                    <Typography variant="body2">
-                      Export product catalog including pricing, inventory and status.
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      sx={{ mt: 2 }}
-                      onClick={() => {
-                        setExportConfig(prev => ({...prev, dataType: "products"}));
-                        setTimeout(() => handleExport(), 100);
-                      }}
-                    >
-                      Quick Export
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
+       <Grid item xs={12} sm={6} md={3}>
+         <Card className="data-type-card sales">
+           <CardContent>
+             <AttachMoney className="data-type-icon" />
+             <Typography variant="h6">Sales Data</Typography>
+             <Typography variant="body2">Export sales data including revenue, expenses and profit by period.</Typography>
+             <Button variant="outlined" size="small" sx={{ mt: 2 }} onClick={() => { setExportConfig(prev => ({...prev, dataType: "sales"})); setTimeout(() => handleExport(), 100); }}>Quick Export</Button>
+           </CardContent>
+         </Card>
+       </Grid>
 
-              <Grid item xs={12} sm={6} md={3}>
-                <Card className="data-type-card dashboard">
-                  <CardContent>
-                    <DashboardIcon className="data-type-icon" />
-                    <Typography variant="h6">Dashboard</Typography>
-                    <Typography variant="body2">
-                      Export complete dashboard data including stats, orders and sales.
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      sx={{ mt: 2 }}
-                      onClick={() => {
-                        setExportConfig(prev => ({...prev, dataType: "dashboard"}));
-                        setTimeout(() => handleExport(), 100);
-                      }}
-                    >
-                      Quick Export
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
-      </Grid>
+       <Grid item xs={12} sm={6} md={3}>
+         <Card className="data-type-card products">
+           <CardContent>
+             <Description className="data-type-icon" />
+             <Typography variant="h6">Products</Typography>
+             <Typography variant="body2">Export product catalog including pricing, inventory and status.</Typography>
+             <Button variant="outlined" size="small" sx={{ mt: 2 }} onClick={() => { setExportConfig(prev => ({...prev, dataType: "products"})); setTimeout(() => handleExport(), 100); }}>Quick Export</Button>
+           </CardContent>
+         </Card>
+       </Grid>
 
-      {/* Notification Snackbar */}
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={6000}
-        onClose={handleCloseNotification}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Alert
-          onClose={handleCloseNotification}
-          severity={notification.severity}
-          variant="filled"
-        >
-          {notification.message}
-        </Alert>
-      </Snackbar>
-    </div>
-  );
-};
+       <Grid item xs={12} sm={6} md={3}>
+         <Card className="data-type-card dashboard">
+           <CardContent>
+             <DashboardIcon className="data-type-icon" />
+             <Typography variant="h6">Dashboard</Typography>
+             <Typography variant="body2">Export complete dashboard data including stats, orders and sales.</Typography>
+             <Button variant="outlined" size="small" sx={{ mt: 2 }} onClick={() => { setExportConfig(prev => ({...prev, dataType: "dashboard"})); setTimeout(() => handleExport(), 100); }}>Quick Export</Button>
+           </CardContent>
+         </Card>
+       </Grid>
+     </Grid>
+   </Paper>
+ </Grid>
+ </Grid>
 
-export default ExportCenter;
+ {/* Notification Snackbar */}
+ <Snackbar open={notification.open} autoHideDuration={6000} onClose={handleCloseNotification} anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
+   <Alert onClose={handleCloseNotification} severity={notification.severity} variant="filled">{notification.message}</Alert>
+ </Snackbar>
+ </div>
+ );
+ };
+
+ export default ExportCenter;

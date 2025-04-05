@@ -1,46 +1,12 @@
-// src/pages/Details.jsx
-import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Typography,
-  CircularProgress,
-  Grid,
-  Button,
-  TextField,
-  MenuItem,
-  Snackbar,
-  Alert,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Paper,
-  Tabs,
-  Tab,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  IconButton,
-  Autocomplete,
-  Chip,
-  Divider
-} from "@mui/material";
-import {
-  Edit,
-  Save,
-  Cancel,
-  Add as AddIcon,
-  Delete as DeleteIcon,
-  Search as SearchIcon
-} from "@mui/icons-material";
+// src/pages/Details.jsx - Cleaned version
+import { Box, Typography, CircularProgress, Grid, Button, TextField, MenuItem, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Paper, Tabs, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Autocomplete, Chip, Divider } from "@mui/material";
+import { Edit, Save, Cancel, Add as AddIcon, Delete as DeleteIcon, Search as SearchIcon } from "@mui/icons-material";
 import "../styles/Details.css";
 import Layout from "../components/Layout/Layout";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import apiService from "../utils/api"; // Add this import
+import apiService from "../utils/api";
+import React, { useState, useEffect } from "react";
 
 const OrgDetails = () => {
   const [organizationData, setOrganizationData] = useState(null);
@@ -48,14 +14,10 @@ const OrgDetails = () => {
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editFormData, setEditFormData] = useState({});
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success"
-  });
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
 
-  // New state for products management
+  // State for products management
   const [activeTab, setActiveTab] = useState(0);
   const [availableProducts, setAvailableProducts] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
@@ -77,7 +39,6 @@ const OrgDetails = () => {
         setEditFormData(response.data); // Initialize edit form with current data
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching organization data:", err);
         setError("Failed to load organization data. Please try again later.");
         setLoading(false);
       }
@@ -93,13 +54,11 @@ const OrgDetails = () => {
 
       setLoadingProducts(true);
       try {
-        // This endpoint would need to be implemented on the backend
         const response = await apiService.get(`/api/organization/${companyId}/products`);
         setAvailableProducts(Array.isArray(response) ? response : []);
       } catch (err) {
-        console.error("Error fetching available products:", err);
-        // If API fails, use sample data
-        setAvailableProducts(generateSampleProducts());
+        // Handle API error - set empty array
+        setAvailableProducts([]);
       } finally {
         setLoadingProducts(false);
       }
@@ -116,14 +75,11 @@ const OrgDetails = () => {
       if (!companyId || activeTab !== 1) return;
 
       try {
-        // This endpoint would need to be implemented on the backend
         const response = await apiService.get(`/api/admin/products`);
-        const products = Array.isArray(response) ? response : [];
-        setAllProducts(products.length > 0 ? products : generateAllProducts());
+        setAllProducts(Array.isArray(response) ? response : []);
       } catch (err) {
-        console.error("Error fetching all products:", err);
-        // If API fails, use sample data
-        setAllProducts(generateAllProducts());
+        // Handle API error - set empty array
+        setAllProducts([]);
       }
     };
 
@@ -201,7 +157,6 @@ const OrgDetails = () => {
     if (!selectedProduct) return;
 
     try {
-      // This endpoint would need to be implemented on the backend
       await apiService.post(`/api/organization/${companyId}/products`, {
         productId: selectedProduct.id
       });
@@ -218,25 +173,16 @@ const OrgDetails = () => {
       setProductDialogOpen(false);
       setSelectedProduct(null);
     } catch (err) {
-      console.error("Error adding product to organization:", err);
-
-      // For demo purposes, still add the product to the UI
-      setAvailableProducts(prev => [...prev, selectedProduct]);
-
       setSnackbar({
         open: true,
-        message: `${selectedProduct.name} added to organization successfully!`,
-        severity: "success"
+        message: "Failed to add product. Please try again.",
+        severity: "error"
       });
-
-      setProductDialogOpen(false);
-      setSelectedProduct(null);
     }
   };
 
   const handleRemoveProduct = async (productId) => {
     try {
-      // This endpoint would need to be implemented on the backend
       await apiService.delete(`/api/organization/${companyId}/products/${productId}`);
 
       // Remove the product from the available products list
@@ -248,82 +194,12 @@ const OrgDetails = () => {
         severity: "success"
       });
     } catch (err) {
-      console.error("Error removing product from organization:", err);
-
-      // For demo purposes, still remove the product from the UI
-      setAvailableProducts(prev => prev.filter(p => p.id !== productId));
-
       setSnackbar({
         open: true,
-        message: "Product removed from organization successfully!",
-        severity: "success"
+        message: "Failed to remove product. Please try again.",
+        severity: "error"
       });
     }
-  };
-
-  // Sample data generators
-  const generateSampleProducts = () => {
-    return [
-      { id: 1, name: "Paracetamol 500mg", type: "Medicine", price: 150, unitTypes: ["I", "II"], availableBatches: ["100", "500", "1000"] },
-      { id: 2, name: "Amoxicillin 250mg", type: "Medicine", price: 280, unitTypes: ["I", "II"], availableBatches: ["50", "100", "500"] },
-      { id: 3, name: "Vitamin C 1000mg", type: "Supplement", price: 350, unitTypes: ["I"], availableBatches: ["30", "60", "90"] }
-    ];
-  };
-
-  const generateAllProducts = () => {
-    const products = [];
-
-    for (let i = 1; i <= 50; i++) {
-      const product = {
-        id: i,
-        name: i <= 10 ? `Product ${i}` : getRandomProductName(),
-        type: getRandomType(),
-        price: Math.floor(Math.random() * 900) + 100,
-        unitTypes: getRandomUnitTypes(),
-        availableBatches: getRandomBatchSizes()
-      };
-
-      products.push(product);
-    }
-
-    return products;
-  };
-
-  const getRandomProductName = () => {
-    const prefixes = ["Generic", "Brand", "Ultra", "Max", "Medi", "Health", "Vita", "Pro", "Super", "Natural"];
-    const meds = ["Tablet", "Capsule", "Syrup", "Injection", "Ointment", "Cream", "Solution", "Powder", "Spray", "Drops"];
-    const suffixes = ["Plus", "Extra", "Forte", "XL", "SR", "Rapid", "Daily", "Complete", "Advanced", "Total"];
-
-    return `${prefixes[Math.floor(Math.random() * prefixes.length)]} ${meds[Math.floor(Math.random() * meds.length)]} ${Math.floor(Math.random() * 1000)}mg ${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
-  };
-
-  const getRandomType = () => {
-    const types = ["Medicine", "Supplement", "Antibiotic", "Analgesic", "Antiseptic", "Vitamin", "Hormone", "Antihistamine", "Antifungal", "Antiviral"];
-    return types[Math.floor(Math.random() * types.length)];
-  };
-
-  const getRandomUnitTypes = () => {
-    const unitTypes = ["I", "II", "III", "IV"];
-    const count = Math.floor(Math.random() * 2) + 1;
-    const result = [];
-
-    for (let i = 0; i < count; i++) {
-      result.push(unitTypes[i]);
-    }
-
-    return result;
-  };
-
-  const getRandomBatchSizes = () => {
-    const batchSizes = ["10", "20", "50", "100", "200", "500", "1000"];
-    const count = Math.floor(Math.random() * 3) + 1;
-    const result = [];
-
-    for (let i = 0; i < count; i++) {
-      result.push(batchSizes[Math.floor(Math.random() * batchSizes.length)]);
-    }
-
-    return result;
   };
 
   const handleEditClick = () => {
@@ -350,7 +226,7 @@ const OrgDetails = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(`Field changed: ${name}, New value: ${value}`);
+
     // Field-specific validation
     let fieldError = null;
 
@@ -377,10 +253,7 @@ const OrgDetails = () => {
     }
 
     // Update form data
-    setEditFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setEditFormData(prev => ({ ...prev, [name]: value }));
 
     // Show validation error if present
     if (fieldError) {
@@ -419,9 +292,6 @@ const OrgDetails = () => {
     try {
       setLoading(true);
 
-      // Log the data being sent
-      console.log("Sending data to update organization:", editFormData);
-
       // Make API call to update the organization
       const response = await apiService.put(`/api/new-org/${companyId}`, editFormData);
 
@@ -436,11 +306,8 @@ const OrgDetails = () => {
         severity: "success"
       });
     } catch (err) {
-      console.error("Error updating organization data:", err);
-
       // Check for validation errors in the response
       if (err.response && err.response.status === 400 && err.response.data) {
-        console.error("Validation errors from server:", err.response.data);
         // Display the first validation error from the server
         const errorMessage = typeof err.response.data === 'object' ?
           Object.values(err.response.data)[0] :
@@ -555,12 +422,7 @@ const OrgDetails = () => {
       <Box className="details-container">
         {/* Tabs for Organization Details and Products */}
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-          <Tabs
-            value={activeTab}
-            onChange={handleTabChange}
-            aria-label="organization tabs"
-            variant="fullWidth"
-          >
+          <Tabs value={activeTab} onChange={handleTabChange} aria-label="organization tabs" variant="fullWidth">
             <Tab label="Organization Details" />
             <Tab label="Available Products" />
           </Tabs>
@@ -569,9 +431,7 @@ const OrgDetails = () => {
         {/* Organization Details Tab */}
         {activeTab === 0 && (
           <>
-            <Typography variant="h5" className="section-title">
-              Organization Details
-            </Typography>
+            <Typography variant="h5" className="section-title">Organization Details</Typography>
             <Box sx={{ my: 2 }}/>
 
             {isEditing ? (
@@ -579,120 +439,38 @@ const OrgDetails = () => {
               <Box className="details-card">
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Organization Name"
-                      name="organizationName"
-                      value={editFormData.organizationName || ""}
-                      onChange={handleChange}
-                      variant="outlined"
-                      margin="normal"
-                    />
+                    <TextField fullWidth label="Organization Name" name="organizationName" value={editFormData.organizationName || ""} onChange={handleChange} variant="outlined" margin="normal" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      select
-                      label="Constitution"
-                      name="constitution"
-                      value={editFormData.constitution || ""}
-                      onChange={handleChange}
-                      variant="outlined"
-                      margin="normal"
-                    >
+                    <TextField fullWidth select label="Constitution" name="constitution" value={editFormData.constitution || ""} onChange={handleChange} variant="outlined" margin="normal">
                       <MenuItem value="Private">Private</MenuItem>
                       <MenuItem value="Public">Public</MenuItem>
                       <MenuItem value="Non-Profit">Non-Profit</MenuItem>
                     </TextField>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Address"
-                      name="addressLine1"
-                      value={editFormData.addressLine1 || ""}
-                      onChange={handleChange}
-                      variant="outlined"
-                      margin="normal"
-                    />
+                    <TextField fullWidth label="Address" name="addressLine1" value={editFormData.addressLine1 || ""} onChange={handleChange} variant="outlined" margin="normal" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="City"
-                      name="city"
-                      value={editFormData.city || ""}
-                      onChange={handleChange}
-                      variant="outlined"
-                      margin="normal"
-                    />
+                    <TextField fullWidth label="City" name="city" value={editFormData.city || ""} onChange={handleChange} variant="outlined" margin="normal" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Zip"
-                      name="zip"
-                      value={editFormData.zip || ""}
-                      onChange={handleChange}
-                      variant="outlined"
-                      margin="normal"
-                    />
+                    <TextField fullWidth label="Zip" name="zip" value={editFormData.zip || ""} onChange={handleChange} variant="outlined" margin="normal" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="GST Number"
-                      name="gstNumber"
-                      value={editFormData.gstNumber || ""}
-                      onChange={handleChange}
-                      variant="outlined"
-                      margin="normal"
-                    />
+                    <TextField fullWidth label="GST Number" name="gstNumber" value={editFormData.gstNumber || ""} onChange={handleChange} variant="outlined" margin="normal" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="PAN Number"
-                      name="panNumber"
-                      value={editFormData.panNumber || ""}
-                      onChange={handleChange}
-                      variant="outlined"
-                      margin="normal"
-                    />
+                    <TextField fullWidth label="PAN Number" name="panNumber" value={editFormData.panNumber || ""} onChange={handleChange} variant="outlined" margin="normal" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Drug License No. 1"
-                      name="drugLicense1"
-                      value={editFormData.drugLicense1 || ""}
-                      onChange={handleChange}
-                      variant="outlined"
-                      margin="normal"
-                    />
+                    <TextField fullWidth label="Drug License No. 1" name="drugLicense1" value={editFormData.drugLicense1 || ""} onChange={handleChange} variant="outlined" margin="normal" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Drug License No. 2"
-                      name="drugLicense2"
-                      value={editFormData.drugLicense2 || ""}
-                      onChange={handleChange}
-                      variant="outlined"
-                      margin="normal"
-                    />
+                    <TextField fullWidth label="Drug License No. 2" name="drugLicense2" value={editFormData.drugLicense2 || ""} onChange={handleChange} variant="outlined" margin="normal" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      select
-                      label="Status"
-                      name="status"
-                      value={editFormData.status || "Processing"}
-                      onChange={handleChange}
-                      variant="outlined"
-                      margin="normal"
-                    >
+                    <TextField fullWidth select label="Status" name="status" value={editFormData.status || "Processing"} onChange={handleChange} variant="outlined" margin="normal">
                       <MenuItem value="Processing">Processing</MenuItem>
                       <MenuItem value="Completed">Completed</MenuItem>
                       <MenuItem value="Rejected">Rejected</MenuItem>
@@ -716,9 +494,7 @@ const OrgDetails = () => {
             )}
 
             {/* Representative Details Container */}
-            <Typography variant="h5" className="section-title">
-              Representative Details
-            </Typography>
+            <Typography variant="h5" className="section-title">Representative Details</Typography>
             <Box sx={{ my: 2 }}/>
 
             {isEditing ? (
@@ -726,70 +502,22 @@ const OrgDetails = () => {
               <Box className="details-card">
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="First Name"
-                      name="representativeFirstName"
-                      value={editFormData.representativeFirstName || ""}
-                      onChange={handleChange}
-                      variant="outlined"
-                      margin="normal"
-                    />
+                    <TextField fullWidth label="First Name" name="representativeFirstName" value={editFormData.representativeFirstName || ""} onChange={handleChange} variant="outlined" margin="normal" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Last Name"
-                      name="representativeLastName"
-                      value={editFormData.representativeLastName || ""}
-                      onChange={handleChange}
-                      variant="outlined"
-                      margin="normal"
-                    />
+                    <TextField fullWidth label="Last Name" name="representativeLastName" value={editFormData.representativeLastName || ""} onChange={handleChange} variant="outlined" margin="normal" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Email"
-                      name="representativeEmail"
-                      value={editFormData.representativeEmail || ""}
-                      onChange={handleChange}
-                      variant="outlined"
-                      margin="normal"
-                    />
+                    <TextField fullWidth label="Email" name="representativeEmail" value={editFormData.representativeEmail || ""} onChange={handleChange} variant="outlined" margin="normal" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Contact Number"
-                      name="representativeNumber"
-                      value={editFormData.representativeNumber || ""}
-                      onChange={handleChange}
-                      variant="outlined"
-                      margin="normal"
-                    />
+                    <TextField fullWidth label="Contact Number" name="representativeNumber" value={editFormData.representativeNumber || ""} onChange={handleChange} variant="outlined" margin="normal" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Aadhar Number"
-                      name="representativeAadhar"
-                      value={editFormData.representativeAadhar || ""}
-                      onChange={handleChange}
-                      variant="outlined"
-                      margin="normal"
-                    />
+                    <TextField fullWidth label="Aadhar Number" name="representativeAadhar" value={editFormData.representativeAadhar || ""} onChange={handleChange} variant="outlined" margin="normal" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Web Username"
-                      name="websiteUsername"
-                      value={editFormData.websiteUsername || ""}
-                      onChange={handleChange}
-                      variant="outlined"
-                      margin="normal"
-                    />
+                    <TextField fullWidth label="Web Username" name="websiteUsername" value={editFormData.websiteUsername || ""} onChange={handleChange} variant="outlined" margin="normal" />
                   </Grid>
                 </Grid>
               </Box>
@@ -812,36 +540,13 @@ const OrgDetails = () => {
             <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
               {isEditing ? (
                 <>
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={handleCancelEdit}
-                    className= "cancel-button"
-                    startIcon={<Cancel />}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSaveClick}
-                    startIcon={<Save />}
-                    className= "save-button"
-                    disabled={loading || !hasChanges()}
-                  >
+                  <Button variant="outlined" color="secondary" onClick={handleCancelEdit} className= "cancel-button" startIcon={<Cancel />}>Cancel</Button>
+                  <Button variant="contained" color="primary" onClick={handleSaveClick} startIcon={<Save />} className= "save-button" disabled={loading || !hasChanges()}>
                     {loading ? <CircularProgress size={24} /> : "Save Changes"}
                   </Button>
                 </>
               ) : (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleEditClick}
-                  startIcon={<Edit />}
-                  className = "edit-button"
-                >
-                  Edit Details
-                </Button>
+                <Button variant="contained" color="primary" onClick={handleEditClick} startIcon={<Edit />} className="edit-button">Edit Details</Button>
               )}
             </Box>
           </>
@@ -851,37 +556,16 @@ const OrgDetails = () => {
         {activeTab === 1 && (
           <>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-              <Typography variant="h5" className="section-title">
-                Available Products
-              </Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<AddIcon />}
-                onClick={handleOpenProductDialog}
-                className="add-product-button"
-              >
-                Add Product
-              </Button>
+              <Typography variant="h5" className="section-title">Available Products</Typography>
+              <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleOpenProductDialog} className="add-product-button">Add Product</Button>
             </Box>
             <Paper className="details-card">
               {loadingProducts ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-                  <CircularProgress />
-                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress /></Box>
               ) : availableProducts.length === 0 ? (
                 <Box sx={{ textAlign: 'center', py: 4 }}>
-                  <Typography variant="body1" color="textSecondary">
-                    No products available for this organization.
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    sx={{ mt: 2 }}
-                    onClick={handleOpenProductDialog}
-                  >
-                    Add First Product
-                  </Button>
+                  <Typography variant="body1" color="textSecondary">No products available for this organization.</Typography>
+                  <Button variant="contained" startIcon={<AddIcon />} sx={{ mt: 2 }} onClick={handleOpenProductDialog}>Add First Product</Button>
                 </Box>
               ) : (
                 <TableContainer>
@@ -906,198 +590,111 @@ const OrgDetails = () => {
                           <TableCell>₹{product.price}</TableCell>
                           <TableCell>
                             {product.unitTypes?.map(unit => (
-                              <Chip
-                                key={unit}
-                                label={unit}
-                                size="small"
-                                variant="outlined"
-                                sx={{ mr: 0.5, mb: 0.5 }}
-                              />
+                              <Chip key={unit} label={unit} size="small" variant="outlined" sx={{ mr: 0.5, mb: 0.5 }} />
                             ))}
                           </TableCell>
                           <TableCell>
                             {product.availableBatches?.map(batch => (
-                              <Chip
-                                key={batch}
-                                label={batch}
-                                size="small"
-                                sx={{ mr: 0.5, mb: 0.5 }}
-                              />
+                              <Chip key={batch} label={batch} size="small" sx={{ mr: 0.5, mb: 0.5 }} />
                             ))}
                           </TableCell>
                           <TableCell>
-                            <IconButton
-                              color="error"
-                              size="small"
-                              onClick={() => handleRemoveProduct(product.id)}
-                            >
+                            <IconButton color="error" size="small" onClick={() => handleRemoveProduct(product.id)}>
                               <DeleteIcon />
                             </IconButton>
                           </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </Paper>
+          </>
+        )}
 
-                                                  </TableRow>
-                                                ))}
-                                              </TableBody>
-                                            </Table>
-                                          </TableContainer>
-                                        )}
-                                      </Paper>
-                                    </>
-                                  )}
+        {/* Add Product Dialog */}
+        <Dialog open={productDialogOpen} onClose={handleCloseProductDialog} maxWidth="md" fullWidth>
+          <DialogTitle>Add Product to Organization</DialogTitle>
+          <DialogContent>
+            <Box sx={{ mb: 2 }}>
+              <TextField fullWidth label="Search Products" variant="outlined" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{ startAdornment: <SearchIcon sx={{ color: 'action.active', mr: 1 }} /> }} margin="normal" />
+            </Box>
 
-                                  {/* Add Product Dialog */}
-                                  <Dialog
-                                    open={productDialogOpen}
-                                    onClose={handleCloseProductDialog}
-                                    maxWidth="md"
-                                    fullWidth
-                                  >
-                                    <DialogTitle>Add Product to Organization</DialogTitle>
-                                    <DialogContent>
-                                      <Box sx={{ mb: 2 }}>
-                                        <TextField
-                                          fullWidth
-                                          label="Search Products"
-                                          variant="outlined"
-                                          value={searchTerm}
-                                          onChange={(e) => setSearchTerm(e.target.value)}
-                                          InputProps={{
-                                            startAdornment: <SearchIcon sx={{ color: 'action.active', mr: 1 }} />
-                                          }}
-                                          margin="normal"
-                                        />
-                                      </Box>
+            <Divider sx={{ my: 2 }} />
 
-                                      <Divider sx={{ my: 2 }} />
+            <TableContainer sx={{ maxHeight: 400 }}>
+              <Table stickyHeader>
+                <TableHead>
+                  <TableRow>
+                    <TableCell padding="checkbox"></TableCell>
+                    <TableCell>Product Name</TableCell>
+                    <TableCell>Type</TableCell>
+                    <TableCell>Price</TableCell>
+                    <TableCell>Unit Types</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredAllProducts.map((product) => {
+                    const isSelected = selectedProduct?.id === product.id;
+                    const isAlreadyAdded = availableProducts.some(p => p.id === product.id);
 
-                                      <TableContainer sx={{ maxHeight: 400 }}>
-                                        <Table stickyHeader>
-                                          <TableHead>
-                                            <TableRow>
-                                              <TableCell padding="checkbox"></TableCell>
-                                              <TableCell>Product Name</TableCell>
-                                              <TableCell>Type</TableCell>
-                                              <TableCell>Price</TableCell>
-                                              <TableCell>Unit Types</TableCell>
-                                            </TableRow>
-                                          </TableHead>
-                                          <TableBody>
-                                            {filteredAllProducts.map((product) => {
-                                              const isSelected = selectedProduct?.id === product.id;
-                                              const isAlreadyAdded = availableProducts.some(p => p.id === product.id);
+                    return (
+                      <TableRow key={product.id} hover selected={isSelected} onClick={() => !isAlreadyAdded && handleSelectProduct(product)}
+                        sx={{ cursor: isAlreadyAdded ? 'default' : 'pointer', opacity: isAlreadyAdded ? 0.5 : 1 }}>
+                        <TableCell padding="checkbox">
+                          <input type="radio" checked={isSelected} disabled={isAlreadyAdded} onChange={() => !isAlreadyAdded && handleSelectProduct(product)} />
+                        </TableCell>
+                        <TableCell>
+                          {product.name}
+                          {isAlreadyAdded && <Chip label="Already Added" size="small" color="primary" variant="outlined" sx={{ ml: 1 }} />}
+                        </TableCell>
+                        <TableCell>{product.type}</TableCell>
+                        <TableCell>₹{product.price}</TableCell>
+                        <TableCell>
+                          {product.unitTypes?.map(unit => (
+                            <Chip key={unit} label={unit} size="small" variant="outlined" sx={{ mr: 0.5 }} />
+                          ))}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
 
-                                              return (
-                                                <TableRow
-                                                  key={product.id}
-                                                  hover
-                                                  selected={isSelected}
-                                                  onClick={() => !isAlreadyAdded && handleSelectProduct(product)}
-                                                  sx={{
-                                                    cursor: isAlreadyAdded ? 'default' : 'pointer',
-                                                    opacity: isAlreadyAdded ? 0.5 : 1
-                                                  }}
-                                                >
-                                                  <TableCell padding="checkbox">
-                                                    <input
-                                                      type="radio"
-                                                      checked={isSelected}
-                                                      disabled={isAlreadyAdded}
-                                                      onChange={() => !isAlreadyAdded && handleSelectProduct(product)}
-                                                    />
-                                                  </TableCell>
-                                                  <TableCell>
-                                                    {product.name}
-                                                    {isAlreadyAdded && (
-                                                      <Chip
-                                                        label="Already Added"
-                                                        size="small"
-                                                        color="primary"
-                                                        variant="outlined"
-                                                        sx={{ ml: 1 }}
-                                                      />
-                                                    )}
-                                                  </TableCell>
-                                                  <TableCell>{product.type}</TableCell>
-                                                  <TableCell>₹{product.price}</TableCell>
-                                                  <TableCell>
-                                                    {product.unitTypes?.map(unit => (
-                                                      <Chip
-                                                        key={unit}
-                                                        label={unit}
-                                                        size="small"
-                                                        variant="outlined"
-                                                        sx={{ mr: 0.5 }}
-                                                      />
-                                                    ))}
-                                                  </TableCell>
-                                                </TableRow>
-                                              );
-                                            })}
-                                          </TableBody>
-                                        </Table>
-                                      </TableContainer>
+            {filteredAllProducts.length === 0 && (
+              <Box sx={{ textAlign: 'center', py: 4 }}>
+                <Typography variant="body1" color="textSecondary">No products match your search criteria.</Typography>
+              </Box>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseProductDialog}>Cancel</Button>
+            <Button onClick={handleAddProductToOrg} variant="contained" color="primary" disabled={!selectedProduct}>Add Selected Product</Button>
+          </DialogActions>
+        </Dialog>
 
-                                      {filteredAllProducts.length === 0 && (
-                                        <Box sx={{ textAlign: 'center', py: 4 }}>
-                                          <Typography variant="body1" color="textSecondary">
-                                            No products match your search criteria.
-                                          </Typography>
-                                        </Box>
-                                      )}
-                                    </DialogContent>
-                                    <DialogActions>
-                                      <Button onClick={handleCloseProductDialog}>Cancel</Button>
-                                      <Button
-                                        onClick={handleAddProductToOrg}
-                                        variant="contained"
-                                        color="primary"
-                                        disabled={!selectedProduct}
-                                      >
-                                        Add Selected Product
-                                      </Button>
-                                    </DialogActions>
-                                  </Dialog>
+        {/* Confirmation Dialog */}
+        <Dialog open={confirmDialogOpen} onClose={handleDialogClose}>
+          <DialogTitle>Discard Changes?</DialogTitle>
+          <DialogContent>
+            <Typography>You have unsaved changes. Are you sure you want to discard them?</Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDialogClose} color="primary">Cancel</Button>
+            <Button onClick={handleConfirmCancel} color="error">Discard Changes</Button>
+          </DialogActions>
+        </Dialog>
 
-                                  {/* Confirmation Dialog */}
-                                  <Dialog
-                                    open={confirmDialogOpen}
-                                    onClose={handleDialogClose}
-                                  >
-                                    <DialogTitle>Discard Changes?</DialogTitle>
-                                    <DialogContent>
-                                      <Typography>
-                                        You have unsaved changes. Are you sure you want to discard them?
-                                      </Typography>
-                                    </DialogContent>
-                                    <DialogActions>
-                                      <Button onClick={handleDialogClose} color="primary">
-                                        Cancel
-                                      </Button>
-                                      <Button onClick={handleConfirmCancel} color="error">
-                                        Discard Changes
-                                      </Button>
-                                    </DialogActions>
-                                  </Dialog>
+        {/* Snackbar for notifications */}
+        <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar} anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
+          <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} variant="filled" sx={{ width: '100%' }}>{snackbar.message}</Alert>
+        </Snackbar>
+      </Box>
+    </Layout>
+  );
+};
 
-                                  {/* Snackbar for notifications */}
-                                  <Snackbar
-                                    open={snackbar.open}
-                                    autoHideDuration={6000}
-                                    onClose={handleCloseSnackbar}
-                                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                                  >
-                                    <Alert
-                                      onClose={handleCloseSnackbar}
-                                      severity={snackbar.severity}
-                                      variant="filled"
-                                      sx={{ width: '100%' }}
-                                    >
-                                      {snackbar.message}
-                                    </Alert>
-                                  </Snackbar>
-                                </Box>
-                              </Layout>
-                            );
-                          };
-
-                          export default OrgDetails;
+export default OrgDetails;

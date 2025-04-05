@@ -43,7 +43,6 @@ api.interceptors.request.use(
       config.cancelToken = source.token;
       // Abort immediately
       source.cancel(`Duplicate request cancelled for ${requestKey}`);
-      console.log(`Prevented duplicate request: ${requestKey}`);
     } else {
       // For non-GET methods or new GET requests, record this request
       pendingRequests.set(requestKey, true);
@@ -89,7 +88,6 @@ api.interceptors.response.use(
 
     // Handle network errors
     if (!error.response) {
-      console.error('Network error:', error);
       return Promise.reject({
         message: 'Network error. Please check your internet connection.',
         networkError: true
@@ -109,10 +107,6 @@ api.interceptors.response.use(
         });
       case 401:
         // Unauthorized - let auth context handle this
-        if (window.location.pathname !== '/login') {
-          // Only handle if we're not already on the login page to avoid loops
-          console.error('Authentication error:', error);
-        }
         return Promise.reject({
           message: 'Session expired. Please login again.',
           authError: true,
@@ -165,10 +159,8 @@ const apiService = {
     } catch (error) {
       // If this was a cancelled duplicate request, try to reuse the original response
       if (error.isDuplicateRequest) {
-        console.log("Duplicate request detected, waiting for original request to complete");
         // For duplicate GET requests, we'd ideally like to return the result of the original request
         // We could implement a more sophisticated caching/promise sharing mechanism here
-        // For now, we'll just re-throw and let the calling code handle this
       }
       throw error;
     }

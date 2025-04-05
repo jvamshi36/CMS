@@ -1,38 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout/Layout";
-import {
-  Typography,
-  Paper,
-  Box,
-  Grid,
-  TextField,
-  Button,
-  Divider,
-  Alert,
-  Snackbar,
-  Tabs,
-  Tab
-} from "@mui/material";
-import {
-  Lock,
-  CloudDownload
-} from "@mui/icons-material";
-import "../styles/Settings.css";
-import ExportCenter from "../components/ExportCenter/ExportCenter";
-
+ import { Typography, Paper, Box, Grid, TextField, Button, Divider, Alert, Snackbar, Tabs, Tab } from "@mui/material";
+ import { Lock, CloudDownload, Inventory } from "@mui/icons-material"; import "../styles/Settings.css"; import ExportCenter from "../components/ExportCenter/ExportCenter"; import ProductManagement from "../components/ProductManagement/ProductManagement";
 
 // Tab Panel Component
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
-
   return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`settings-tabpanel-${index}`}
-      aria-labelledby={`settings-tab-${index}`}
-      {...other}
-    >
+    <div role="tabpanel" hidden={value !== index} id={`settings-tabpanel-${index}`} aria-labelledby={`settings-tab-${index}`} {...other}>
       {value === index && (
         <Box sx={{ p: { xs: 1, sm: 3 } }}>
           {children}
@@ -119,26 +94,21 @@ const Settings = () => {
     const tabParam = params.get('tab');
     if (tabParam === 'export') {
       setActiveTab(1); // Set to the export tab index
+    } else if (tabParam === 'products') {
+      setActiveTab(2); // Set to the products tab index
     }
   }, []);
 
   return (
     <Layout>
       <div className="settings-container">
-        <Typography variant="h4" className="settings-title">
-          Settings
-        </Typography>
+        <Typography variant="h4" className="settings-title">Settings</Typography>
 
         <Box sx={{ width: '100%', mb: 3 }}>
-          <Tabs
-            value={activeTab}
-            onChange={handleTabChange}
-            variant="scrollable"
-            scrollButtons="auto"
-            aria-label="settings tabs"
-          >
+          <Tabs value={activeTab} onChange={handleTabChange} variant="scrollable" scrollButtons="auto" aria-label="settings tabs">
             <Tab icon={<Lock />} label="Password" iconPosition="start" />
             <Tab icon={<CloudDownload />} label="Export Data" iconPosition="start" />
+            <Tab icon={<Inventory />} label="Products" iconPosition="start" />
           </Tabs>
         </Box>
 
@@ -153,48 +123,17 @@ const Settings = () => {
 
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Current Password"
-                  name="currentPassword"
-                  type="password"
-                  value={passwordData.currentPassword}
-                  onChange={handlePasswordChange}
-                  variant="outlined"
-                />
+                <TextField fullWidth label="Current Password" name="currentPassword" type="password" value={passwordData.currentPassword} onChange={handlePasswordChange} variant="outlined" />
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="New Password"
-                  name="newPassword"
-                  type="password"
-                  value={passwordData.newPassword}
-                  onChange={handlePasswordChange}
-                  variant="outlined"
-                />
+                <TextField fullWidth label="New Password" name="newPassword" type="password" value={passwordData.newPassword} onChange={handlePasswordChange} variant="outlined" />
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Confirm New Password"
-                  name="confirmPassword"
-                  type="password"
-                  value={passwordData.confirmPassword}
-                  onChange={handlePasswordChange}
-                  variant="outlined"
-                />
+                <TextField fullWidth label="Confirm New Password" name="confirmPassword" type="password" value={passwordData.confirmPassword} onChange={handlePasswordChange} variant="outlined" />
               </Grid>
             </Grid>
 
-            <Button
-              variant="contained"
-              className="settings-save-button"
-              onClick={handleChangePassword}
-              color="primary"
-            >
-              Change Password
-            </Button>
+            <Button variant="contained" className="settings-save-button" onClick={handleChangePassword} color="primary">Change Password</Button>
           </Paper>
         </TabPanel>
 
@@ -203,19 +142,13 @@ const Settings = () => {
           <ExportCenter />
         </TabPanel>
 
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={6000}
-          onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        >
-          <Alert
-            onClose={handleCloseSnackbar}
-            severity={snackbar.severity}
-            sx={{ width: '100%' }}
-          >
-            {snackbar.message}
-          </Alert>
+        {/* Product Management Tab */}
+        <TabPanel value={activeTab} index={2}>
+          <ProductManagement />
+        </TabPanel>
+
+        <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar} anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
+          <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>{snackbar.message}</Alert>
         </Snackbar>
       </div>
     </Layout>
